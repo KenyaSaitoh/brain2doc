@@ -1,0 +1,49 @@
+// リポジトリ設定
+repositories {
+    mavenCentral()
+}
+
+// プラグイン読み込み
+apply plugin: "java"
+apply plugin: "eclipse"
+
+// 文字コード設定
+def defaultEncoding = "UTF-8"
+tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
+
+// 依存関係設定
+dependencies {
+    implementation "com.lilittlecat:chatgpt:1.0.2"
+}
+
+// ソースフォルダの設定
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+        }
+    }
+    test {
+        java {
+            srcDir "src/test/java"
+        }
+        resources {
+            srcDir "src/test/resources"
+        }
+    }
+}
+
+// Eclipseプラグイン設定
+eclipse {
+    classpath {
+        defaultOutputDir = file("bin")
+    }
+}
+
+// ビルドキャッシュをクリアする
+task cleanBuildCache {
+    cleanBuildCache
+}
