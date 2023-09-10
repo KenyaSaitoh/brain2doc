@@ -1,4 +1,4 @@
-package pro.kensait.gpt_doc_creator;
+package pro.kensait.gpt_doc_creator.old;
 
 import java.io.IOException;
 import java.util.Enumeration;

@@ -1,4 +1,4 @@
-package pro.kensait.gpt_doc_creator;
+package jp.mufg.it.openai.docgen.params;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

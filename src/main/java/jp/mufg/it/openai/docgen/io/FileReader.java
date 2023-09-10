@@ -1,4 +1,4 @@
-package pro.kensait.gpt_doc_creator;
+package jp.mufg.it.openai.docgen.io;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,24 +10,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
-import pro.kensait.gpt_doc_creator.chatgpt.client.BizException;
-import pro.kensait.gpt_doc_creator.chatgpt.client.ChatGPT;
+import jp.mufg.it.openai.docgen.params.Parameter;
 
-public class GptDocCreatorMain {
-
-    private static ChatGPT chatGPT;
-
-    public static void main(String[] args) throws IOException {
-        Parameter params = Parameter.of(args);
-        System.out.println(params);
-        chatGPT = new ChatGPT(params.getKey());
-        //initGPT();
-
-        if (Files.isDirectory(params.getSrcPath())) { 
-            processDirectory(params);
-        }
-    }
-
+public class FileReader {
+    
     private static void processDirectory(Parameter params) throws IOException {
         Files.walkFileTree(params.getSrcPath(), new SimpleFileVisitor<Path>() { 
             @Override
@@ -37,41 +23,11 @@ public class GptDocCreatorMain {
                 if (Files.isDirectory(inputFile)) return FileVisitResult.CONTINUE;
                 if (inputFile.toString().endsWith(".java")) {
                     List<String> content = Files.readAllLines(inputFile);
-                    askToChatGPT(content, params);
+                    //askToChatGPT(content, params);
                 }
                 return FileVisitResult.CONTINUE;
             };
         });
-    }
-
-    private static void sleepAWhile(long timer) {
-        try {
-            Thread.sleep(timer);
-        } catch(InterruptedException ie) {
-        }
-    }
-    
-    private static void initGPT() {
-        chatGPT.ask("日本語でお願いします Javaのソースコードです");
-    }
-
-    private static void askToChatGPT(List<String> content, Parameter params) {
-        String lines = getLinesAsString(content);
-        int count = 0;
-        while (true) {
-            try {
-                String answer = chatGPT.ask("gpt-3.5-turbo", "user", lines);
-                System.out.println(answer);
-                break;
-            } catch(BizException biz) {
-                System.out.println(biz.getCode());
-                if (biz.getCode() != 500) throw new RuntimeException(biz);
-                count++;
-                if (5 < count) throw new RuntimeException("Retry timeout");
-                sleepAWhile(30000);
-                continue;
-            }
-        } 
     }
 
     private static String getLinesAsString(List<String> content) {

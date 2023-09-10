@@ -18,10 +18,10 @@ tasks.withType(AbstractCompile).each { it.options.encoding = defaultEncoding }
 
 // 依存関係設定
 dependencies {
+    // implementation "com.lilittlecat:chatgpt:1.0.2"
     implementation "com.fasterxml.jackson.core:jackson-core:2.15.2"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
-    implementation "org.yaml:snakeyaml:2.2"
 }
 
 // ソースフォルダの設定
@@ -51,13 +51,21 @@ processResources {
 
 jar {
     manifest {
-        attributes "Main-Class": "jp.mufg.it.openai.docgen.main.Main"
+        attributes "Main-Class": "pro.kensait.gpt_doc_creator.Main"
     }
+}
+
+graalvmNative {
+    toolchainDetection = true
 }
 
 graalvmNative {
     binaries {
         main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+                // vendor = JvmVendorSpec.matching("Oracle Corporation")
+            }
             useFatJar = true
         }
     }
