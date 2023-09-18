@@ -1,7 +1,6 @@
 java: 
-  ext: java
-  types:
-    explanation: |
+  processes:
+    spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
@@ -10,9 +9,8 @@ java:
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
 sql:
-  ext: sql
-  types:
-    explanation: |
+  processes:
+    spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
@@ -21,9 +19,8 @@ sql:
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
 page:
-  ext: html,xhtml
-  types:
-    explanation: |
+  processes:
+    spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
@@ -32,9 +29,8 @@ page:
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
 javascript:
-  ext: html,js
-  types:
-    explanation: |
+  processes:
+    spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
@@ -43,9 +39,8 @@ javascript:
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。
 shellscript:
-  ext: sh,bash,ksh,csh
-  types:
-    explanation: |
+  processes:
+    spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
       Markdownの見出しは、レベル4からにしてください。
       日本語で作成をお願いします。

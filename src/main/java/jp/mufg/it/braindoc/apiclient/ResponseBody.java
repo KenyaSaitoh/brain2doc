@@ -1,4 +1,4 @@
-package jp.mufg.it.openai.docgen.apiclient;
+package jp.mufg.it.braindoc.apiclient;
 
 import java.util.List;
 
