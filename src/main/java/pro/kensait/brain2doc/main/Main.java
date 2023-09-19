@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.main;
+package pro.kensait.brain2doc.main;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,9 +20,9 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.mufg.it.braindoc.apiclient.Message;
-import jp.mufg.it.braindoc.apiclient.RequestBody;
-import jp.mufg.it.braindoc.apiclient.ResponseBody;
+import pro.kensait.brain2doc.apiclient.Message;
+import pro.kensait.brain2doc.apiclient.RequestBody;
+import pro.kensait.brain2doc.apiclient.ResponseBody;
 
 public class Main {
     private static final String PACKAGE_REGEX = "package (.*);";

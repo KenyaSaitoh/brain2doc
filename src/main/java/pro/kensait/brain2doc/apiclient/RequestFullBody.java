@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.apiclient;
+package pro.kensait.brain2doc.apiclient;
 
 import java.util.List;
 import java.util.Map;

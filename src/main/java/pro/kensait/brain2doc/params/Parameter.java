@@ -1,11 +1,11 @@
-package jp.mufg.it.braindoc.params;
+package pro.kensait.brain2doc.params;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jp.mufg.it.braindoc.common.Const;
-import jp.mufg.it.braindoc.config.DefaultPropsHolder;
+import pro.kensait.brain2doc.common.Const;
+import pro.kensait.brain2doc.config.DefaultPropsHolder;
 
 public class Parameter {
     /*

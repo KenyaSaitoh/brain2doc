@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.params;
+package pro.kensait.brain2doc.params;
 
 public enum ResourceType {
     JAVA(new String[] {".java"}),

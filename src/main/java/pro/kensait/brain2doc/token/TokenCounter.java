@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.token;
+package pro.kensait.brain2doc.token;
 
 import java.io.BufferedReader;
 import java.io.IOException;

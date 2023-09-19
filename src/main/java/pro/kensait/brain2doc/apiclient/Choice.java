@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.apiclient;
+package pro.kensait.brain2doc.apiclient;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

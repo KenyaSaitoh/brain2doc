@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.params;
+package pro.kensait.brain2doc.params;
 
 public class ParamMain {
     public static void main(String[] args) {

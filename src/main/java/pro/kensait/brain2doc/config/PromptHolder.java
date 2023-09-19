@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.config;
+package pro.kensait.brain2doc.config;
 
 import java.util.Map;
 

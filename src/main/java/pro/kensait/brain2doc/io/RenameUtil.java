@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.io;
+package pro.kensait.brain2doc.io;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import jp.mufg.it.braindoc.common.Const;
+import pro.kensait.brain2doc.common.Const;
 
 public class RenameUtil {
 

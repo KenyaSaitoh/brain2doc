@@ -1,4 +1,4 @@
-package jp.mufg.it.braindoc.apiclient;
+package pro.kensait.brain2doc.apiclient;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jp.mufg.it.braindoc.params.Parameter;
+import pro.kensait.brain2doc.params.Parameter;
 
 public class ApiClient {
     public static List<String> askToOpenAI(Parameter param,
