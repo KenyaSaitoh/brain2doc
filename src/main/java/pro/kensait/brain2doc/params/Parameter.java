@@ -3,11 +3,18 @@ package pro.kensait.brain2doc.params;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import pro.kensait.brain2doc.common.Constants;
 import pro.kensait.brain2doc.config.DefaultValueHolder;
 
 public class Parameter {
+
+    private static Parameter parameter;
+    public static Parameter getParameter() {
+        return parameter;
+    }
+
     /*
     private static final String DEFAULT_OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     private static final String DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
@@ -20,18 +27,20 @@ public class Parameter {
 
     private String openaiURL; // デフォルト値はプロパティファイルから
     private String openaiModel; // デフォルト値はプロパティファイルから
-    private String openaiApikey; // 指定必須
+    private String openaiApikey; // デフォルト値は環境変数から
     private ResourceType resourceType; // デフォルト値はプロパティファイルから
     private ProcessType processType; // デフォルト値はプロパティファイルから
     private ScaleType scaleType; // デフォルト値はプロパティファイルから
     private Path srcPath; // 指定必須
     private Path destFilePath; // デフォルト値はソースパスと同じディレクトリの固定ファイル名
+    private Locale locale; // デフォルト値はプロパティファイルから
     private int connectTimeout; // デフォルト値はプロパティファイルから
     private int requestTimeout; // デフォルト値はプロパティファイルから
     private int retryCount; // デフォルト値はプロパティファイルから
+    private int retryInterval; // デフォルト値はプロパティファイルから
     private boolean stopOnFailure; // デフォルト値はfalse
 
-    public static Parameter of(String[] args) {
+    synchronized public static void setUp(String[] args) {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
         String openaiModel = DefaultValueHolder.getProperty("openai_model");
         String openaiApiKey = System.getenv("OPENAI_APY_KEY");
@@ -43,12 +52,15 @@ public class Parameter {
                 DefaultValueHolder.getProperty("scale"));
         String srcParam = null;
         String destParam = null;
+        String langParam = DefaultValueHolder.getProperty("lang");
         int connectTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("connect_timeout"));
         int requestTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("request_timeout"));
         int retryCount = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_count"));
+        int retryInterval = Integer.parseInt(
+                DefaultValueHolder.getProperty("retry_interval"));
 
         boolean stopOnFailure = false;
         try {
@@ -85,6 +97,10 @@ public class Parameter {
                     if (args[i + 1].startsWith("-"))
                         continue;
                     destParam = args[++i];
+                } else if (args[i].equalsIgnoreCase("--lang")) {
+                    if (args[i + 1].startsWith("-"))
+                        continue;
+                    langParam = args[++i];
                 } else if (args[i].equalsIgnoreCase("--connectTimeout")) {
                     if (args[i + 1].startsWith("-"))
                         continue;
@@ -97,6 +113,10 @@ public class Parameter {
                     if (args[i + 1].startsWith("-"))
                         continue;
                     retryCount = Integer.parseInt(args[++i]);
+                } else if (args[i].equalsIgnoreCase("--retryInterval")) {
+                    if (args[i + 1].startsWith("-"))
+                        continue;
+                    retryInterval = Integer.parseInt(args[++i]);
                 } else if (args[i].equalsIgnoreCase("--stopOnFailure")) {
                     stopOnFailure = true;
                 } else {
@@ -107,11 +127,11 @@ public class Parameter {
         } catch (ArrayIndexOutOfBoundsException ex) {
         }
 
-        // APIKeyを決める
+        // APIKeyのチェック
         if (openaiApiKey == null || openaiApiKey.equals(""))
             throw new IllegalArgumentException("APIキーが指定されていません");
 
-        // 入力元パスと入力元ディレクトリを決める
+        // 入力元パスをチェックし、パラメータから入力元パスと入力元ディレクトリを決める
         if (srcParam == null || srcParam.equals(""))
             throw new IllegalArgumentException("ソースが指定されていません");
         Path srcPath = Paths.get(srcParam);
@@ -141,16 +161,18 @@ public class Parameter {
             }
         }
 
-        return new Parameter(openaiUrl, openaiModel, openaiApiKey, resourceType,
-                processType, scaleType, srcPath, destPath, connectTimeout, requestTimeout,
-                retryCount, stopOnFailure);
+        // ロケールを決める
+        Locale locale = new Locale(langParam);
 
+        parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey, resourceType,
+                processType, scaleType, srcPath, destPath, locale, connectTimeout,
+                requestTimeout, retryCount, retryInterval, stopOnFailure);
     }
 
-    public Parameter(String openaiURL, String openaiModel, String openaiApikey,
+    private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, ProcessType processType, ScaleType scaleType,
-            Path srcPath, Path destFilePath, int connectTimeout, int requestTimeout,
-            int retryCount, boolean stopOnFailure) {
+            Path srcPath, Path destFilePath, Locale locale, int connectTimeout,
+            int requestTimeout, int retryCount, int retryInterval, boolean stopOnFailure) {
         super();
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
@@ -160,9 +182,11 @@ public class Parameter {
         this.scaleType = scaleType;
         this.srcPath = srcPath;
         this.destFilePath = destFilePath;
+        this.locale = locale;
         this.connectTimeout = connectTimeout;
         this.requestTimeout = requestTimeout;
         this.retryCount = retryCount;
+        this.retryInterval = retryInterval;
         this.stopOnFailure = stopOnFailure;
     }
 
@@ -170,96 +194,56 @@ public class Parameter {
         return openaiURL;
     }
 
-    public void setOpenaiURL(String openaiURL) {
-        this.openaiURL = openaiURL;
-    }
-
     public String getOpenaiModel() {
         return openaiModel;
-    }
-
-    public void setOpenaiModel(String openaiModel) {
-        this.openaiModel = openaiModel;
     }
 
     public String getOpenaiApikey() {
         return openaiApikey;
     }
 
-    public void setOpenaiApikey(String openaiApikey) {
-        this.openaiApikey = openaiApikey;
-    }
-
     public ResourceType getResourceType() {
         return resourceType;
-    }
-
-    public void setResourceType(ResourceType resourceType) {
-        this.resourceType = resourceType;
     }
 
     public ProcessType getProcessType() {
         return processType;
     }
 
-    public void setProcessType(ProcessType processType) {
-        this.processType = processType;
-    }
-
     public ScaleType getScaleType() {
         return scaleType;
-    }
-
-    public void setScaleType(ScaleType scaleType) {
-        this.scaleType = scaleType;
     }
 
     public Path getSrcPath() {
         return srcPath;
     }
 
-    public void setSrcPath(Path srcPath) {
-        this.srcPath = srcPath;
-    }
-
     public Path getDestFilePath() {
         return destFilePath;
     }
 
-    public void setDestFilePath(Path destFilePath) {
-        this.destFilePath = destFilePath;
+    public Locale getLocale() {
+        return locale;
     }
 
     public int getConnectTimeout() {
         return connectTimeout;
     }
 
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
     public int getRequestTimeout() {
         return requestTimeout;
-    }
-
-    public void setRequestTimeout(int requestTimeout) {
-        this.requestTimeout = requestTimeout;
     }
 
     public int getRetryCount() {
         return retryCount;
     }
 
-    public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
+    public int getRetryInterval() {
+        return retryInterval;
     }
 
     public boolean isStopOnFailure() {
         return stopOnFailure;
-    }
-
-    public void setStopOnFailure(boolean stopOnFailure) {
-        this.stopOnFailure = stopOnFailure;
     }
 
     @Override
@@ -267,9 +251,9 @@ public class Parameter {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
                 + ", processType=" + processType + ", scaleType=" + scaleType
-                + ", srcPath=" + srcPath + ", destFilePath=" + destFilePath
-                + ", connectTimeout=" + connectTimeout + ", requestTimeout="
-                + requestTimeout + ", retryCount=" + retryCount + ", stopOnFailure="
-                + stopOnFailure + "]";
+                + ", srcPath=" + srcPath + ", destFilePath=" + destFilePath + ", locale="
+                + locale + ", connectTimeout=" + connectTimeout + ", requestTimeout="
+                + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
+                + retryInterval + ", stopOnFailure=" + stopOnFailure + "]";
     }
 }

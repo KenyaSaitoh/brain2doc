@@ -15,7 +15,8 @@ public class ParamMain {
         for (String s : params) {
             System.out.println(s);
         }
-        Parameter param = Parameter.of(params);
+        Parameter.setUp(params);
+        Parameter param = Parameter.getParameter();
         System.out.println(param);
     }
 }
