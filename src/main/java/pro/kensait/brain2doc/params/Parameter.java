@@ -43,7 +43,8 @@ public class Parameter {
     synchronized public static void setUp(String[] args) {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
         String openaiModel = DefaultValueHolder.getProperty("openai_model");
-        String openaiApiKey = System.getenv("OPENAI_APY_KEY");
+        String openaiApiKey = System.getenv("OPENAI_API_KEY");
+        System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource"));
         ProcessType processType = ProcessType.valueOf(

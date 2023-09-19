@@ -4,7 +4,7 @@ public class ParamMain {
     public static void main(String[] args) {
         String parameter = "" +
                 "--apikey " +
-                "aaaaaaaa " +
+                
                 "--stopOnFailure " + 
                 "--src " +
                 "C:\\Users\\kenya\\AppData\\Local\\Programs\\Python\\Python311\\Lib " +

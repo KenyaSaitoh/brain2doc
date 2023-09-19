@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.io;
+package pro.kensait.brain2doc.write;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -20,11 +20,11 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pro.kensait.brain2doc.apiclient.Message;
-import pro.kensait.brain2doc.apiclient.RequestBody;
-import pro.kensait.brain2doc.apiclient.ResponseBody;
+import pro.kensait.brain2doc.openai.Message;
+import pro.kensait.brain2doc.openai.RequestBody;
+import pro.kensait.brain2doc.openai.ResponseBody;
 
-public class Main {
+public class OldMain {
     private static final String PACKAGE_REGEX = "package (.*);";
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
     private static final String OPENAI_API_KEY = "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";

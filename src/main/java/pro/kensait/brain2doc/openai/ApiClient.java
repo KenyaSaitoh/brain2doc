@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.apiclient;
+package pro.kensait.brain2doc.openai;
 
 import java.io.FileWriter;
 import java.io.IOException;

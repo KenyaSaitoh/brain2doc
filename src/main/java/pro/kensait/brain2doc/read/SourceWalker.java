@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.io;
+package pro.kensait.brain2doc.read;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import pro.kensait.brain2doc.apiclient.ApiClient;
+import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.params.Parameter;
 
 public class SourceWalker {

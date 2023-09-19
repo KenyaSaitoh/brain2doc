@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.apiclient;
+package pro.kensait.brain2doc.openai;
 
 import java.util.List;
 import java.util.Map;
