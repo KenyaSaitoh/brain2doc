@@ -5,12 +5,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import pro.kensait.brain2doc.common.Constants;
+import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.DefaultValueHolder;
 
 public class Parameter {
 
     private static Parameter parameter;
+
     public static Parameter getParameter() {
         return parameter;
     }
@@ -46,11 +47,11 @@ public class Parameter {
         String openaiApiKey = System.getenv("OPENAI_API_KEY");
         System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
-                DefaultValueHolder.getProperty("resource"));
+                DefaultValueHolder.getProperty("resource").toUpperCase());
         ProcessType processType = ProcessType.valueOf(
-                DefaultValueHolder.getProperty("process"));
+                DefaultValueHolder.getProperty("process").toUpperCase());
         ScaleType scaleType = ScaleType.valueOf(
-                DefaultValueHolder.getProperty("scale"));
+                DefaultValueHolder.getProperty("scale").toUpperCase());
         String srcParam = null;
         String destParam = null;
         String langParam = DefaultValueHolder.getProperty("lang");
@@ -66,66 +67,74 @@ public class Parameter {
         boolean stopOnFailure = false;
         try {
             for (int i = 0; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("--url")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    openaiUrl = args[++i];
-                } else if (args[i].equalsIgnoreCase("--model")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    openaiModel = args[++i];
-                } else if (args[i].equalsIgnoreCase("--apikey")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    openaiApiKey = args[++i];
-                } else if (args[i].equalsIgnoreCase("--resource")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    resourceType = ResourceType.valueOf(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--process")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    processType = ProcessType.valueOf(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--scale")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    scaleType = ScaleType.valueOf(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--src")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    srcParam = args[++i];
-                } else if (args[i].equalsIgnoreCase("--dest")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    destParam = args[++i];
-                } else if (args[i].equalsIgnoreCase("--lang")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    langParam = args[++i];
-                } else if (args[i].equalsIgnoreCase("--connectTimeout")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    connectTimeout = Integer.parseInt(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--requestTimeout")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    requestTimeout = Integer.parseInt(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--retryCount")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    retryCount = Integer.parseInt(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--retryInterval")) {
-                    if (args[i + 1].startsWith("-"))
-                        continue;
-                    retryInterval = Integer.parseInt(args[++i]);
-                } else if (args[i].equalsIgnoreCase("--stopOnFailure")) {
-                    stopOnFailure = true;
-                } else {
+                try {
+                    if (args[i].equalsIgnoreCase("--url")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        openaiUrl = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--model")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        openaiModel = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--apikey")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        openaiApiKey = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--resource")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        resourceType = ResourceType.valueOf(args[++i].toUpperCase());
+                    } else if (args[i].equalsIgnoreCase("--process")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        processType = ProcessType.valueOf(args[++i].toUpperCase());
+                    } else if (args[i].equalsIgnoreCase("--scale")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        scaleType = ScaleType.valueOf(args[++i].toUpperCase());
+                    } else if (args[i].equalsIgnoreCase("--src")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        srcParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--dest")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        destParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--lang")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        langParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--connectTimeout")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        connectTimeout = Integer.parseInt(args[++i]);
+                    } else if (args[i].equalsIgnoreCase("--requestTimeout")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        requestTimeout = Integer.parseInt(args[++i]);
+                    } else if (args[i].equalsIgnoreCase("--retryCount")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        retryCount = Integer.parseInt(args[++i]);
+                    } else if (args[i].equalsIgnoreCase("--retryInterval")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        retryInterval = Integer.parseInt(args[++i]);
+                    } else if (args[i].equalsIgnoreCase("--stopOnFailure")) {
+                        stopOnFailure = true;
+                    } else {
+                        throw new IllegalArgumentException(
+                                "パラメータが不正です => \"" + args[i] + "\"");
+                    }
+                } catch (IllegalArgumentException ex) {
+                    // Enumの列挙子がないパラメータが指定された場合はここに来る
                     throw new IllegalArgumentException(
-                            "存在しないパラメータが指定されました: \"" + args[i] + "\"");
+                            "パラメータが不正です => \"" + args[i] + "\"");
                 }
             }
         } catch (ArrayIndexOutOfBoundsException ex) {
+            // 最後のオプションにパラメータの指定がなかった場合はここにくる
+            // 無視する
         }
 
         // APIKeyのチェック
@@ -150,7 +159,7 @@ public class Parameter {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
             destPath = Paths.get(srcDirPath.toString(),
                     DefaultValueHolder.getProperty("output_file_name")
-                            + Constants.OUTPUT_FILE_EXT);
+                            + Const.OUTPUT_FILE_EXT);
         } else {
             // destオプションの指定があった場合は、ディレクトリ指定だった場合は
             // デフォルトファイル名を採用し、ファイル指定だった場合はそのまま
@@ -158,7 +167,7 @@ public class Parameter {
             if (Files.isDirectory(destPath)) {
                 destPath = Paths.get(destPath.toString(),
                         DefaultValueHolder.getProperty("output_file_name") +
-                                Constants.OUTPUT_FILE_EXT);
+                                Const.OUTPUT_FILE_EXT);
             }
         }
 
@@ -173,7 +182,8 @@ public class Parameter {
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, ProcessType processType, ScaleType scaleType,
             Path srcPath, Path destFilePath, Locale locale, int connectTimeout,
-            int requestTimeout, int retryCount, int retryInterval, boolean stopOnFailure) {
+            int requestTimeout, int retryCount, int retryInterval,
+            boolean stopOnFailure) {
         super();
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;

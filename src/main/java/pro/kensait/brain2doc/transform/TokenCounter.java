@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.token;
+package pro.kensait.brain2doc.transform;
 
 import java.io.BufferedReader;
 import java.io.IOException;

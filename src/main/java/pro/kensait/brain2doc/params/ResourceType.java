@@ -1,17 +1,32 @@
 package pro.kensait.brain2doc.params;
 
 public enum ResourceType {
-    JAVA(new String[] {".java"}),
-    JAVASCRIPT(new String[] {".js"}),
-    PYTHON(new String[] {".py"}),
-    SQL(new String[] {".sql"}),
-    PAGE(new String[] {".html", ".htm", ".xhtml", ".jsp"}),
-    SHELLSCRIPT(new String[] {".sh", ".bash", ".ksh", ".bash"}),
-    OTHERS(null);
+    JAVA("java", ".java"),
+    JAVASCRIPT("javascript", ".js"),
+    PYTHON("python", ".py"),
+    SQL("sql", ".sql"),
+    PAGE("page", ".html", ".htm", ".xhtml", ".jsp"),
+    SHELLSCRIPT("shellscript", ".sh", ".bash", ".ksh", ".bash"),
+    OTHERS("others", ".*");
 
+    private String name;
     private String[] exts;
-    private ResourceType(String[] exts) {
+    private ResourceType(String name, String... exts) {
+        this.name = name;
         this.exts = exts;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ResourceType getResourceTypeByName(String name) {
+        for (ResourceType type : ResourceType.values()) {
+            if (type.getName().equals(name)) {
+                return type;
+            }
+        }
+        return null;
     }
 
     public String[] getExts() {
@@ -20,6 +35,7 @@ public enum ResourceType {
 
     public boolean matchesExt(String target) {
         for (String ext : exts) {
+            if (ext.equals(".*")) return true;
             if (ext.equals(target)) return true;
         }
         return false;

@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pro.kensait.brain2doc.params.Parameter;
 
 public class ApiClient {
-    public static List<String> askToOpenAI(Parameter param,
-            List<String> requestLines) {
+    public static List<String> askToOpenAI(List<String> requestLines) {
+        Parameter param = Parameter.getParameter();
         String requestContent = convertToReqString(requestLines);
 
         // HttpClientオブジェクトを生成する
