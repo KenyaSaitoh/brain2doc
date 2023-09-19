@@ -4,8 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import pro.kensait.brain2doc.common.Const;
-import pro.kensait.brain2doc.config.DefaultPropsHolder;
+import pro.kensait.brain2doc.common.Constants;
+import pro.kensait.brain2doc.config.DefaultValueHolder;
 
 public class Parameter {
     /*
@@ -32,23 +32,23 @@ public class Parameter {
     private boolean stopOnFailure; // デフォルト値はfalse
 
     public static Parameter of(String[] args) {
-        String openaiUrl = DefaultPropsHolder.getProperty("openai_url");
-        String openaiModel = DefaultPropsHolder.getProperty("openai_model");
+        String openaiUrl = DefaultValueHolder.getProperty("openai_url");
+        String openaiModel = DefaultValueHolder.getProperty("openai_model");
         String openaiApiKey = System.getenv("OPENAI_APY_KEY");
         ResourceType resourceType = ResourceType.valueOf(
-                DefaultPropsHolder.getProperty("resource"));
+                DefaultValueHolder.getProperty("resource"));
         ProcessType processType = ProcessType.valueOf(
-                DefaultPropsHolder.getProperty("process"));
+                DefaultValueHolder.getProperty("process"));
         ScaleType scaleType = ScaleType.valueOf(
-                DefaultPropsHolder.getProperty("scale"));
+                DefaultValueHolder.getProperty("scale"));
         String srcParam = null;
         String destParam = null;
         int connectTimeout = Integer.parseInt(
-                DefaultPropsHolder.getProperty("connect_timeout"));
+                DefaultValueHolder.getProperty("connect_timeout"));
         int requestTimeout = Integer.parseInt(
-                DefaultPropsHolder.getProperty("request_timeout"));
+                DefaultValueHolder.getProperty("request_timeout"));
         int retryCount = Integer.parseInt(
-                DefaultPropsHolder.getProperty("retry_count"));
+                DefaultValueHolder.getProperty("retry_count"));
 
         boolean stopOnFailure = false;
         try {
@@ -128,16 +128,16 @@ public class Parameter {
         if (destParam == null || destParam.equals("")) {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
             destPath = Paths.get(srcDirPath.toString(),
-                    DefaultPropsHolder.getProperty("output_file_name")
-                            + Const.OUTPUT_FILE_EXT);
+                    DefaultValueHolder.getProperty("output_file_name")
+                            + Constants.OUTPUT_FILE_EXT);
         } else {
             // destオプションの指定があった場合は、ディレクトリ指定だった場合は
             // デフォルトファイル名を採用し、ファイル指定だった場合はそのまま
             destPath = Paths.get(destParam);
             if (Files.isDirectory(destPath)) {
                 destPath = Paths.get(destPath.toString(),
-                        DefaultPropsHolder.getProperty("output_file_name") +
-                                Const.OUTPUT_FILE_EXT);
+                        DefaultValueHolder.getProperty("output_file_name") +
+                                Constants.OUTPUT_FILE_EXT);
             }
         }
 

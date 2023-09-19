@@ -6,12 +6,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-public class DefaultPropsHolder {
+public class ConstValueHolder {
     private static Properties props;
     static {
         props = new Properties();
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try (InputStream is = classloader.getResourceAsStream("default.properties")) {
+        try (InputStream is = classloader.getResourceAsStream("const.properties")) {
             props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
