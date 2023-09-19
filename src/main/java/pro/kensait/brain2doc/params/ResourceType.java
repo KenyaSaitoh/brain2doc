@@ -36,7 +36,7 @@ public enum ResourceType {
     public boolean matchesExt(String target) {
         for (String ext : exts) {
             if (ext.equals(".*")) return true;
-            if (ext.equals(target)) return true;
+            if (target.endsWith(ext)) return true;
         }
         return false;
     }

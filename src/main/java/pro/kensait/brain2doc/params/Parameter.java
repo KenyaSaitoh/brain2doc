@@ -3,6 +3,8 @@ package pro.kensait.brain2doc.params;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import pro.kensait.brain2doc.common.Const;
@@ -15,16 +17,6 @@ public class Parameter {
     public static Parameter getParameter() {
         return parameter;
     }
-
-    /*
-    private static final String DEFAULT_OPENAI_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String DEFAULT_OPENAI_MODEL = "gpt-3.5-turbo";
-    private static final int DEFAULT_CONNECT_TIMEOUT = 10;
-    private static final int DEFAULT_REQUEST_TIMEOUT = 300;
-    private static final int DEFAULT_RETRY_COUNT = 5;
-    private static final boolean DEFAULT_STOP_ON_FAILURE = false;
-    private static final String DEFAULT_OUTPUT_FILE_NAME = "brain-doc-output";
-     */
 
     private String openaiURL; // デフォルト値はプロパティファイルから
     private String openaiModel; // デフォルト値はプロパティファイルから
@@ -145,31 +137,33 @@ public class Parameter {
         if (srcParam == null || srcParam.equals(""))
             throw new IllegalArgumentException("ソースが指定されていません");
         Path srcPath = Paths.get(srcParam);
-        Path srcDirPath = null;
+        if (! Files.exists(srcPath)) {
+            throw new IllegalArgumentException("ソースが存在しません");
+        }
+
+        Path srcDirPath = null; // ソースパスがファイルの場合もあるので、ソースのディレクトリパスを用意する
         if (Files.isDirectory(srcPath)) {
             srcDirPath = srcPath;
         } else {
             srcDirPath = srcPath.getParent();
-            throw new IllegalArgumentException("ソースが存在しません");
         }
 
         // 出力先パスを決める
         Path destPath = null;
         if (destParam == null || destParam.equals("")) {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
-            destPath = Paths.get(srcDirPath.toString(),
-                    DefaultValueHolder.getProperty("output_file_name")
-                            + Const.OUTPUT_FILE_EXT);
+            destPath = Paths.get(srcDirPath.toString(), 
+                    getDefaultOutputFileName(resourceType, processType));
         } else {
             // destオプションの指定があった場合は、ディレクトリ指定だった場合は
             // デフォルトファイル名を採用し、ファイル指定だった場合はそのまま
             destPath = Paths.get(destParam);
             if (Files.isDirectory(destPath)) {
-                destPath = Paths.get(destPath.toString(),
-                        DefaultValueHolder.getProperty("output_file_name") +
-                                Const.OUTPUT_FILE_EXT);
+                destPath = Paths.get(destPath.toString(), 
+                        getDefaultOutputFileName(resourceType, processType));
             }
         }
+
 
         // ロケールを決める
         Locale locale = new Locale(langParam);
@@ -178,6 +172,21 @@ public class Parameter {
                 processType, scaleType, srcPath, destPath, locale, connectTimeout,
                 requestTimeout, retryCount, retryInterval, stopOnFailure);
     }
+
+    private static String getDefaultOutputFileName(ResourceType resourceType,
+            ProcessType processType) {
+        return DefaultValueHolder.getProperty("output_file_name") + "-" +
+                resourceType.getName() + "-" +
+                processType.getName() + "-" + 
+                getCurrentDateTimeStr() +
+                Const.OUTPUT_FILE_EXT;
+    }
+
+    private static String getCurrentDateTimeStr() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yMMddHHmmss");
+        return localDateTime.format(dateTimeFormatter);
+    } 
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, ProcessType processType, ScaleType scaleType,

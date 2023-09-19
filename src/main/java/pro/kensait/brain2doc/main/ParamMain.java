@@ -1,25 +1,29 @@
-package pro.kensait.brain2doc.params;
+package pro.kensait.brain2doc.main;
 
-import pro.kensait.brain2doc.walk_read.PromptAttacher;
+import pro.kensait.brain2doc.params.Parameter;
+import pro.kensait.brain2doc.process.ProcessorFlow;
 
 public class ParamMain {
     public static void main(String[] args) {
         String parameter = "" +
                 "--stopOnFailure " + 
                 "--src " +
-                "C:\\Users\\kenya\\AppData\\Local\\Programs\\Python\\Python311\\Lib " +
+                "D:\\GitHubRepos\\learn_java_basic\\15_enum\\src\\pro\\kensait\\java\\basic\\lsn_15_1_3\\Main.java " +
                 "--resource " +
                 "java " +
                 "--process " +
-                "spec " +
+                "refactoring " +
                 "--scale " +
-                "medium" + 
+                "medium " + 
+                "--dest " +
+                "C:/tmp" + 
                 "";
         String[] params = parameter.split(" ");
+        System.out.println(params);
         Parameter.setUp(params);
         Parameter param = Parameter.getParameter();
         System.out.println(param);
 
-        PromptAttacher.attachPrompt(null);
+        ProcessorFlow.inputProcess();
     }
 }

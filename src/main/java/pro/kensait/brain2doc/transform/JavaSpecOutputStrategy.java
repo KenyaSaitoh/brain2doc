@@ -1,6 +1,6 @@
-package pro.kensait.brain2doc.write;
+package pro.kensait.brain2doc.transform;
 
-public class JavaSpecOutputStrategy implements InputStrategy {
+public class JavaSpecOutputStrategy implements OutputStrategy {
     private static final String PACKAGE_REGEX = "package (.*);";
 
     /*

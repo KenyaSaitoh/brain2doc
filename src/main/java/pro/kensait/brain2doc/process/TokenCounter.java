@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.transform;
+package pro.kensait.brain2doc.process;
 
 import java.io.BufferedReader;
 import java.io.IOException;

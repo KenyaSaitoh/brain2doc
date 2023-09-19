@@ -14,9 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pro.kensait.brain2doc.params.Parameter;
 
 public class ApiClient {
-    public static List<String> ask(List<String> requestLines) {
+    public static List<String> ask(String requestContent) {
         Parameter param = Parameter.getParameter();
-        String requestContent = convertToReqString(requestLines);
 
         // HttpClientオブジェクトを生成する
         HttpClient client = HttpClient.newBuilder()
@@ -46,20 +45,12 @@ public class ApiClient {
 
         String responseStr = response.body();
         ResponseBody responseBody = getResponseBody(responseStr);
-        List<String> responseLines = new ArrayList<>();
+        List<String> responseContents = new ArrayList<>();
         responseBody.getChoices().forEach(choice -> {
             String responseContent = choice.getMessage().getContent();
-            responseLines.add(responseContent);
+            responseContents.add(responseContent);
         });
-        return responseLines;
-    }
-
-    private static String convertToReqString(List<String> content) {
-        String reqString = "";
-        for (String line : content) {
-            reqString += line + System.getProperty("line.separator");
-        }
-        return reqString;
+        return responseContents;
     }
 
     private static String getRequestJson(RequestBody requestBody) {

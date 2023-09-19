@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.walk_read;
+package pro.kensait.brain2doc.process;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import pro.kensait.brain2doc.params.ResourceType;
 
 public class PromptAttacher {
     @SuppressWarnings("rawtypes")
-    public static List<String> attachPrompt(List<String> inputFileLines) {
+    public static List<String> attach(List<String> inputFileLines) {
         Parameter param = Parameter.getParameter();
         ResourceType resourceType = param.getResourceType();
         ProcessType processType = param.getProcessType();
