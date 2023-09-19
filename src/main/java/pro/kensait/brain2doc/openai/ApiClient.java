@@ -1,6 +1,5 @@
 package pro.kensait.brain2doc.openai;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pro.kensait.brain2doc.params.Parameter;
 
 public class ApiClient {
-    public static List<String> askToOpenAI(List<String> requestLines) {
+    public static List<String> ask(List<String> requestLines) {
         Parameter param = Parameter.getParameter();
         String requestContent = convertToReqString(requestLines);
 
@@ -61,14 +60,6 @@ public class ApiClient {
             reqString += line + System.getProperty("line.separator");
         }
         return reqString;
-    }
-
-    private static void writeMarkdown(String destPathStr, String content) {
-        try (FileWriter writer = new FileWriter(destPathStr, true)) {
-           writer.append(content);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
     }
 
     private static String getRequestJson(RequestBody requestBody) {

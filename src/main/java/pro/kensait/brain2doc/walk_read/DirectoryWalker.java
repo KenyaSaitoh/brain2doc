@@ -6,25 +6,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 
-import pro.kensait.brain2doc.openai.ApiClient;
+import pro.kensait.brain2doc.params.ResourceType;
 
 public class DirectoryWalker {
     
-    public static void walkDirectory(Path srcPath) throws IOException {
+    public static void walkDirectory(Path srcPath, ResourceType resourceType) {
+        try {
         Files.walkFileTree(srcPath, new SimpleFileVisitor<Path>() { 
             @Override
-            public FileVisitResult visitFile(Path inputFile, BasicFileAttributes attrs)
+            public FileVisitResult visitFile(Path inputFilePath, BasicFileAttributes attrs)
                     throws IOException {
-                System.out.println("#####" + inputFile.getFileName() + "#####");
-                if (Files.isDirectory(inputFile)) return FileVisitResult.CONTINUE;
-                if (inputFile.toString().endsWith(".java")) {
-                    List<String> requestLines = Files.readAllLines(inputFile);
-                    ApiClient.askToOpenAI(requestLines);
-                }
+                System.out.println("#####" + inputFilePath.getFileName() + "#####");
+                if (Files.isDirectory(inputFilePath)) return FileVisitResult.CONTINUE;
+                FileProcessor.processFile(inputFilePath, resourceType);
                 return FileVisitResult.CONTINUE;
             };
         });
+        } catch(IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 }

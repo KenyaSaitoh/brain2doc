@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public class ZipFileWalker {
@@ -25,12 +24,12 @@ public class ZipFileWalker {
                 if (resourceType.matchesExt(entryName)) {
                     try (BufferedReader br =
                             new BufferedReader(new InputStreamReader(zis))) {
-                        List<String> requestLines = new ArrayList<>();
+                        List<String> inputFileLines = new ArrayList<>();
                         String line;
                         while ((line = br.readLine()) != null) {
-                            requestLines.add(line);
+                            inputFileLines.add(line);
                         }
-                        ApiClient.askToOpenAI(requestLines);
+                        FileProcessor.askToOpenAPI(inputFileLines);
                     }
                 }
             }
