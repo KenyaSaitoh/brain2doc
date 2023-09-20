@@ -10,13 +10,20 @@ public class PromptHolder {
     private static final String PROMPT_YAML_FILE_PREFIX = "prompt_";
     private static final String PROMPT_YAML_FILE_EXT = ".yaml";
 
+    private static final PromptHolder promptHolder = new PromptHolder(); 
+
+    public static PromptHolder getInstance() {
+        return promptHolder;
+    }
+    
     @SuppressWarnings("rawtypes")
-    private static Map promptMap; 
+    private Map promptMap; 
+
+    private PromptHolder() {}
 
     @SuppressWarnings("rawtypes")
-    synchronized public static Map getMap() {
+    synchronized public Map getMap(Parameter param) {
         if (promptMap == null) {
-            Parameter param = Parameter.getParameter();
             String yamlFileName = PROMPT_YAML_FILE_PREFIX +
                     param.getLocale().getLanguage() + PROMPT_YAML_FILE_EXT;
             System.out.println("####" + yamlFileName);

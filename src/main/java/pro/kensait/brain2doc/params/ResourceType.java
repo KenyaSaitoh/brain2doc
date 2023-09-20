@@ -40,4 +40,11 @@ public enum ResourceType {
         }
         return false;
     }
+
+    public String getMatchExt(String target) {
+        for (String ext : exts) {
+            if (target.endsWith(ext)) return ext;
+        }
+        return null;
+    }
 }

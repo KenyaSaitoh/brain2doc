@@ -14,8 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pro.kensait.brain2doc.params.Parameter;
 
 public class ApiClient {
-    public static List<String> ask(String requestContent) {
-        Parameter param = Parameter.getParameter();
+    public static List<String> ask(String requestContent, Parameter param) {
 
         // HttpClientオブジェクトを生成する
         HttpClient client = HttpClient.newBuilder()

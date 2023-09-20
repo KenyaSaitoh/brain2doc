@@ -23,8 +23,8 @@ public class RenameUtil {
             throw new RuntimeException(ioe);
         }
     }
-    
-    private static String extractNameWithoutExt(String fileName) {
+
+    public static String extractNameWithoutExt(String fileName) {
         int lastExtIndex = fileName.lastIndexOf(Const.OUTPUT_FILE_EXT);
         return fileName.substring(0, lastExtIndex);
     }

@@ -1,14 +1,14 @@
 package pro.kensait.brain2doc.main;
 
 import pro.kensait.brain2doc.params.Parameter;
-import pro.kensait.brain2doc.process.ProcessorFlow;
+import pro.kensait.brain2doc.process.ProcessFlow;
 
-public class ParamMain {
+public class Main1 {
     public static void main(String[] args) {
         String parameter = "" +
                 "--stopOnFailure " + 
                 "--src " +
-                "D:\\GitHubRepos\\learn_java_basic\\15_enum\\src\\pro\\kensait\\java\\basic\\lsn_15_1_3\\Main.java " +
+                "D:\\GitHubRepos\\learn_java_basic\\15_enum\\src\\pro\\kensait\\java\\basic\\lsn_15_1_3 " +
                 "--resource " +
                 "java " +
                 "--process " +
@@ -16,7 +16,9 @@ public class ParamMain {
                 "--scale " +
                 "medium " + 
                 "--dest " +
-                "C:/tmp" + 
+                "C:/tmp " + 
+                "--regex " +
+                "Cust.*" + 
                 "";
         String[] params = parameter.split(" ");
         System.out.println(params);
@@ -24,6 +26,6 @@ public class ParamMain {
         Parameter param = Parameter.getParameter();
         System.out.println(param);
 
-        ProcessorFlow.inputProcess();
+        ProcessFlow.inputProcess(param);
     }
 }

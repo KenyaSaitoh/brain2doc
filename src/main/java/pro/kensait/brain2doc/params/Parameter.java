@@ -25,6 +25,7 @@ public class Parameter {
     private ProcessType processType; // デフォルト値はプロパティファイルから
     private ScaleType scaleType; // デフォルト値はプロパティファイルから
     private Path srcPath; // 指定必須
+    private String srcRegex; // 任意指定
     private Path destFilePath; // デフォルト値はソースパスと同じディレクトリの固定ファイル名
     private Locale locale; // デフォルト値はプロパティファイルから
     private int connectTimeout; // デフォルト値はプロパティファイルから
@@ -45,6 +46,7 @@ public class Parameter {
         ScaleType scaleType = ScaleType.valueOf(
                 DefaultValueHolder.getProperty("scale").toUpperCase());
         String srcParam = null;
+        String srcRegex = null;
         String destParam = null;
         String langParam = DefaultValueHolder.getProperty("lang");
         int connectTimeout = Integer.parseInt(
@@ -88,6 +90,10 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         srcParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--regex")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        srcRegex = args[++i];
                     } else if (args[i].equalsIgnoreCase("--dest")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -164,13 +170,12 @@ public class Parameter {
             }
         }
 
-
         // ロケールを決める
         Locale locale = new Locale(langParam);
 
         parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey, resourceType,
-                processType, scaleType, srcPath, destPath, locale, connectTimeout,
-                requestTimeout, retryCount, retryInterval, stopOnFailure);
+                processType, scaleType, srcPath, srcRegex, destPath, locale,
+                connectTimeout, requestTimeout, retryCount, retryInterval, stopOnFailure);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
@@ -190,8 +195,8 @@ public class Parameter {
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, ProcessType processType, ScaleType scaleType,
-            Path srcPath, Path destFilePath, Locale locale, int connectTimeout,
-            int requestTimeout, int retryCount, int retryInterval,
+            Path srcPath, String srcRegex, Path destFilePath, Locale locale,
+            int connectTimeout, int requestTimeout, int retryCount, int retryInterval,
             boolean stopOnFailure) {
         super();
         this.openaiURL = openaiURL;
@@ -201,6 +206,7 @@ public class Parameter {
         this.processType = processType;
         this.scaleType = scaleType;
         this.srcPath = srcPath;
+        this.srcRegex = srcRegex;
         this.destFilePath = destFilePath;
         this.locale = locale;
         this.connectTimeout = connectTimeout;
@@ -238,6 +244,10 @@ public class Parameter {
         return srcPath;
     }
 
+    public String getSrcRegex() {
+        return srcRegex;
+    }
+
     public Path getDestFilePath() {
         return destFilePath;
     }
@@ -271,9 +281,10 @@ public class Parameter {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
                 + ", processType=" + processType + ", scaleType=" + scaleType
-                + ", srcPath=" + srcPath + ", destFilePath=" + destFilePath + ", locale="
-                + locale + ", connectTimeout=" + connectTimeout + ", requestTimeout="
-                + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
-                + retryInterval + ", stopOnFailure=" + stopOnFailure + "]";
+                + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
+                + destFilePath + ", locale=" + locale + ", connectTimeout="
+                + connectTimeout + ", requestTimeout=" + requestTimeout + ", retryCount="
+                + retryCount + ", retryInterval=" + retryInterval + ", stopOnFailure="
+                + stopOnFailure + "]";
     }
 }
