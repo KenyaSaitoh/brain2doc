@@ -17,29 +17,34 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import pro.kensait.brain2doc.config.PromptHolder;
+import pro.kensait.brain2doc.config.TemplateHolder;
 import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.params.ProcessType;
 import pro.kensait.brain2doc.params.ResourceType;
 import pro.kensait.brain2doc.transform.OutputTransformer;
 
-public class ProcessFlow {
+public class Flow {
+    private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static final String ZIP_FILE_EXT = ".zip";
 
-    public static void inputProcess(Parameter param) {
+    synchronized public static void init(Parameter paramValues) {
+        param = paramValues;
+    }
+
+    public static void inputProcess() {
         if (Files.isDirectory(param.getSrcPath())) {
-            walkDirectory(param.getSrcPath(), param);
+            walkDirectory(param.getSrcPath());
         } else {
             if (param.getSrcPath().getFileName().endsWith(ZIP_FILE_EXT)) {
-                readZipFile(param.getSrcPath(), param);
+                readZipFile(param.getSrcPath());
             } else {
-                readNormalFile(param.getSrcPath(), param);
+                readNormalFile(param.getSrcPath());
             }
         }
     }
 
-    private static void walkDirectory(Path srcPath, Parameter param) {
+    private static void walkDirectory(Path srcPath) {
         try {
         Files.walkFileTree(srcPath, new SimpleFileVisitor<Path>() { 
             @Override
@@ -47,7 +52,7 @@ public class ProcessFlow {
                     throws IOException {
                 System.out.println("#####" + inputFilePath.getFileName() + "#####");
                 if (Files.isDirectory(inputFilePath)) return FileVisitResult.CONTINUE;
-                readNormalFile(inputFilePath, param);
+                readNormalFile(inputFilePath);
                 return FileVisitResult.CONTINUE;
             };
         });
@@ -56,7 +61,7 @@ public class ProcessFlow {
         }
     }
 
-    private static void readNormalFile(Path inputFilePath, Parameter param) {
+    private static void readNormalFile(Path inputFilePath) {
         ResourceType resourceType = param.getResourceType();
         try {
             if (resourceType.matchesExt(inputFilePath.toString())) {
@@ -72,14 +77,14 @@ public class ProcessFlow {
                     return;
                 }
                 List<String> inputFileLines = Files.readAllLines(inputFilePath);
-                mainProcess(inputFilePath, param, inputFileLines);
+                mainProcess(inputFilePath, inputFileLines);
             }
         } catch(IOException ioe) {
             throw new RuntimeException(ioe);
         }
     }
 
-    private static void readZipFile(Path srcPath, Parameter param) {
+    private static void readZipFile(Path srcPath) {
         ResourceType resourceType = param.getResourceType();
         ZipInputStream zis = null;
         try {
@@ -106,7 +111,7 @@ public class ProcessFlow {
                         while ((line = br.readLine()) != null) {
                             inputFileLines.add(line);
                         }
-                        mainProcess(inputFilePath, param, inputFileLines);
+                        mainProcess(inputFilePath, inputFileLines);
                     }
                 }
             }
@@ -121,17 +126,20 @@ public class ProcessFlow {
         }
     }
 
-    private static void mainProcess(Path inputFilePath, Parameter param,
-            List<String> inputFileLines) {
-        List<String> requestLines = attachTemplate(inputFileLines, param);
+    private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
+        List<String> requestLines = attachTemplate(inputFileLines);
         String requestContent = toReqString(requestLines);
-        List<String> responseContents = ApiClient.ask(requestContent, param);
+        List<String> responseContents = ApiClient.ask(requestContent,
+                param.getOpenaiURL(),
+                param.getOpenaiModel(),
+                param.getOpenaiApikey(),
+                param.getProxyURL());
         String outputFileContent = OutputTransformer.transform(inputFilePath,
                 requestContent, responseContents);
-        write(outputFileContent, param);
+        write(outputFileContent);
     }
 
-    private static void write(String responseContent, Parameter param) {
+    private static void write(String responseContent) {
         try (FileWriter writer = new FileWriter(param.getDestFilePath().toString(),
                 true)) {
            writer.append(responseContent);
@@ -142,20 +150,29 @@ public class ProcessFlow {
     }
 
     @SuppressWarnings("rawtypes")
-    private static List<String> attachTemplate(List<String> inputFileLines,
-            Parameter param) {
+    private static List<String> attachTemplate(List<String> inputFileLines) {
         ResourceType resourceType = param.getResourceType();
         ProcessType processType = param.getProcessType();
-        PromptHolder ph = PromptHolder.getInstance();
-        Map resourceMap = (Map) (ph.getMap(param).get(resourceType.getName()));
-        Map messageMap = (Map) resourceMap.get("processes");
-        String headerMessages = (String) messageMap.get(processType.getName());
+        TemplateHolder th = TemplateHolder.getInstance();
+        Map templateMap = th.getTemplateMap(param.getLocale(), param.getTemplateFile());
+
+        Map resourceMap = (Map) templateMap.get(resourceType.getName());
+        if (resourceMap == null || resourceMap.isEmpty())
+            throw new IllegalArgumentException("テンプレートの誤り => リソース名の指定");
         
+        Map processMap = (Map) resourceMap.get("processes");
+        if (processMap == null || processMap.isEmpty())
+            throw new IllegalArgumentException("テンプレートの誤り => プロセスの指定");
+        
+        String phrases = (String) processMap.get(processType.getName());
+        if (processMap == null || processMap.isEmpty())
+            throw new IllegalArgumentException("テンプレートの誤り => フレーズの指定");
+
         // TODO
-        System.out.println(headerMessages);
+        System.out.println(phrases);
 
         List<String> requestLines = new ArrayList<>();
-        requestLines.add(headerMessages);
+        requestLines.add(phrases);
         requestLines.addAll(inputFileLines);
         return requestLines;
     }

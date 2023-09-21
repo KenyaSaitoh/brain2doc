@@ -28,6 +28,8 @@ public class Parameter {
     private String srcRegex; // 任意指定
     private Path destFilePath; // デフォルト値はソースパスと同じディレクトリの固定ファイル名
     private Locale locale; // デフォルト値はプロパティファイルから
+    private Path templateFile; // 任意指定
+    private String proxyURL; // 任意指定
     private int connectTimeout; // デフォルト値はプロパティファイルから
     private int requestTimeout; // デフォルト値はプロパティファイルから
     private int retryCount; // デフォルト値はプロパティファイルから
@@ -49,6 +51,8 @@ public class Parameter {
         String srcRegex = null;
         String destParam = null;
         String langParam = DefaultValueHolder.getProperty("lang");
+        String templateFileParam = null;
+        String proxyURL = null;
         int connectTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("connect_timeout"));
         int requestTimeout = Integer.parseInt(
@@ -102,6 +106,14 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         langParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--template")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        templateFileParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--proxyURL")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        proxyURL = args[++i];
                     } else if (args[i].equalsIgnoreCase("--connectTimeout")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -173,9 +185,17 @@ public class Parameter {
         // ロケールを決める
         Locale locale = new Locale(langParam);
 
-        parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey, resourceType,
-                processType, scaleType, srcPath, srcRegex, destPath, locale,
-                connectTimeout, requestTimeout, retryCount, retryInterval, stopOnFailure);
+        // 外部指定されたテンプレートファイルを決める
+        Path templateFile = templateFileParam != null ?
+                Paths.get(templateFileParam) :
+                    null;
+
+        parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey,
+                resourceType, processType, scaleType,
+                srcPath, srcRegex, destPath,
+                locale, templateFile,
+                proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
+                stopOnFailure);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
@@ -195,8 +215,10 @@ public class Parameter {
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, ProcessType processType, ScaleType scaleType,
-            Path srcPath, String srcRegex, Path destFilePath, Locale locale,
-            int connectTimeout, int requestTimeout, int retryCount, int retryInterval,
+            Path srcPath, String srcRegex, Path destFilePath,
+            Locale locale, Path templateFile,
+            String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
+            int retryInterval,
             boolean stopOnFailure) {
         super();
         this.openaiURL = openaiURL;
@@ -209,6 +231,8 @@ public class Parameter {
         this.srcRegex = srcRegex;
         this.destFilePath = destFilePath;
         this.locale = locale;
+        this.templateFile = templateFile;
+        this.proxyURL = proxyURL;
         this.connectTimeout = connectTimeout;
         this.requestTimeout = requestTimeout;
         this.retryCount = retryCount;
@@ -256,6 +280,14 @@ public class Parameter {
         return locale;
     }
 
+    public Path getTemplateFile() {
+        return templateFile;
+    }
+
+    public String getProxyURL() {
+        return proxyURL;
+    }
+
     public int getConnectTimeout() {
         return connectTimeout;
     }
@@ -282,9 +314,10 @@ public class Parameter {
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
                 + ", processType=" + processType + ", scaleType=" + scaleType
                 + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
-                + destFilePath + ", locale=" + locale + ", connectTimeout="
-                + connectTimeout + ", requestTimeout=" + requestTimeout + ", retryCount="
-                + retryCount + ", retryInterval=" + retryInterval + ", stopOnFailure="
-                + stopOnFailure + "]";
+                + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
+                + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
+                + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
+                + ", retryInterval=" + retryInterval + ", stopOnFailure=" + stopOnFailure
+                + "]";
     }
 }

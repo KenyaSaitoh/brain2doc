@@ -11,10 +11,9 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pro.kensait.brain2doc.params.Parameter;
-
 public class ApiClient {
-    public static List<String> ask(String requestContent, Parameter param) {
+    public static List<String> ask(String requestContent, String openaiURL,
+            String openAiModel, String openAiApiKey, String proxyURL) {
 
         // HttpClientオブジェクトを生成する
         HttpClient client = HttpClient.newBuilder()
@@ -22,15 +21,15 @@ public class ApiClient {
                 .build();
 
         Message message = new Message("user", requestContent);
-        RequestBody requestBody = new RequestBody(param.getOpenaiModel(), List.of(message), 0.7F);
+        RequestBody requestBody = new RequestBody(openAiModel, List.of(message), 0.7F);
         String requestStr = getRequestJson(requestBody);
         // System.out.println(requestStr);
 
         // HttpRequestオブジェクトを生成する
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(param.getOpenaiURL()))
+                .uri(URI.create(openaiURL))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + param.getOpenaiApikey())
+                .header("Authorization", "Bearer " + openAiApiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(requestStr))
                 .build();
 

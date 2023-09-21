@@ -1,7 +1,7 @@
 package pro.kensait.brain2doc.main;
 
 import pro.kensait.brain2doc.params.Parameter;
-import pro.kensait.brain2doc.process.ProcessFlow;
+import pro.kensait.brain2doc.process.Flow;
 
 public class Main1 {
     public static void main(String[] args) {
@@ -26,6 +26,7 @@ public class Main1 {
         Parameter param = Parameter.getParameter();
         System.out.println(param);
 
-        ProcessFlow.inputProcess(param);
+        Flow.init(param);
+        Flow.inputProcess();
     }
 }
