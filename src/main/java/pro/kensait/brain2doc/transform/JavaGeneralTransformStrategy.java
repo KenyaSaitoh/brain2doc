@@ -12,18 +12,19 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
 
     @Override
     public String transform(Path inputFilePath, String requestContent,
-            List<String> responseLines) {
-        String outputContent = "";
+            List<String> responseLines, int seqNum) {
+        String responseContent = "";
         for (String line : responseLines) {
-            outputContent += line;
+            responseContent += line;
         }
         String packageName = getPackageName(requestContent);
         String className = inputFilePath.getFileName().toString()
                 .replaceAll("(.*)\\.java", "$1");
-        outputContent = Const.MARKDOWN_HEADING + 
-                packageName + "." + className +
+        String outputContent = Const.MARKDOWN_HEADING + 
+                packageName + "." + "**" + className + "**" +
+                (seqNum != 1 ? " [" + seqNum + "]" : "") +
                 Const.SEPARATOR +
-                outputContent +
+                responseContent +
                 Const.SEPARATOR +
                 Const.SEPARATOR;
         return outputContent;

@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface TransformStrategy {
     String transform(Path inputFilePath, String requestContent,
-            List<String> responseContents);
+            List<String> responseContents, int seqNum);
 }

@@ -12,14 +12,16 @@ import pro.kensait.brain2doc.params.OutputType;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public class TemplateAttacher {
-    private static final String OUTPUT_SCALE_PREFIX = "回答は";
-    private static final String OUTPUT_SCALE_SUFFIX = "文字以内でお願いします。";
-    private static final String MARKDOWN_LEVEL_MESSAGE = "Markdownの見出しは、レベル4以上にしてください。";
+    private static final String SUMMARY_MESSAGE = "簡潔に要約をお願いします。";
+    private static final String CHAR_LIMIT_PREFIX = "回答は";
+    private static final String CHAR_LIMIT_SUFFIX = "文字以内でお願いします。";
+    private static final String MARKDOWN_LEVEL_MESSAGE = "Markdownの見出しは、レベル3以上にしてください。";
     private static final String LANG_MESSAGE = "回答は日本語でお願いします。";
 
-    private static final String OUTPUT_SCALE_PREFIX_EN = "Please keep the answer within ";
-    private static final String OUTPUT_SCALE_SUFFIX_EN = " words.";
-    private static final String MARKDOWN_LEVEL_MESSAGE_EN = "Please set the headings in Markdown to level 4 or higher.";
+    private static final String SUMMARY_MESSAGE_EN = "Please provide a concise summary.";
+    private static final String CHAR_LIMIT_PREFIX_EN = "Please keep the answer within ";
+    private static final String CHAR_LIMIT_SUFFIX_EN = " words.";
+    private static final String MARKDOWN_LEVEL_MESSAGE_EN = "Please set the headings in Markdown to level 3 or higher.";
     private static final String LANG_MESSAGE_EN = "Please answer in English.";
 
     @SuppressWarnings("rawtypes")
@@ -69,28 +71,26 @@ public class TemplateAttacher {
         if (locale.getLanguage().equals("en")) {
             switch (outputSizeType) {
             case SMALL:
-                return OUTPUT_SCALE_PREFIX_EN + OutputScaleType.SMALL.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX_EN;
+                return SUMMARY_MESSAGE_EN;
             case MEDIUM:
-                return OUTPUT_SCALE_PREFIX_EN + OutputScaleType.MEDIUM.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX_EN;
+                return CHAR_LIMIT_PREFIX_EN + OutputScaleType.MEDIUM.getCharSize()
+                        + CHAR_LIMIT_SUFFIX_EN;
             case LARGE:
-                return OUTPUT_SCALE_PREFIX_EN + OutputScaleType.LARGE.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX_EN;
+                return CHAR_LIMIT_PREFIX_EN + OutputScaleType.LARGE.getCharSize()
+                        + CHAR_LIMIT_SUFFIX_EN;
             default:
                 return "";
             }
         } else {
             switch (outputSizeType) {
             case SMALL:
-                return OUTPUT_SCALE_PREFIX + OutputScaleType.SMALL.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX;
+                return SUMMARY_MESSAGE;
             case MEDIUM:
-                return OUTPUT_SCALE_PREFIX + OutputScaleType.MEDIUM.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX;
+                return CHAR_LIMIT_PREFIX + OutputScaleType.MEDIUM.getCharSize()
+                        + CHAR_LIMIT_SUFFIX;
             case LARGE:
-                return OUTPUT_SCALE_PREFIX + OutputScaleType.LARGE.getCharSize()
-                        + OUTPUT_SCALE_SUFFIX;
+                return CHAR_LIMIT_PREFIX + OutputScaleType.LARGE.getCharSize()
+                        + CHAR_LIMIT_SUFFIX;
             default:
                 return "";
             }

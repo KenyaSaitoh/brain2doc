@@ -15,12 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import pro.kensait.brain2doc.common.Const;
+import pro.kensait.brain2doc.config.ConstValueHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
 import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
+import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
 import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.openai.ApiResult;
 import pro.kensait.brain2doc.openai.SuccessResponseBody;
@@ -68,7 +72,7 @@ public class Flow {
             @Override
             public FileVisitResult visitFile(Path inputFilePath, BasicFileAttributes attrs)
                     throws IOException {
-                System.out.println("#####" + inputFilePath.getFileName() + "#####");
+                System.out.println("##### " + inputFilePath.getFileName() + " #####");
                 if (Files.isDirectory(inputFilePath)) return FileVisitResult.CONTINUE;
                 readNormalFile(inputFilePath);
                 return FileVisitResult.CONTINUE;
@@ -83,7 +87,6 @@ public class Flow {
         ResourceType resourceType = param.getResourceType();
         try {
             if (resourceType.matchesExt(inputFilePath.toString())) {
-                System.out.println("###########" + inputFilePath.getFileName().toString());
                 String ext = resourceType.getMatchExt(inputFilePath.toString());
                 // 正規表現がパラメータとして指定されており、かつ、
                 // 拡張子を取り除いたファイル名が、正規表現とマッチしなかった場合は、
@@ -145,50 +148,114 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        List<String> requestLines = TemplateAttacher.attach(inputFileLines,
-                param.getResourceType(),
-                param.getOutputType(),
-                param.getOutputScaleType(),
-                param.getLocale(),
-                param.getTemplateFile());
-        String requestContent = toReqString(requestLines);
-        ApiResult apiResult = null;
+        String inputFileContent = toStringFromStrList(inputFileLines);
+        List<ApiResult> apiResultList = null;
         try {
-            apiResult = askToOpenAi(requestContent);
-        } catch(OpenAIClientException oe) {
+            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1);
+        } catch(OpenAITokenLimitOverException oe) {
             System.out.println(oe.getClientErrorBody());
-            if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
-                    oe.getClientErrorBody().getError().getCode())) {
-                addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
-                return; // 次のファイルへ
-            }
+            addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
+            return; // 次のファイルへ
+        } catch(OpenAIClientException oce) {
             addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
-            throw oe;
-        } catch(OpenAIRetryCountOverException oe) {
+            throw oce; // プログラム停止
+        } catch(OpenAIRetryCountOverException ore) {
             addReport(inputFilePath, TIMEOUT_MESSAGE, 0);
-            throw oe;
+            throw ore; // プログラム停止
         }
-        List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
-        List<String> responseLines = toLineListFromChoices(responseChoices);
-        TransformStrategy transStrategy = getOutputStrategy(param.getResourceType(),
-                param.getOutputType());
-        String outputFileContent = transStrategy.transform(inputFilePath,
-                requestContent, responseLines);
-        write(outputFileContent);
-        addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
+
+        for (int i = 0; i < apiResultList.size(); i++) {
+            ApiResult apiResult = apiResultList.get(i);
+            List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
+            List<String> responseLines = toLineListFromChoices(responseChoices);
+            TransformStrategy transStrategy = getOutputStrategy(param.getResourceType(),
+                    param.getOutputType());
+            String outputFileContent = transStrategy.transform(
+                    inputFilePath,
+                    inputFileContent,
+                    responseLines,
+                    i + 1);
+            write(outputFileContent);
+            addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
+        }
     }
 
-    private static ApiResult askToOpenAi(String requestContent) {
-        ApiResult result = ApiClient.ask(requestContent,
-                param.getOpenaiURL(),
-                param.getOpenaiModel(),
-                param.getOpenaiApikey(),
-                param.getProxyURL(),
-                param.getConnectTimeout(),
-                param.getRequestTimeout(),
-                param.getRetryCount(),
-                param.getRetryInterval());
-        return result;
+    private static List<ApiResult> askToOpenAi(List<String> inputFileLines,
+            String inputFileContent, int splitCount) {
+        List<List<String>> splittedInputFileLists = null;
+        if (splitCount == 1) {
+            splittedInputFileLists = new ArrayList<>();
+            splittedInputFileLists.add(inputFileLines);
+        } else {
+            splittedInputFileLists = InputSplitter.split(inputFileLines, splitCount);
+        }
+
+        List<ApiResult> apiResultList = new ArrayList<>();
+        for (int i = 0; i < splittedInputFileLists.size(); i++) {
+            List<String> eachInputFileLines = splittedInputFileLists.get(i);
+
+            // 分割された入力ファイルに、テンプレートをアタッチする
+            List<String> requestLines = TemplateAttacher.attach(eachInputFileLines,
+                    param.getResourceType(),
+                    param.getOutputType(),
+                    param.getOutputScaleType(),
+                    param.getLocale(),
+                    param.getTemplateFile());
+
+            String requestContent = toStringFromStrList(requestLines);
+            /*
+            System.out.println("%%%%%%%%%%%%");
+            System.out.println(requestContent);
+            System.out.println("%%%%%%%%%%%%");
+            */
+
+            // OpenAIのAPIを呼び出す
+            ApiResult apiResult = null;
+            try {
+                apiResult = ApiClient.ask(requestContent,
+                        param.getOpenaiURL(),
+                        param.getOpenaiModel(),
+                        param.getOpenaiApikey(),
+                        param.getProxyURL(),
+                        param.getConnectTimeout(),
+                        param.getRequestTimeout(),
+                        param.getRetryCount(),
+                        param.getRetryInterval());
+            } catch (OpenAIClientException oce) {
+
+                // トークンリミットオーバーの場合
+                if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
+                        oce.getClientErrorBody().getError().getCode())) {
+                    if (param.isAutoSplitMode()) { // 自動分割モードの場合
+                        // エラーメッセージからトークン数を抽出し、分割数を計算する
+                        Integer tokenCount = extractToken(requestContent,
+                                oce.getClientErrorBody().getError().getMessage());
+                        if (tokenCount == null)
+                            throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
+                        int tokenCountLimit = Integer.parseInt(
+                                ConstValueHolder.getProperty("token-count-limit"));
+                        int rate = tokenCount / tokenCountLimit; // 分割比率（小数点以下は切り捨てられる）
+                        splitCount = rate + 1; // なるべく分割数を多めにするため1を足す
+
+                        // 分割数を指定して再帰呼び出しする
+                        return askToOpenAi(inputFileLines, inputFileContent,
+                                splitCount);
+                    }
+                    throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
+                }
+            }
+            apiResultList.add(apiResult);
+        }
+        return apiResultList;
+    }
+
+    private static Integer extractToken(String content, String message) {
+        Matcher matcher = Pattern.compile("resulted in (\\d+) tokens").matcher(message);
+        if (matcher.find()) {
+            System.out.println(Integer.parseInt(matcher.group(1)));
+            return Integer.parseInt(matcher.group(1));
+        }
+        return null; 
     }
 
     private static String extractNameWithoutExt(String fileName, String ext) {
@@ -196,12 +263,12 @@ public class Flow {
         return fileName.substring(0, lastExtIndex);
     }
 
-    private static String toReqString(List<String> inputFileLines) {
-        String reqString = "";
-        for (String line : inputFileLines) {
-            reqString += line + Const.SEPARATOR;
+    private static String toStringFromStrList(List<String> strList) {
+        String content = "";
+        for (String line : strList) {
+            content += line + Const.SEPARATOR;
         }
-        return reqString;
+        return content;
     }
 
     private static List<String> toChoicesFromResponce(SuccessResponseBody responseBody) {

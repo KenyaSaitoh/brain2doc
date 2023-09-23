@@ -1,0 +1,28 @@
+java: 
+  spec: |
+    Please output the specification of the Java program in Markdown format.
+    Use the title "Class Specification".
+  refactoring: |
+    Please provide suggestions for refactoring the Java program in Markdown format.
+    Use the title "Refactoring Proposal".
+sql:
+  spec: |
+    Please output the specification of the Java program in Markdown format.
+  refactoring: |
+    Please output the specification of the Java program in Markdown format.
+page:
+  spec: |
+    Please output the specification of the Java program in Markdown format.
+  refactoring: |
+    Please output the specification of the Java program in Markdown format.
+javascript:
+  spec: |
+    Please output the specification of the Java program in Markdown format.
+  refactoring: |
+    Please output the specification of the Java program in Markdown format.
+shellscript:
+  spec: |
+    Please output the specification of the Java program in Markdown format.
+  refactoring: |
+    Please output the specification of the Java program in Markdown format.
+

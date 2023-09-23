@@ -1,25 +1,27 @@
 java: 
   spec: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
+    タイトルは「クラス仕様書」でお願いします。
   refactoring: |
-      Javaプログラムのリファクタリングの提案を、Markdown形式で出力してください。
+    Javaプログラムのリファクタリングの提案を、Markdown形式で出力してください。
+    タイトルは「リファクタリング提案書」でお願いします。
 sql:
-    spec: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
-    refactoring: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
+  spec: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
+  refactoring: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
 page:
-    spec: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
-    refactoring: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
+  spec: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
+  refactoring: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
 javascript:
-    spec: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
-    refactoring: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
+  spec: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
+  refactoring: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
 shellscript:
-    spec: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
-    refactoring: |
-      Javaプログラムの仕様書を、Markdown形式で出力してください。
+  spec: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。
+  refactoring: |
+    Javaプログラムの仕様書を、Markdown形式で出力してください。

@@ -87,13 +87,13 @@ public class ApiClient {
         long interval = duration.getSeconds();
 
         int statusCode = response.statusCode();
-        System.out.println("ステータス:" + statusCode);
         String responseStr = response.body();
         if (200 <= statusCode && statusCode < 300) {
             SuccessResponseBody responseBody = getResponseBody(SuccessResponseBody.class,
                     responseStr);
             return new ApiResult(responseBody, interval);
         } else if (400 <= statusCode && statusCode < 500) {
+            // トークンリミットオーバーを含むOpenAIClientExceptionを返す
             ClientErrorBody responseBody = getResponseBody(ClientErrorBody.class,
                     responseStr);
             throw new OpenAIClientException(responseBody);

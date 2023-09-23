@@ -2,7 +2,7 @@ package pro.kensait.brain2doc;
 
 import org.junit.jupiter.api.Test;
 
-public class TestLarge {
+public class TestLargeEn {
 
     @Test
     public void testLargeRequest() {
@@ -12,11 +12,13 @@ public class TestLarge {
                 "--resource " +
                 "java " +
                 "--output " +
-                "refactoring " +
+                "spec " +
                 "--outputScale " +
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
+                "--lang " + 
+                "en " +
                 "--autoSplit" +
                 "";
         String[] params = parameter.split(" ");

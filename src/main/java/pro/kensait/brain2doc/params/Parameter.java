@@ -34,6 +34,7 @@ public class Parameter {
     private int requestTimeout; // デフォルト値はプロパティファイルから
     private int retryCount; // デフォルト値はプロパティファイルから
     private int retryInterval; // デフォルト値はプロパティファイルから
+    private boolean isAutoSplitMode; // デフォルト値false
 
     synchronized public static void setUp(String[] args) {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
@@ -60,7 +61,8 @@ public class Parameter {
                 DefaultValueHolder.getProperty("retry_count"));
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
-
+        boolean isAutoSplitMode = false;
+        
         try {
             for (int i = 0; i < args.length; i++) {
                 try {
@@ -128,6 +130,8 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         retryInterval = Integer.parseInt(args[++i]);
+                    } else if (args[i].equalsIgnoreCase("--autoSplit")) {
+                        isAutoSplitMode = true;
                     } else {
                         throw new IllegalArgumentException(
                                 "パラメータが不正です => \"" + args[i] + "\"");
@@ -190,7 +194,8 @@ public class Parameter {
                 resourceType, outputType, outputScaleType,
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
-                proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval);
+                proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
+                isAutoSplitMode);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
@@ -213,7 +218,8 @@ public class Parameter {
             Path srcPath, String srcRegex, Path destFilePath,
             Locale locale, Path templateFile,
             String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
-            int retryInterval) {
+            int retryInterval,
+            boolean isAutoSplitMode) {
         super();
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
@@ -231,6 +237,7 @@ public class Parameter {
         this.requestTimeout = requestTimeout;
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
+        this.isAutoSplitMode = isAutoSplitMode;
     }
 
     public String getOpenaiURL() {
@@ -297,6 +304,10 @@ public class Parameter {
         return retryInterval;
     }
 
+    public boolean isAutoSplitMode() {
+        return isAutoSplitMode;
+    }
+
     @Override
     public String toString() {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
@@ -306,6 +317,7 @@ public class Parameter {
                 + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
                 + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
                 + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
-                + ", retryInterval=" + retryInterval + "]";
+                + ", retryInterval=" + retryInterval + ", isAutoSplitMode="
+                + isAutoSplitMode + "]";
     }
 }
