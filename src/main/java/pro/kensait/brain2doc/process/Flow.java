@@ -13,26 +13,44 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import pro.kensait.brain2doc.config.TemplateHolder;
+import pro.kensait.brain2doc.common.Const;
+import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
 import pro.kensait.brain2doc.openai.ApiClient;
+import pro.kensait.brain2doc.openai.ApiResult;
+import pro.kensait.brain2doc.openai.SuccessResponseBody;
+import pro.kensait.brain2doc.params.OutputType;
 import pro.kensait.brain2doc.params.Parameter;
-import pro.kensait.brain2doc.params.ProcessType;
 import pro.kensait.brain2doc.params.ResourceType;
-import pro.kensait.brain2doc.transform.OutputTransformer;
+import pro.kensait.brain2doc.transform.JavaGeneralTransformStrategy;
+import pro.kensait.brain2doc.transform.TransformStrategy;
 
 public class Flow {
-    private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static final String ZIP_FILE_EXT = ".zip";
+    private static final String SUCCESS_MESSAGE = "SUCCESS";
+    private static final String TIMEOUT_MESSAGE = "TIMEOUT";
+    private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
+    private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
+    private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
+    
+    private static Parameter param; // このクラス内のみで使われるグローバルな変数
+    private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
 
     synchronized public static void init(Parameter paramValues) {
         param = paramValues;
+        reportList.clear();
     }
 
-    public static void inputProcess() {
+    public static List<String> getReportList() {
+        return reportList;
+    }
+
+    public static void startAndFork() {
         if (Files.isDirectory(param.getSrcPath())) {
             walkDirectory(param.getSrcPath());
         } else {
@@ -127,16 +145,96 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        List<String> requestLines = attachTemplate(inputFileLines);
+        List<String> requestLines = TemplateAttacher.attach(inputFileLines,
+                param.getResourceType(),
+                param.getOutputType(),
+                param.getOutputScaleType(),
+                param.getLocale(),
+                param.getTemplateFile());
         String requestContent = toReqString(requestLines);
-        List<String> responseContents = ApiClient.ask(requestContent,
+        ApiResult apiResult = null;
+        try {
+            apiResult = askToOpenAi(requestContent);
+        } catch(OpenAIClientException oe) {
+            System.out.println(oe.getClientErrorBody());
+            if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
+                    oe.getClientErrorBody().getError().getCode())) {
+                addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
+                return; // 次のファイルへ
+            }
+            addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
+            throw oe;
+        } catch(OpenAIRetryCountOverException oe) {
+            addReport(inputFilePath, TIMEOUT_MESSAGE, 0);
+            throw oe;
+        }
+        List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
+        List<String> responseLines = toLineListFromChoices(responseChoices);
+        TransformStrategy transStrategy = getOutputStrategy(param.getResourceType(),
+                param.getOutputType());
+        String outputFileContent = transStrategy.transform(inputFilePath,
+                requestContent, responseLines);
+        write(outputFileContent);
+        addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
+    }
+
+    private static ApiResult askToOpenAi(String requestContent) {
+        ApiResult result = ApiClient.ask(requestContent,
                 param.getOpenaiURL(),
                 param.getOpenaiModel(),
                 param.getOpenaiApikey(),
-                param.getProxyURL());
-        String outputFileContent = OutputTransformer.transform(inputFilePath,
-                requestContent, responseContents);
-        write(outputFileContent);
+                param.getProxyURL(),
+                param.getConnectTimeout(),
+                param.getRequestTimeout(),
+                param.getRetryCount(),
+                param.getRetryInterval());
+        return result;
+    }
+
+    private static String extractNameWithoutExt(String fileName, String ext) {
+        int lastExtIndex = fileName.lastIndexOf(ext);
+        return fileName.substring(0, lastExtIndex);
+    }
+
+    private static String toReqString(List<String> inputFileLines) {
+        String reqString = "";
+        for (String line : inputFileLines) {
+            reqString += line + Const.SEPARATOR;
+        }
+        return reqString;
+    }
+
+    private static List<String> toChoicesFromResponce(SuccessResponseBody responseBody) {
+        List<String> responseChoiceList = new ArrayList<>();
+        responseBody.getChoices().forEach(choice -> {
+            String responseContent = choice.getMessage().getContent();
+            responseChoiceList.add(responseContent);
+        });
+        return responseChoiceList;
+    }
+    
+    // 複数のChoiceがリストで返されるので、それを文字列リストに変換する
+    private static List<String> toLineListFromChoices(
+            List<String> responseChoices) {
+        List<String> responseLines = new ArrayList<>();
+        for (String responseChoice :responseChoices) {
+            for (String line : responseChoice.split(Const.SEPARATOR)) {
+                responseLines.add(line);
+            }
+        }
+        return responseLines;
+    }
+
+    // TODO
+    private static TransformStrategy getOutputStrategy(ResourceType resourceType,
+            OutputType outputType) {
+        if (resourceType == ResourceType.JAVA) {
+            if (outputType == OutputType.SPEC ||
+                    outputType == OutputType.REFACTORING) {
+                return new JavaGeneralTransformStrategy();
+            }
+        }
+        return null;
     }
 
     private static void write(String responseContent) {
@@ -149,44 +247,9 @@ public class Flow {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private static List<String> attachTemplate(List<String> inputFileLines) {
-        ResourceType resourceType = param.getResourceType();
-        ProcessType processType = param.getProcessType();
-        TemplateHolder th = TemplateHolder.getInstance();
-        Map templateMap = th.getTemplateMap(param.getLocale(), param.getTemplateFile());
-
-        Map resourceMap = (Map) templateMap.get(resourceType.getName());
-        if (resourceMap == null || resourceMap.isEmpty())
-            throw new IllegalArgumentException("テンプレートの誤り => リソース名の指定");
-        
-        Map processMap = (Map) resourceMap.get("processes");
-        if (processMap == null || processMap.isEmpty())
-            throw new IllegalArgumentException("テンプレートの誤り => プロセスの指定");
-        
-        String phrases = (String) processMap.get(processType.getName());
-        if (processMap == null || processMap.isEmpty())
-            throw new IllegalArgumentException("テンプレートの誤り => フレーズの指定");
-
-        // TODO
-        System.out.println(phrases);
-
-        List<String> requestLines = new ArrayList<>();
-        requestLines.add(phrases);
-        requestLines.addAll(inputFileLines);
-        return requestLines;
-    }
-
-    private static String extractNameWithoutExt(String fileName, String ext) {
-        int lastExtIndex = fileName.lastIndexOf(ext);
-        return fileName.substring(0, lastExtIndex);
-    }
-
-    private static String toReqString(List<String> inputFileLines) {
-        String reqString = "";
-        for (String line : inputFileLines) {
-            reqString += line + System.getProperty("line.separator");
-        }
-        return reqString;
+    private static void addReport(Path inputFilePath, String message, long interval) {
+        String report = inputFilePath.getFileName().toString() + "," +
+                message + "," + interval;
+        reportList.add(report);
     }
 }

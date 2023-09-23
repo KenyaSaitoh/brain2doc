@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ResponseBody {
+public class SuccessResponseBody {
     @JsonProperty(value = "id")
     private String id;
 
@@ -23,15 +23,20 @@ public class ResponseBody {
     @JsonProperty(value = "usage")
     private Usage usage;
 
-    public ResponseBody() {}
+    @JsonProperty(value = "error")
+    private Error error;
 
-    public ResponseBody(String id, String object, Long created, String model, List<Choice> choices, Usage usage) {
+    public SuccessResponseBody() {}
+
+    public SuccessResponseBody(String id, String object, Long created, String model,
+            List<Choice> choices, Usage usage, Error error) {
         this.id = id;
         this.object = object;
         this.created = created;
         this.model = model;
         this.choices = choices;
         this.usage = usage;
+        this.error = error;
     }
 
     public String getId() {
@@ -82,9 +87,18 @@ public class ResponseBody {
         this.usage = usage;
     }
 
+    public Error getError() {
+        return error;
+    }
+
+    public void setError(Error error) {
+        this.error = error;
+    }
+
     @Override
     public String toString() {
         return "ResponseBody [id=" + id + ", object=" + object + ", created=" + created
-                + ", model=" + model + ", choices=" + choices + ", usage=" + usage + "]";
+                + ", model=" + model + ", choices=" + choices + ", usage=" + usage
+                + ", error=" + error + "]";
     }
 }

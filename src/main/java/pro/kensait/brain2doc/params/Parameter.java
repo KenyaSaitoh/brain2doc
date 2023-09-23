@@ -22,8 +22,8 @@ public class Parameter {
     private String openaiModel; // デフォルト値はプロパティファイルから
     private String openaiApikey; // デフォルト値は環境変数から
     private ResourceType resourceType; // デフォルト値はプロパティファイルから
-    private ProcessType processType; // デフォルト値はプロパティファイルから
-    private ScaleType scaleType; // デフォルト値はプロパティファイルから
+    private OutputType outputType; // デフォルト値はプロパティファイルから
+    private OutputScaleType outputScaleType; // デフォルト値はプロパティファイルから
     private Path srcPath; // 指定必須
     private String srcRegex; // 任意指定
     private Path destFilePath; // デフォルト値はソースパスと同じディレクトリの固定ファイル名
@@ -34,7 +34,6 @@ public class Parameter {
     private int requestTimeout; // デフォルト値はプロパティファイルから
     private int retryCount; // デフォルト値はプロパティファイルから
     private int retryInterval; // デフォルト値はプロパティファイルから
-    private boolean stopOnFailure; // デフォルト値はfalse
 
     synchronized public static void setUp(String[] args) {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
@@ -43,10 +42,10 @@ public class Parameter {
         System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource").toUpperCase());
-        ProcessType processType = ProcessType.valueOf(
-                DefaultValueHolder.getProperty("process").toUpperCase());
-        ScaleType scaleType = ScaleType.valueOf(
-                DefaultValueHolder.getProperty("scale").toUpperCase());
+        OutputType outputType = OutputType.valueOf(
+                DefaultValueHolder.getProperty("output").toUpperCase());
+        OutputScaleType outputScaleType = OutputScaleType.valueOf(
+                DefaultValueHolder.getProperty("output_scale").toUpperCase());
         String srcParam = null;
         String srcRegex = null;
         String destParam = null;
@@ -56,13 +55,12 @@ public class Parameter {
         int connectTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("connect_timeout"));
         int requestTimeout = Integer.parseInt(
-                DefaultValueHolder.getProperty("request_timeout"));
+                DefaultValueHolder.getProperty("timeout"));
         int retryCount = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_count"));
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
 
-        boolean stopOnFailure = false;
         try {
             for (int i = 0; i < args.length; i++) {
                 try {
@@ -82,14 +80,14 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         resourceType = ResourceType.valueOf(args[++i].toUpperCase());
-                    } else if (args[i].equalsIgnoreCase("--process")) {
+                    } else if (args[i].equalsIgnoreCase("--output")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        processType = ProcessType.valueOf(args[++i].toUpperCase());
-                    } else if (args[i].equalsIgnoreCase("--scale")) {
+                        outputType = OutputType.valueOf(args[++i].toUpperCase());
+                    } else if (args[i].equalsIgnoreCase("--outputScale")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        scaleType = ScaleType.valueOf(args[++i].toUpperCase());
+                        outputScaleType = OutputScaleType.valueOf(args[++i].toUpperCase());
                     } else if (args[i].equalsIgnoreCase("--src")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -118,7 +116,7 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         connectTimeout = Integer.parseInt(args[++i]);
-                    } else if (args[i].equalsIgnoreCase("--requestTimeout")) {
+                    } else if (args[i].equalsIgnoreCase("--timeout")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         requestTimeout = Integer.parseInt(args[++i]);
@@ -130,8 +128,6 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         retryInterval = Integer.parseInt(args[++i]);
-                    } else if (args[i].equalsIgnoreCase("--stopOnFailure")) {
-                        stopOnFailure = true;
                     } else {
                         throw new IllegalArgumentException(
                                 "パラメータが不正です => \"" + args[i] + "\"");
@@ -171,14 +167,14 @@ public class Parameter {
         if (destParam == null || destParam.equals("")) {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
             destPath = Paths.get(srcDirPath.toString(), 
-                    getDefaultOutputFileName(resourceType, processType));
+                    getDefaultOutputFileName(resourceType, outputType));
         } else {
             // destオプションの指定があった場合は、ディレクトリ指定だった場合は
             // デフォルトファイル名を採用し、ファイル指定だった場合はそのまま
             destPath = Paths.get(destParam);
             if (Files.isDirectory(destPath)) {
                 destPath = Paths.get(destPath.toString(), 
-                        getDefaultOutputFileName(resourceType, processType));
+                        getDefaultOutputFileName(resourceType, outputType));
             }
         }
 
@@ -191,18 +187,17 @@ public class Parameter {
                     null;
 
         parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey,
-                resourceType, processType, scaleType,
+                resourceType, outputType, outputScaleType,
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
-                proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
-                stopOnFailure);
+                proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
-            ProcessType processType) {
+            OutputType outputType) {
         return DefaultValueHolder.getProperty("output_file_name") + "-" +
                 resourceType.getName() + "-" +
-                processType.getName() + "-" + 
+                outputType.getName() + "-" + 
                 getCurrentDateTimeStr() +
                 Const.OUTPUT_FILE_EXT;
     }
@@ -214,19 +209,18 @@ public class Parameter {
     } 
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
-            ResourceType resourceType, ProcessType processType, ScaleType scaleType,
+            ResourceType resourceType, OutputType outputType, OutputScaleType outputScaleType,
             Path srcPath, String srcRegex, Path destFilePath,
             Locale locale, Path templateFile,
             String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
-            int retryInterval,
-            boolean stopOnFailure) {
+            int retryInterval) {
         super();
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
         this.openaiApikey = openaiApikey;
         this.resourceType = resourceType;
-        this.processType = processType;
-        this.scaleType = scaleType;
+        this.outputType = outputType;
+        this.outputScaleType = outputScaleType;
         this.srcPath = srcPath;
         this.srcRegex = srcRegex;
         this.destFilePath = destFilePath;
@@ -237,7 +231,6 @@ public class Parameter {
         this.requestTimeout = requestTimeout;
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
-        this.stopOnFailure = stopOnFailure;
     }
 
     public String getOpenaiURL() {
@@ -256,12 +249,12 @@ public class Parameter {
         return resourceType;
     }
 
-    public ProcessType getProcessType() {
-        return processType;
+    public OutputType getOutputType() {
+        return outputType;
     }
 
-    public ScaleType getScaleType() {
-        return scaleType;
+    public OutputScaleType getOutputScaleType() {
+        return outputScaleType;
     }
 
     public Path getSrcPath() {
@@ -304,20 +297,15 @@ public class Parameter {
         return retryInterval;
     }
 
-    public boolean isStopOnFailure() {
-        return stopOnFailure;
-    }
-
     @Override
     public String toString() {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
-                + ", processType=" + processType + ", scaleType=" + scaleType
+                + ", outputType=" + outputType + ", outputScaleType=" + outputScaleType
                 + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
                 + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
                 + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
                 + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
-                + ", retryInterval=" + retryInterval + ", stopOnFailure=" + stopOnFailure
-                + "]";
+                + ", retryInterval=" + retryInterval + "]";
     }
 }

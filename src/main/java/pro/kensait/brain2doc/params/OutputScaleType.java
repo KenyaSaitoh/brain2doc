@@ -1,13 +1,14 @@
 package pro.kensait.brain2doc.params;
 
-public enum ScaleType {
+public enum OutputScaleType {
     SMALL("small", 50),
-    MEDIUM("medium", 300),
-    LARGE("large", null);
+    MEDIUM("medium", 200),
+    LARGE("large", 500),
+    NO_LIMIT("no_limit", null);
 
     private String name;
     private Integer charSize;
-    private ScaleType(String name, Integer charSize) {
+    private OutputScaleType(String name, Integer charSize) {
         this.name = name;
         this.charSize = charSize;
     }
@@ -20,8 +21,8 @@ public enum ScaleType {
         return charSize;
     }
 
-    public ScaleType getScaleTypeByName(String name) {
-        for (ScaleType type : ScaleType.values()) {
+    public OutputScaleType getScaleTypeByName(String name) {
+        for (OutputScaleType type : OutputScaleType.values()) {
             if (type.getName().equals(name)) {
                 return type;
             }

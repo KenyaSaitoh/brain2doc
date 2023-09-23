@@ -1,6 +1,6 @@
 package pro.kensait.brain2doc.params;
 
-public enum ProcessType {
+public enum OutputType {
     SPEC("spec"),
     REFACTORING("refactoring"),
     WEB_API_LIST("api"),
@@ -12,7 +12,7 @@ public enum ProcessType {
     OTHERS("others");
 
     private String name;
-    private ProcessType(String name) {
+    private OutputType(String name) {
         this.name = name;
     }
 
@@ -20,8 +20,8 @@ public enum ProcessType {
         return name;
     }
 
-    public ProcessType getProcessTypeByName(String name) {
-        for (ProcessType type : ProcessType.values()) {
+    public OutputType getProcessTypeByName(String name) {
+        for (OutputType type : OutputType.values()) {
             if (type.getName().equals(name)) {
                 return type;
             }

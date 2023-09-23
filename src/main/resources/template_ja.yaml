@@ -1,51 +1,25 @@
 java: 
-  processes:
-    spec: |
+  spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      100文字以内にしてください。
-      日本語で作成をお願いします。
-    refactoring: |
+  refactoring: |
       Javaプログラムのリファクタリングの提案を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
 sql:
-  processes:
     spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
     refactoring: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
 page:
-  processes:
     spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
     refactoring: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
 javascript:
-  processes:
     spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
     refactoring: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
 shellscript:
-  processes:
     spec: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。
     refactoring: |
       Javaプログラムの仕様書を、Markdown形式で出力してください。
-      Markdownの見出しは、レベル4からにしてください。
-      日本語で作成をお願いします。

@@ -1,25 +1,18 @@
 package pro.kensait.brain2doc.transform;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pro.kensait.brain2doc.common.Const;
 
-public class OutputTransformer {
+public class JavaGeneralTransformStrategy implements TransformStrategy {
     private static final String PACKAGE_REGEX = "package (.*);";
 
-    public static String transform(Path inputFilePath, String requestContent,
-            List<String> responseContents) {
-
-        List<String> responseLines = new ArrayList<>();
-        for (String responseContent :responseContents) {
-            for (String line : responseContent.split(Const.SEPARATOR)) {
-                responseLines.add(line);
-            }
-        }
+    @Override
+    public String transform(Path inputFilePath, String requestContent,
+            List<String> responseLines) {
         String outputContent = "";
         for (String line : responseLines) {
             outputContent += line;
@@ -27,7 +20,7 @@ public class OutputTransformer {
         String packageName = getPackageName(requestContent);
         String className = inputFilePath.getFileName().toString()
                 .replaceAll("(.*)\\.java", "$1");
-        outputContent = "## " + 
+        outputContent = Const.MARKDOWN_HEADING + 
                 packageName + "." + className +
                 Const.SEPARATOR +
                 outputContent +
@@ -36,7 +29,7 @@ public class OutputTransformer {
         return outputContent;
     }
 
-    private static String getPackageName(String requestContent) {
+    private String getPackageName(String requestContent) {
         Matcher matcher = Pattern.compile(PACKAGE_REGEX)
                 .matcher(requestContent);
         return matcher.find() ?

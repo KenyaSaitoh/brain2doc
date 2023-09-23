@@ -1,4 +1,4 @@
-package pro.kensait.brain2doc.main;
+package pro.kensait.brain2doc;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.kensait.brain2doc.openai.Message;
 import pro.kensait.brain2doc.openai.RequestBody;
-import pro.kensait.brain2doc.openai.ResponseBody;
+import pro.kensait.brain2doc.openai.SuccessResponseBody;
 
 public class OldMain {
     private static final String PACKAGE_REGEX = "package (.*);";
@@ -246,7 +246,7 @@ Merci de répondre en français.
                 client.send(request, HttpResponse.BodyHandlers.ofString());
 
         String responseStr = response.body();
-        ResponseBody responseBody = getResponseBody(responseStr);
+        SuccessResponseBody responseBody = getResponseBody(responseStr);
         List<String> responseLines = new ArrayList<>();
         responseBody.getChoices().forEach(choice -> {
             String content = choice.getMessage().getContent();
@@ -274,11 +274,11 @@ Merci de répondre en français.
         return json;
     }
 
-    private static ResponseBody getResponseBody(String responseStr) {
+    private static SuccessResponseBody getResponseBody(String responseStr) {
         ObjectMapper mapper = new ObjectMapper();
-        ResponseBody responseBody = null;
+        SuccessResponseBody responseBody = null;
         try {
-            responseBody = mapper.readValue(responseStr, ResponseBody.class);
+            responseBody = mapper.readValue(responseStr, SuccessResponseBody.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
