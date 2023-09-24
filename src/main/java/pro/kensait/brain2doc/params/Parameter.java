@@ -81,15 +81,19 @@ public class Parameter {
                     } else if (args[i].equalsIgnoreCase("--resource")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        resourceType = ResourceType.valueOf(args[++i].toUpperCase());
+                        resourceType = ResourceType.getResourceTypeByName(args[++i].toLowerCase());
+                        if (resourceType == null) throw new IllegalArgumentException();
                     } else if (args[i].equalsIgnoreCase("--output")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        outputType = OutputType.valueOf(args[++i].toUpperCase());
+                        outputType = OutputType.getOutputTypeByName(args[++i].toLowerCase());
+                        if (outputType == null) throw new IllegalArgumentException();
                     } else if (args[i].equalsIgnoreCase("--outputScale")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        outputScaleType = OutputScaleType.valueOf(args[++i].toUpperCase());
+                        outputScaleType = OutputScaleType
+                                .getOutputScaleTypeByName(args[++i].toLowerCase());
+                        if (outputScaleType == null) throw new IllegalArgumentException();
                     } else if (args[i].equalsIgnoreCase("--src")) {
                         if (args[i + 1].startsWith("-"))
                             continue;

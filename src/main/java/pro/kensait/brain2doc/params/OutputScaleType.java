@@ -21,7 +21,7 @@ public enum OutputScaleType {
         return charSize;
     }
 
-    public OutputScaleType getScaleTypeByName(String name) {
+    public static OutputScaleType getOutputScaleTypeByName(String name) {
         for (OutputScaleType type : OutputScaleType.values()) {
             if (type.getName().equals(name)) {
                 return type;

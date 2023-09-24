@@ -20,7 +20,7 @@ public enum ResourceType {
         return name;
     }
 
-    public ResourceType getResourceTypeByName(String name) {
+    public static ResourceType getResourceTypeByName(String name) {
         for (ResourceType type : ResourceType.values()) {
             if (type.getName().equals(name)) {
                 return type;

@@ -13,11 +13,7 @@ public interface TransformStrategy {
     public static TransformStrategy getOutputStrategy(ResourceType resourceType,
             OutputType outputType) {
         if (resourceType == ResourceType.JAVA) {
-            if (outputType == OutputType.SPEC ||
-                    outputType == OutputType.SUMMARY ||
-                    outputType == OutputType.REVIEW) {
-                return new JavaGeneralTransformStrategy();
-            }
+            return new JavaGeneralTransformStrategy();
         }
         return new OtherTransformStrategy();
     }

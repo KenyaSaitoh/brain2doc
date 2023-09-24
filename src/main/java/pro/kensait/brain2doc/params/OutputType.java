@@ -21,7 +21,7 @@ public enum OutputType {
         return name;
     }
 
-    public OutputType getProcessTypeByName(String name) {
+    public static OutputType getOutputTypeByName(String name) {
         for (OutputType type : OutputType.values()) {
             if (type.getName().equals(name)) {
                 return type;
