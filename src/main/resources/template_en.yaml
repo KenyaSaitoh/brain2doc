@@ -1,8 +1,14 @@
+message:
+  summary: Please provide a brief summary.
+  char-limit-prefix: The answer should be
+  char-limit-suffix: characters or less.
+  markdown-level: Please set the Markdown header to level 3 or above.
+  lang: Please answer in English.
 java: 
   spec: |
     Please output the specification of the Java program in Markdown format.
     Use the title "Class Specification".
-  refactoring: |
+  refactor: |
     Please provide suggestions for refactoring the Java program in Markdown format.
     Use the title "Refactoring Proposal".
 sql:

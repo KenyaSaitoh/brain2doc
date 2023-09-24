@@ -28,10 +28,8 @@ import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
 import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.openai.ApiResult;
 import pro.kensait.brain2doc.openai.SuccessResponseBody;
-import pro.kensait.brain2doc.params.OutputType;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.params.ResourceType;
-import pro.kensait.brain2doc.transform.JavaGeneralTransformStrategy;
 import pro.kensait.brain2doc.transform.TransformStrategy;
 
 public class Flow {
@@ -58,7 +56,7 @@ public class Flow {
         if (Files.isDirectory(param.getSrcPath())) {
             walkDirectory(param.getSrcPath());
         } else {
-            if (param.getSrcPath().getFileName().endsWith(ZIP_FILE_EXT)) {
+            if (param.getSrcPath().getFileName().toString().endsWith(ZIP_FILE_EXT)) {
                 readZipFile(param.getSrcPath());
             } else {
                 readNormalFile(param.getSrcPath());
@@ -125,15 +123,13 @@ public class Flow {
                             .matches(param.getSrcRegex())) {
                         continue;
                     }
-                    try (BufferedReader br =
-                            new BufferedReader(new InputStreamReader(zis))) {
-                        List<String> inputFileLines = new ArrayList<>();
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            inputFileLines.add(line);
-                        }
-                        mainProcess(inputFilePath, inputFileLines);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(zis));
+                    List<String> inputFileLines = new ArrayList<>();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        inputFileLines.add(line);
                     }
+                    mainProcess(inputFilePath, inputFileLines);
                 }
             }
         } catch (IOException ioe) {
@@ -168,7 +164,8 @@ public class Flow {
             ApiResult apiResult = apiResultList.get(i);
             List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
             List<String> responseLines = toLineListFromChoices(responseChoices);
-            TransformStrategy transStrategy = getOutputStrategy(param.getResourceType(),
+            TransformStrategy transStrategy = TransformStrategy.getOutputStrategy(
+                    param.getResourceType(),
                     param.getOutputType());
             String outputFileContent = transStrategy.transform(
                     inputFilePath,
@@ -181,19 +178,18 @@ public class Flow {
     }
 
     private static List<ApiResult> askToOpenAi(List<String> inputFileLines,
-            String inputFileContent, int splitCount) {
+            String inputFileContent, int splitConut) {
         List<List<String>> splittedInputFileLists = null;
-        if (splitCount == 1) {
+        if (splitConut == 1) {
             splittedInputFileLists = new ArrayList<>();
             splittedInputFileLists.add(inputFileLines);
         } else {
-            splittedInputFileLists = InputSplitter.split(inputFileLines, splitCount);
+            splittedInputFileLists = SplitUtil.split(inputFileLines, splitConut);
         }
 
         List<ApiResult> apiResultList = new ArrayList<>();
         for (int i = 0; i < splittedInputFileLists.size(); i++) {
             List<String> eachInputFileLines = splittedInputFileLists.get(i);
-
             // 分割された入力ファイルに、テンプレートをアタッチする
             List<String> requestLines = TemplateAttacher.attach(eachInputFileLines,
                     param.getResourceType(),
@@ -203,11 +199,6 @@ public class Flow {
                     param.getTemplateFile());
 
             String requestContent = toStringFromStrList(requestLines);
-            /*
-            System.out.println("%%%%%%%%%%%%");
-            System.out.println(requestContent);
-            System.out.println("%%%%%%%%%%%%");
-            */
 
             // OpenAIのAPIを呼び出す
             ApiResult apiResult = null;
@@ -227,19 +218,18 @@ public class Flow {
                 if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
                         oce.getClientErrorBody().getError().getCode())) {
                     if (param.isAutoSplitMode()) { // 自動分割モードの場合
+
                         // エラーメッセージからトークン数を抽出し、分割数を計算する
-                        Integer tokenCount = extractToken(requestContent,
+                        Double tokenCount = extractToken(requestContent,
                                 oce.getClientErrorBody().getError().getMessage());
                         if (tokenCount == null)
                             throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
-                        int tokenCountLimit = Integer.parseInt(
+                        Double tokenCountLimit = Double.parseDouble(
                                 ConstValueHolder.getProperty("token-count-limit"));
-                        int rate = tokenCount / tokenCountLimit; // 分割比率（小数点以下は切り捨てられる）
-                        splitCount = rate + 1; // なるべく分割数を多めにするため1を足す
-
+                        splitConut = SplitUtil.calcSplitCount(tokenCount, tokenCountLimit);
                         // 分割数を指定して再帰呼び出しする
                         return askToOpenAi(inputFileLines, inputFileContent,
-                                splitCount);
+                                splitConut);
                     }
                     throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
                 }
@@ -249,11 +239,10 @@ public class Flow {
         return apiResultList;
     }
 
-    private static Integer extractToken(String content, String message) {
+    private static Double extractToken(String content, String message) {
         Matcher matcher = Pattern.compile("resulted in (\\d+) tokens").matcher(message);
         if (matcher.find()) {
-            System.out.println(Integer.parseInt(matcher.group(1)));
-            return Integer.parseInt(matcher.group(1));
+            return Double.parseDouble(matcher.group(1));
         }
         return null; 
     }
@@ -290,18 +279,6 @@ public class Flow {
             }
         }
         return responseLines;
-    }
-
-    // TODO
-    private static TransformStrategy getOutputStrategy(ResourceType resourceType,
-            OutputType outputType) {
-        if (resourceType == ResourceType.JAVA) {
-            if (outputType == OutputType.SPEC ||
-                    outputType == OutputType.REFACTORING) {
-                return new JavaGeneralTransformStrategy();
-            }
-        }
-        return null;
     }
 
     private static void write(String responseContent) {

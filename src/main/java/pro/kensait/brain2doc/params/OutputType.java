@@ -2,7 +2,8 @@ package pro.kensait.brain2doc.params;
 
 public enum OutputType {
     SPEC("spec"),
-    REFACTORING("refactoring"),
+    SUMMARY("summary"),
+    REVIEW("review"),
     WEB_API_LIST("api"),
     CONST_LIST("const"),
     MESSAGE_LIST("message"),

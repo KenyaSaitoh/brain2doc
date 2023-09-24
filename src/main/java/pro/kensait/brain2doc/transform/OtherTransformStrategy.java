@@ -2,14 +2,10 @@ package pro.kensait.brain2doc.transform;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import pro.kensait.brain2doc.common.Const;
 
-public class JavaGeneralTransformStrategy implements TransformStrategy {
-    private static final String PACKAGE_REGEX = "package (.*);";
-
+public class OtherTransformStrategy implements TransformStrategy {
     @Override
     public String transform(Path inputFilePath, String requestContent,
             List<String> responseLines, int seqNum) {
@@ -17,12 +13,10 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
         for (String line : responseLines) {
             responseContent += line;
         }
-        String packageName = getPackageName(requestContent);
-        String className = inputFilePath.getFileName().toString()
-                .replaceAll("(.*)\\.java", "$1");
+        String fileName = inputFilePath.getFileName().toString();
         String url = inputFilePath.toUri().toString();
         String outputContent = Const.MARKDOWN_HEADING + 
-                packageName + "." + "**" + className + "**" +
+                "**" + fileName + "**" +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
                 Const.SEPARATOR +
                 Const.SEPARATOR +
@@ -34,15 +28,6 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
                 Const.SEPARATOR +
                 Const.MARKDOWN_HORIZON + 
                 Const.SEPARATOR;
-                
         return outputContent;
-    }
-
-    private String getPackageName(String requestContent) {
-        Matcher matcher = Pattern.compile(PACKAGE_REGEX)
-                .matcher(requestContent);
-        return matcher.find() ?
-                matcher.group().replaceAll(PACKAGE_REGEX, "$1") :
-                    "";
     }
 }

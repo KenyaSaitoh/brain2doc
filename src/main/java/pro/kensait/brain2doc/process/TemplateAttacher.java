@@ -6,23 +6,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.TemplateHolder;
 import pro.kensait.brain2doc.params.OutputScaleType;
 import pro.kensait.brain2doc.params.OutputType;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public class TemplateAttacher {
-    private static final String SUMMARY_MESSAGE = "簡潔に要約をお願いします。";
-    private static final String CHAR_LIMIT_PREFIX = "回答は";
-    private static final String CHAR_LIMIT_SUFFIX = "文字以内でお願いします。";
-    private static final String MARKDOWN_LEVEL_MESSAGE = "Markdownの見出しは、レベル3以上にしてください。";
-    private static final String LANG_MESSAGE = "回答は日本語でお願いします。";
-
-    private static final String SUMMARY_MESSAGE_EN = "Please provide a concise summary.";
-    private static final String CHAR_LIMIT_PREFIX_EN = "Please keep the answer within ";
-    private static final String CHAR_LIMIT_SUFFIX_EN = " words.";
-    private static final String MARKDOWN_LEVEL_MESSAGE_EN = "Please set the headings in Markdown to level 3 or higher.";
-    private static final String LANG_MESSAGE_EN = "Please answer in English.";
 
     @SuppressWarnings("rawtypes")
     public static List<String> attach(List<String> inputFileLines,
@@ -42,58 +32,39 @@ public class TemplateAttacher {
         if (templateStr == null || templateStr.isEmpty())
             throw new IllegalArgumentException("テンプレートの誤り");
 
+        Map messageMap = (Map) templateMap.get("message");
         List<String> requestLines = new ArrayList<>();
         requestLines.add(templateStr);
-        requestLines.add(getLangMessage(locale));
-        requestLines.add(getScaleString(locale, outputSizeType));
-        requestLines.add(getMarkdownLevelString(locale));
+        requestLines.add((String) (messageMap.get("constraints")));
+        requestLines.add((String) (messageMap.get("lang")));
+        requestLines.add(getScaleString(messageMap, outputSizeType));
+        requestLines.add((String) (messageMap.get("markdown-level")));
+        requestLines.add(Const.SEPARATOR +
+                (String) (messageMap.get("input")) +
+                Const.SEPARATOR);
 
         System.out.println(requestLines);
         requestLines.addAll(inputFileLines);
         return requestLines;
     }
 
-    private static String getLangMessage(Locale locale) {
-        if (locale.getLanguage().equals("en")) {
-            return LANG_MESSAGE_EN;
-        }
-        return LANG_MESSAGE;
-    }
-
-    private static String getMarkdownLevelString(Locale locale) {
-        if (locale.getLanguage().equals("en")) {
-            return MARKDOWN_LEVEL_MESSAGE_EN;
-        }
-        return MARKDOWN_LEVEL_MESSAGE;
-    }
-
-    private static String getScaleString(Locale locale, OutputScaleType outputSizeType) {
-        if (locale.getLanguage().equals("en")) {
-            switch (outputSizeType) {
-            case SMALL:
-                return SUMMARY_MESSAGE_EN;
-            case MEDIUM:
-                return CHAR_LIMIT_PREFIX_EN + OutputScaleType.MEDIUM.getCharSize()
-                        + CHAR_LIMIT_SUFFIX_EN;
-            case LARGE:
-                return CHAR_LIMIT_PREFIX_EN + OutputScaleType.LARGE.getCharSize()
-                        + CHAR_LIMIT_SUFFIX_EN;
-            default:
-                return "";
-            }
-        } else {
-            switch (outputSizeType) {
-            case SMALL:
-                return SUMMARY_MESSAGE;
-            case MEDIUM:
-                return CHAR_LIMIT_PREFIX + OutputScaleType.MEDIUM.getCharSize()
-                        + CHAR_LIMIT_SUFFIX;
-            case LARGE:
-                return CHAR_LIMIT_PREFIX + OutputScaleType.LARGE.getCharSize()
-                        + CHAR_LIMIT_SUFFIX;
-            default:
-                return "";
-            }
+    @SuppressWarnings("rawtypes")
+    private static String getScaleString(Map messageMap, OutputScaleType outputSizeType) {
+        switch (outputSizeType) {
+        case SMALL:
+            return (String) (messageMap.get("char-limit-prefix")) +
+                    OutputScaleType.SMALL.getCharSize() +
+                    (String) (messageMap.get("char-limit-suffix"));
+        case MEDIUM:
+            return (String) (messageMap.get("char-limit-prefix")) +
+                    OutputScaleType.MEDIUM.getCharSize() +
+                    (String) (messageMap.get("char-limit-suffix"));
+        case LARGE:
+            return (String) (messageMap.get("char-limit-prefix")) +
+                    OutputScaleType.LARGE.getCharSize() +
+                    (String) (messageMap.get("char-limit-suffix"));
+        default:
+            return "";
         }
     }
 }

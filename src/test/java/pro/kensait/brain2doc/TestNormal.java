@@ -29,7 +29,7 @@ public class TestNormal {
                 "--resource " +
                 "java " +
                 "--output " +
-                "refactoring " +
+                "review " +
                 "--dest " +
                 "C:/tmp " + 
                 "--regex " +

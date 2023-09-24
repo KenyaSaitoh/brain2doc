@@ -2,22 +2,19 @@ package pro.kensait.brain2doc;
 
 import org.junit.jupiter.api.Test;
 
-public class TestLarge {
-
+public class TestNormalSummaryZip {
     @Test
-    public void testLargeRequest() {
+    public void testSimple1() {
         String parameter = "" +
                 "--src " +
-                "C:\\tmp\\large2 " +
+                "E:\\Download\\SpringBootJpa_Web-master.zip " +
                 "--resource " +
                 "java " +
                 "--output " +
                 "review " +
-                "--outputScale " +
-                "small " +
+                // "summary " +
                 "--dest " +
-                "C:/tmp/output " +
-                "--autoSplit" +
+                "C:/tmp " + 
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);
