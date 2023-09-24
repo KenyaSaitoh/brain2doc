@@ -43,7 +43,7 @@ public class TemplateAttacher {
                 (String) (messageMap.get("input")) +
                 Const.SEPARATOR);
 
-        System.out.println(requestLines);
+        // TODO System.out.println(requestLines);
         requestLines.addAll(inputFileLines);
         return requestLines;
     }

@@ -39,7 +39,9 @@ public class Flow {
     private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
-    
+    private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
+    private static final String PROCESSING_CONSOLE_MARK = " >";
+
     private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
 
@@ -70,7 +72,7 @@ public class Flow {
             @Override
             public FileVisitResult visitFile(Path inputFilePath, BasicFileAttributes attrs)
                     throws IOException {
-                System.out.println("##### " + inputFilePath.getFileName() + " #####");
+                
                 if (Files.isDirectory(inputFilePath)) return FileVisitResult.CONTINUE;
                 readNormalFile(inputFilePath);
                 return FileVisitResult.CONTINUE;
@@ -82,6 +84,7 @@ public class Flow {
     }
 
     private static void readNormalFile(Path inputFilePath) {
+        System.out.print("\nProcessing [" + inputFilePath.getFileName() + "]");
         ResourceType resourceType = param.getResourceType();
         try {
             if (resourceType.matchesExt(inputFilePath.toString())) {
@@ -112,7 +115,7 @@ public class Flow {
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName();
                 Path inputFilePath = Paths.get(srcPath.toString(), entryName);
-                System.out.println("===== " + entryName + " =====");
+                System.out.print("\nProcessing [" + entryName + "]");
                 if (resourceType.matchesExt(entryName)) {
                     String ext = resourceType.getMatchExt(entryName.toString());
                     // 正規表現がパラメータとして指定されており、かつ、
@@ -144,12 +147,12 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
+        System.out.print(PROCESSING_CONSOLE_MARK);
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
         try {
-            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1);
+            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1, 0);
         } catch(OpenAITokenLimitOverException oe) {
-            System.out.println(oe.getClientErrorBody());
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
             return; // 次のファイルへ
         } catch(OpenAIClientException oce) {
@@ -161,6 +164,7 @@ public class Flow {
         }
 
         for (int i = 0; i < apiResultList.size(); i++) {
+            System.out.print(PROCESSING_CONSOLE_MARK);
             ApiResult apiResult = apiResultList.get(i);
             List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
             List<String> responseLines = toLineListFromChoices(responseChoices);
@@ -178,7 +182,16 @@ public class Flow {
     }
 
     private static List<ApiResult> askToOpenAi(List<String> inputFileLines,
-            String inputFileContent, int splitConut) {
+            String inputFileContent, int splitConut, int prevSplitCount) {
+        // TODO System.out.println(splitConut + "," + prevSplitCount);
+        if (prevSplitCount != 0) {
+            if (splitConut <= prevSplitCount) {
+                throw new OpenAITokenLimitOverException(
+                        "「エラーメッセージ上のトークンリミット」を利用した分割に、"
+                        + "何らかの理由で失敗しました");
+            }
+        }
+
         List<List<String>> splittedInputFileLists = null;
         if (splitConut == 1) {
             splittedInputFileLists = new ArrayList<>();
@@ -226,10 +239,11 @@ public class Flow {
                             throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
                         Double tokenCountLimit = Double.parseDouble(
                                 ConstValueHolder.getProperty("token-count-limit"));
-                        splitConut = SplitUtil.calcSplitCount(tokenCount, tokenCountLimit);
+                        int newSplitConut = SplitUtil.calcSplitCount(tokenCount, tokenCountLimit);
+
                         // 分割数を指定して再帰呼び出しする
                         return askToOpenAi(inputFileLines, inputFileContent,
-                                splitConut);
+                                newSplitConut, splitConut);
                     }
                     throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
                 }
@@ -240,7 +254,7 @@ public class Flow {
     }
 
     private static Double extractToken(String content, String message) {
-        Matcher matcher = Pattern.compile("resulted in (\\d+) tokens").matcher(message);
+        Matcher matcher = Pattern.compile(EXTRACT_TOKEN_COUNT_REGEX).matcher(message);
         if (matcher.find()) {
             return Double.parseDouble(matcher.group(1));
         }
@@ -294,6 +308,7 @@ public class Flow {
     private static void addReport(Path inputFilePath, String message, long interval) {
         String report = inputFilePath.getFileName().toString() + "," +
                 message + "," + interval;
+        System.out.print(" " + message);
         reportList.add(report);
     }
 }

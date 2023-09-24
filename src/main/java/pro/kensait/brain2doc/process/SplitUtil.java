@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SplitUtil {
-    private static final double MARKUP = 0.5d;
+    private static final double MARKUP_FOR_SPLIT_COUNT = 0.5d;
 
     public static List<List<String>> split(List<String> requestLines, int splitCount) {
         // 10行のリストを3分割するのであれば、10÷3＝3.3
@@ -22,8 +22,10 @@ public class SplitUtil {
     
     public static int calcSplitCount(double tokenCount, double tokenCountLimit) {
         // トークン数比率と文字列比率が同じであるとは限らない、
-        // またテンプレート追加なども考慮して、安全に考えて0.3を足し、さらに切り上げる
-        int splitCount = (int) (Math.ceil((tokenCount / tokenCountLimit) + MARKUP));
+        // またテンプレート追加なども考慮して、安全に倒すためマークアップを加算し、さらに切り上げる
+        int splitCount = (int) (Math.ceil((tokenCount / tokenCountLimit) +
+                MARKUP_FOR_SPLIT_COUNT));
+        // TODO System.out.println("splitCount" + splitCount);
         return splitCount;
     }
 }

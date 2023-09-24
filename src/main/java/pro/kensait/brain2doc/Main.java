@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         Parameter.setUp(args);
         Parameter param = Parameter.getParameter();
-        System.out.println(param);
+        // TODO System.out.println(param);
 
         Flow.init(param);
         try {
@@ -22,7 +22,7 @@ public class Main {
     }
 
     private static void outputReport() {
-        System.out.println("########## REPORT ##########");
+        System.out.println("\n\n########## REPORT ##########");
         for (String report : Flow.getReportList()) {
             System.out.println(report);
         }

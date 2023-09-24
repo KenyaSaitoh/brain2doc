@@ -40,7 +40,7 @@ public class Parameter {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
         String openaiModel = DefaultValueHolder.getProperty("openai_model");
         String openaiApiKey = System.getenv("OPENAI_API_KEY");
-        System.out.println("###" + openaiApiKey);
+        // TODO System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource").toUpperCase());
         OutputType outputType = OutputType.valueOf(
