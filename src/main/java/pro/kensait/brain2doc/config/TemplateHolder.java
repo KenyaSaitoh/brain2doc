@@ -28,13 +28,13 @@ public class TemplateHolder {
     synchronized public Map getTemplateMap(Locale locale, Path templateFile) {
         if (templateMap == null) {
             Yaml yaml = new Yaml();
-            if (templateFile == null) {
+            if (templateFile == null) { // 外部ファイルの指定がない場合
                 String templateFileName = TEMPLATE_FILE_PREFIX + locale.getLanguage() +
                         TEMPLATE_FILE_EXT;
                 ClassLoader classloader = Thread.currentThread().getContextClassLoader();
                 templateMap = yaml.loadAs(
                         classloader.getResourceAsStream(templateFileName), Map.class);
-            } else {
+            } else { // 外部ファイルの指定がある場合
                 try (InputStream is = Files.newInputStream(templateFile)) {
                     templateMap = yaml.loadAs(is, Map.class);
                 } catch (IOException ioe) {

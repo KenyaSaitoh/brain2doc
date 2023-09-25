@@ -1,11 +1,28 @@
 package pro.kensait.brain2doc;
 
+import static pro.kensait.brain2doc.common.ConsoleColor.*;
+
+import java.util.List;
+
+import pro.kensait.brain2doc.config.HelpMessageHolder;
+import pro.kensait.brain2doc.exception.OpenAIClientException;
 import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.process.Flow;
 
 public class Main {
     public static void main(String[] args) {
+        if(args == null || args.length == 0 ||
+                (args.length == 1 && args[0] == "--help"))  {
+            String lang = System.getenv("LANG");
+            if (lang != null && ! lang.isEmpty() && ! lang.startsWith("ja_")) {
+                printHelpMessage("en");
+                return;
+            }
+            printHelpMessage("ja");
+            return;
+        }
+
         Parameter.setUp(args);
         Parameter param = Parameter.getParameter();
         // TODO System.out.println(param);
@@ -13,16 +30,26 @@ public class Main {
         Flow.init(param);
         try {
             Flow.startAndFork();
-        } catch(OpenAIRetryCountOverException re) {
-            System.err.println("Error occured!!!!!");
-            outputReport();
+        } catch(OpenAIClientException | OpenAIRetryCountOverException oe) {
+            System.err.println("\nError occured!!!!!");
+            printReport();
             System.exit(1);
         }
-        outputReport();
+        printReport();
     }
 
-    private static void outputReport() {
-        System.out.println("\n\n########## REPORT ##########");
+    private static void printHelpMessage(String lang) {
+        List<String> messageList = HelpMessageHolder.getInstance().getHelpMessage(lang);
+        for (String line : messageList) {
+            System.out.println(line
+                    .replaceAll("<r>", ANSI_RED)
+                    .replaceAll("<b>", ANSI_BLUE)
+                    .replaceAll("</>", ANSI_RESET));
+        }
+    }
+
+    private static void printReport() {
+        System.out.println("\n########## REPORT ##########");
         for (String report : Flow.getReportList()) {
             System.out.println(report);
         }

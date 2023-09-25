@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -40,7 +44,6 @@ public class Flow {
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
-    private static final String PROCESSING_CONSOLE_MARK = " >";
 
     private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
@@ -84,7 +87,7 @@ public class Flow {
     }
 
     private static void readNormalFile(Path inputFilePath) {
-        System.out.print("\nProcessing [" + inputFilePath.getFileName() + "]");
+        System.out.print("Processing [" + inputFilePath.getFileName() + "] ");
         ResourceType resourceType = param.getResourceType();
         try {
             if (resourceType.matchesExt(inputFilePath.toString())) {
@@ -115,7 +118,7 @@ public class Flow {
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName();
                 Path inputFilePath = Paths.get(srcPath.toString(), entryName);
-                System.out.print("\nProcessing [" + entryName + "]");
+                System.out.print("Processing [" + entryName + "] ");
                 if (resourceType.matchesExt(entryName)) {
                     String ext = resourceType.getMatchExt(entryName.toString());
                     // 正規表現がパラメータとして指定されており、かつ、
@@ -147,7 +150,11 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        System.out.print(PROCESSING_CONSOLE_MARK);
+        // コンソールへの進捗バー表示スレッドを起動する
+        ConsoleProgressTask cpt = new ConsoleProgressTask(false);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<?> future = executorService.submit(cpt);
+
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
         try {
@@ -164,7 +171,6 @@ public class Flow {
         }
 
         for (int i = 0; i < apiResultList.size(); i++) {
-            System.out.print(PROCESSING_CONSOLE_MARK);
             ApiResult apiResult = apiResultList.get(i);
             List<String> responseChoices = toChoicesFromResponce(apiResult.getResponseBody());
             List<String> responseLines = toLineListFromChoices(responseChoices);
@@ -178,6 +184,13 @@ public class Flow {
                     i + 1);
             write(outputFileContent);
             addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
+        }
+        cpt.setDone(true);
+        try {
+            future.get();
+            System.out.println("");
+        } catch (InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -308,7 +321,6 @@ public class Flow {
     private static void addReport(Path inputFilePath, String message, long interval) {
         String report = inputFilePath.getFileName().toString() + "," +
                 message + "," + interval;
-        System.out.print(" " + message);
         reportList.add(report);
     }
 }
