@@ -1,29 +1,33 @@
 [パラメータの指定方法]
---url             APIのURLを指定します（デフォルトは""）
---model           gptのモデルを指定します（デフォルトは""）
---apikey          APIキーを指定します（指定がない場合は環境変数""より取得）
---resource        入力となるリソースの種別を指定します（デフォルトは""）
-                  リソースには、以下の種別があります
-                  <b>java</>   : Javaのソースコード（拡張子".java"が対象）
-                  <b>js</>     : 
-                  <b>python</> :
-                  <b>sql</>    : SQLコード（拡張子".sql"が対象）
-                  <b>page</>   : ページファイル（拡張子"page", ".html", ".htm", ".xhtml", ".jsp"が対象）
-                  <b>shell</>  : シェルスクリプト（拡張子".sh", ".bash", ".ksh", ".bash"が対象）
-                  <b>others</> :
---output
---outputScale
---src             ソースのファイルまたはディレクトリを指定します（<r>指定必須</>）
+<b>--url</>
+    APIのURLを指定します（デフォルトは"https://api.openai.com/v1/chat/completions"）
+<b>--model</>           
+    gptのモデルを指定します（デフォルトは"gpt-3.5-turbo"）
+<b>--apikey</>
+    APIキーを指定します（指定がない場合は環境変数"OPENAI_API_KEY"より取得）
+<b>--resource</>
+    入力となるリソースの種別を指定します（デフォルトは"others"）
+    リソースには、以下の種別があります
+    <b>java</>   : Javaのソースコード（拡張子".java"が対象）
+    <b>js</>     : 
+    <b>python</> :
+    <b>sql</>    : SQLコード（拡張子".sql"が対象）
+    <b>page</>   : ページファイル（拡張子"page", ".html", ".htm", ".xhtml", ".jsp"が対象）
+    <b>shell</>  : シェルスクリプト（拡張子".sh", ".bash", ".ksh", ".bash"が対象）
+    <b>others</> :
+<b>--output</>
+<b>--output-scale</>
+<b>--src</>             ソースのファイルまたはディレクトリを指定します（<r>指定必須</>）
                   ディレクトリを指定すると、再帰的にファイルを一括処理します
                   ZIPファイルを指定することも可能です
---regex
---dest
---lang
---template
---proxyURL
---connectTimeout  API呼び出しにおける接続タイムアウト時間を指定します
---timeout
---retryCount
---retryInterval
---autoSplit      
+<b>--regex</>
+<b>--dest</>
+<b>--lang</>
+<b>--template</>
+<b>--proxyURL</>
+<b>--connect-timeout</>  API呼び出しにおける接続タイムアウト時間を指定します
+<b>--timeout</>
+<b>--retry-count</>
+<b>--retry-interval</>
+<b>--auto-split</>
 

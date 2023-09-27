@@ -1,6 +1,7 @@
 plugins {
+    id "java"
     id "com.github.johnrengelman.shadow" version "7.0.0"
-    id "org.graalvm.buildtools.native" version "0.9.25"
+    id "org.beryx.jlink" version "3.0.0"
 }
 
 // リポジトリ設定
@@ -9,7 +10,6 @@ repositories {
 }
 
 // プラグイン読み込み
-apply plugin: "java"
 apply plugin: "eclipse"
 
 // 文字コード設定
@@ -22,6 +22,8 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.15.2"
     implementation "org.yaml:snakeyaml:2.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.9.3"
+    testImplementation "org.junit.platform:junit-platform-launcher"
 }
 
 // ソースフォルダの設定
@@ -49,17 +51,16 @@ processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "jp.mufg.it.openai.docgen.main.Main"
+// モジュール化対応
+plugins.withType(JavaPlugin).configureEach {
+    java {
+        modularity.inferModulePath = true
     }
 }
 
-graalvmNative {
-    binaries {
-        main {
-            useFatJar = true
-        }
+jar {
+    manifest {
+        attributes "Main-Class": "pro.kensait.brain2doc.Main"
     }
 }
 

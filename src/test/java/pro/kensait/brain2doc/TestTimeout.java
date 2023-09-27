@@ -19,13 +19,13 @@ public class TestTimeout {
                 "refactoring " +
                 "--dest " +
                 "C:/tmp " + 
-                "--connectTimeout " +
+                "--connect-timeout " +
                 "1 " +
                 "--timeout " +
                 "11 " +
-                "--retryCount " +
+                "--retry-count " +
                 "1 " +
-                "--retryInterval " +
+                "--retry-interval " +
                 "3 " +
                 "";
         String[] params = parameter.split(" ");

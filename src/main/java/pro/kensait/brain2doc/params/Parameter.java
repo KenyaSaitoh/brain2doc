@@ -11,7 +11,7 @@ import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.DefaultValueHolder;
 
 public class Parameter {
-
+    private static final String OPENAI_API_KEY = "OPENAI_API_KEY";
     private static Parameter parameter;
 
     public static Parameter getParameter() {
@@ -39,7 +39,7 @@ public class Parameter {
     synchronized public static void setUp(String[] args) {
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
         String openaiModel = DefaultValueHolder.getProperty("openai_model");
-        String openaiApiKey = System.getenv("OPENAI_API_KEY");
+        String openaiApiKey = System.getenv(OPENAI_API_KEY);
         // TODO System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource").toUpperCase());
@@ -82,13 +82,15 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         resourceType = ResourceType.getResourceTypeByName(args[++i].toLowerCase());
-                        if (resourceType == null) throw new IllegalArgumentException();
+                        if (resourceType == null) {
+                            resourceType = ResourceType.OTHERS;
+                        }
                     } else if (args[i].equalsIgnoreCase("--output")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         outputType = OutputType.getOutputTypeByName(args[++i].toLowerCase());
                         if (outputType == null) throw new IllegalArgumentException();
-                    } else if (args[i].equalsIgnoreCase("--outputScale")) {
+                    } else if (args[i].equalsIgnoreCase("--output-scale")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         outputScaleType = OutputScaleType
@@ -118,7 +120,7 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         proxyURL = args[++i];
-                    } else if (args[i].equalsIgnoreCase("--connectTimeout")) {
+                    } else if (args[i].equalsIgnoreCase("--connect-timeout")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         connectTimeout = Integer.parseInt(args[++i]);
@@ -126,15 +128,15 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         requestTimeout = Integer.parseInt(args[++i]);
-                    } else if (args[i].equalsIgnoreCase("--retryCount")) {
+                    } else if (args[i].equalsIgnoreCase("--retry-count")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         retryCount = Integer.parseInt(args[++i]);
-                    } else if (args[i].equalsIgnoreCase("--retryInterval")) {
+                    } else if (args[i].equalsIgnoreCase("--retry-interval")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         retryInterval = Integer.parseInt(args[++i]);
-                    } else if (args[i].equalsIgnoreCase("--autoSplit")) {
+                    } else if (args[i].equalsIgnoreCase("--auto-split")) {
                         isAutoSplitMode = true;
                     } else {
                         throw new IllegalArgumentException(

@@ -63,10 +63,19 @@ graalvmNative {
     binaries {
         main {
             javaLauncher = javaToolchains.launcherFor {
-                languageVersion = JavaLanguageVersion.of(17)
+                languageVersion = JavaLanguageVersion.of(11)
                 // vendor = JvmVendorSpec.matching("Oracle Corporation")
             }
             useFatJar = true
+        }
+    }
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName = "brain2doc"
+            mainClass = "pro.kensait.brain2doc.Main"
         }
     }
 }

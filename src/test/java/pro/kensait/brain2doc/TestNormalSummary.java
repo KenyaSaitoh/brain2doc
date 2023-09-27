@@ -12,7 +12,7 @@ public class TestNormalSummary {
                 "java " +
                 "--output " +
                 "summary " +
-                "--outputScale " +
+                "--output-scale " +
                 "medium " + 
                 "--dest " +
                 "C:/tmp " + 

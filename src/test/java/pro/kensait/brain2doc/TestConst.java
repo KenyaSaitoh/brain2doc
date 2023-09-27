@@ -13,11 +13,11 @@ public class TestConst {
                 "java " +
                 "--output " +
                 "const " +
-                "--outputScale " +
+                "--output-scale " +
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--autoSplit" +
+                "--auto-split" +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

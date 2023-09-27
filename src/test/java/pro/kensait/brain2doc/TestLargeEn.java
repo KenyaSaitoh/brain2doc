@@ -13,13 +13,13 @@ public class TestLargeEn {
                 "java " +
                 "--output " +
                 "spec " +
-                "--outputScale " +
+                "--output-scale " +
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
                 "--lang " + 
                 "en " +
-                "--autoSplit" +
+                "--auto-split" +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

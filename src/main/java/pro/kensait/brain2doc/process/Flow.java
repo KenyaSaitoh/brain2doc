@@ -87,7 +87,6 @@ public class Flow {
     }
 
     private static void readNormalFile(Path inputFilePath) {
-        System.out.print("Processing [" + inputFilePath.getFileName() + "] ");
         ResourceType resourceType = param.getResourceType();
         try {
             if (resourceType.matchesExt(inputFilePath.toString())) {
@@ -102,6 +101,7 @@ public class Flow {
                     return;
                 }
                 List<String> inputFileLines = Files.readAllLines(inputFilePath);
+                System.out.print("Processing [" + inputFilePath.getFileName() + "] ");
                 mainProcess(inputFilePath, inputFileLines);
             }
         } catch(IOException ioe) {
@@ -188,10 +188,10 @@ public class Flow {
         cpt.setDone(true);
         try {
             future.get();
-            System.out.println("");
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
+        System.out.println("");
     }
 
     private static List<ApiResult> askToOpenAi(List<String> inputFileLines,

@@ -12,7 +12,7 @@ public class TestNormal {
                 "java " +
                 "--output " +
                 "spec " +
-                "--outputScale " +
+                "--output-scale " +
                 "medium " + 
                 "--dest " +
                 "C:/tmp " + 
@@ -34,11 +34,10 @@ public class TestNormal {
                 "C:/tmp " + 
                 "--regex " +
                 "Cust.* " +
-                "--outputScale " +
+                "--output-scale " +
                 "small " + 
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);
     }
-
 }

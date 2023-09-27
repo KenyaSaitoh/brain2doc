@@ -13,11 +13,11 @@ public class TestLarge {
                 "java " +
                 "--output " +
                 "review " +
-                "--outputScale " +
+                "--output-scale " +
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--autoSplit" +
+                "--auto-split" +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);
