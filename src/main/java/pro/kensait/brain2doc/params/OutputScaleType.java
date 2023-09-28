@@ -4,7 +4,7 @@ public enum OutputScaleType {
     SMALL("small", 50),
     MEDIUM("medium", 200),
     LARGE("large", 500),
-    NO_LIMIT("no_limit", null);
+    NO_LIMIT("nolimit", null);
 
     private String name;
     private Integer charSize;
