@@ -11,7 +11,7 @@ public class TestLargeEn {
                 "C:\\tmp\\large " +
                 "--resource " +
                 "java " +
-                "--output " +
+                "--gen " +
                 "spec " +
                 "--output-scale " +
                 "small " +

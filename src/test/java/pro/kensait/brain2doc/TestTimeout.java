@@ -11,7 +11,7 @@ public class TestTimeout {
                 "D:\\GitHubRepos\\learn_java_basic\\15_enum\\src\\pro\\kensait\\java\\basic\\lsn_15_1_3 " +
                 "--resource " +
                 "java " +
-                "--process " +
+                "--gen " +
                 "refactoring " +
                 "--dest " +
                 "C:/tmp " + 

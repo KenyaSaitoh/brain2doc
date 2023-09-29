@@ -10,7 +10,7 @@ public class TestNormalSummary {
                 "C:\\tmp\\params " +
                 "--resource " +
                 "java " +
-                "--output " +
+                "--gen " +
                 "summary " +
                 "--output-scale " +
                 "medium " + 

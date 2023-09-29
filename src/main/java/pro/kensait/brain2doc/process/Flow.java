@@ -176,7 +176,7 @@ public class Flow {
             List<String> responseLines = toLineListFromChoices(responseChoices);
             TransformStrategy transStrategy = TransformStrategy.getOutputStrategy(
                     param.getResourceType(),
-                    param.getOutputType());
+                    param.getGenerateType());
             String outputFileContent = transStrategy.transform(
                     inputFilePath,
                     inputFileContent,
@@ -219,7 +219,9 @@ public class Flow {
             // 分割された入力ファイルに、テンプレートをアタッチする
             List<String> requestLines = TemplateAttacher.attach(eachInputFileLines,
                     param.getResourceType(),
-                    param.getOutputType(),
+                    param.getGenerateType(),
+                    param.getGenListName(),
+                    param.getFiledNames(),
                     param.getOutputScaleType(),
                     param.getLocale(),
                     param.getTemplateFile());

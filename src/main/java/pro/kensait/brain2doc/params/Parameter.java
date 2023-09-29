@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Locale;
 
 import pro.kensait.brain2doc.common.Const;
@@ -22,7 +23,9 @@ public class Parameter {
     private String openaiModel; // デフォルト値はプロパティファイルから
     private String openaiApikey; // デフォルト値は環境変数から
     private ResourceType resourceType; // デフォルト値はプロパティファイルから
-    private OutputType outputType; // デフォルト値はプロパティファイルから
+    private GenerateType generateType; // デフォルト値はプロパティファイルから
+    private String genListName = null;
+    private String[] fieldNames = null;
     private OutputScaleType outputScaleType; // デフォルト値はプロパティファイルから
     private Path srcPath; // 指定必須
     private String srcRegex; // 任意指定
@@ -43,8 +46,10 @@ public class Parameter {
         // TODO System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource").toUpperCase());
-        OutputType outputType = OutputType.valueOf(
-                DefaultValueHolder.getProperty("output").toUpperCase());
+        GenerateType generateType = GenerateType.valueOf(
+                DefaultValueHolder.getProperty("generate").toUpperCase());
+        String genListName = null;
+        String[] fieldNames = null;
         OutputScaleType outputScaleType = OutputScaleType.valueOf(
                 DefaultValueHolder.getProperty("output_scale").toUpperCase());
         String srcParam = null;
@@ -62,7 +67,7 @@ public class Parameter {
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
         boolean isAutoSplitMode = false;
-        
+
         try {
             for (int i = 0; i < args.length; i++) {
                 try {
@@ -81,21 +86,31 @@ public class Parameter {
                     } else if (args[i].equalsIgnoreCase("--resource")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        resourceType = ResourceType.getResourceTypeByName(args[++i].toLowerCase());
+                        resourceType = ResourceType
+                                .getResourceTypeByName(args[++i].toLowerCase());
                         if (resourceType == null) {
                             resourceType = ResourceType.OTHERS;
                         }
-                    } else if (args[i].equalsIgnoreCase("--output")) {
+                    } else if (args[i].equalsIgnoreCase("--gen")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        outputType = OutputType.getOutputTypeByName(args[++i].toLowerCase());
-                        if (outputType == null) throw new IllegalArgumentException();
+                        generateType = GenerateType
+                                .getGenerateTypeByName(args[++i].toLowerCase());
+                    } else if (args[i].equalsIgnoreCase("--gen-list")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        genListName = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--field-names")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        fieldNames = args[++i].split(",");
                     } else if (args[i].equalsIgnoreCase("--output-scale")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         outputScaleType = OutputScaleType
                                 .getOutputScaleTypeByName(args[++i].toLowerCase());
-                        if (outputScaleType == null) throw new IllegalArgumentException();
+                        if (outputScaleType == null)
+                            throw new IllegalArgumentException();
                     } else if (args[i].equalsIgnoreCase("--src")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -154,14 +169,19 @@ public class Parameter {
         }
 
         // APIKeyのチェック
-        if (openaiApiKey == null || openaiApiKey.equals(""))
+        if (openaiApiKey == null || openaiApiKey.isBlank())
             throw new IllegalArgumentException("APIキーが指定されていません");
 
+        // 生成種別のチェック
+        if (generateType == null && (genListName == null || genListName.isBlank())) {
+            throw new IllegalArgumentException();
+        }
+
         // 入力元パスをチェックし、パラメータから入力元パスと入力元ディレクトリを決める
-        if (srcParam == null || srcParam.equals(""))
+        if (srcParam == null || srcParam.isBlank())
             throw new IllegalArgumentException("ソースが指定されていません");
         Path srcPath = Paths.get(srcParam);
-        if (! Files.exists(srcPath)) {
+        if (!Files.exists(srcPath)) {
             throw new IllegalArgumentException("ソースが存在しません");
         }
 
@@ -174,17 +194,17 @@ public class Parameter {
 
         // 出力先パスを決める
         Path destPath = null;
-        if (destParam == null || destParam.equals("")) {
+        if (destParam == null || destParam.isBlank()) {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
-            destPath = Paths.get(srcDirPath.toString(), 
-                    getDefaultOutputFileName(resourceType, outputType));
+            destPath = Paths.get(srcDirPath.toString(),
+                    getDefaultOutputFileName(resourceType, generateType));
         } else {
             // destオプションの指定があった場合は、ディレクトリ指定だった場合は
             // デフォルトファイル名を採用し、ファイル指定だった場合はそのまま
             destPath = Paths.get(destParam);
             if (Files.isDirectory(destPath)) {
-                destPath = Paths.get(destPath.toString(), 
-                        getDefaultOutputFileName(resourceType, outputType));
+                destPath = Paths.get(destPath.toString(),
+                        getDefaultOutputFileName(resourceType, generateType));
             }
         }
 
@@ -192,12 +212,12 @@ public class Parameter {
         Locale locale = new Locale(langParam);
 
         // 外部指定されたテンプレートファイルを決める
-        Path templateFile = templateFileParam != null ?
-                Paths.get(templateFileParam) :
-                    null;
+        Path templateFile = templateFileParam != null ? Paths.get(templateFileParam)
+                : null;
 
         parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey,
-                resourceType, outputType, outputScaleType,
+                resourceType, generateType, genListName, fieldNames,
+                outputScaleType,
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
                 proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
@@ -205,10 +225,10 @@ public class Parameter {
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
-            OutputType outputType) {
+            GenerateType generateType) {
         return DefaultValueHolder.getProperty("output_file_name") + "-" +
                 resourceType.getName() + "-" +
-                outputType.getName() + "-" + 
+                generateType.getName() + "-" +
                 getCurrentDateTimeStr() +
                 Const.OUTPUT_FILE_EXT;
     }
@@ -217,21 +237,24 @@ public class Parameter {
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yMMddHHmmss");
         return localDateTime.format(dateTimeFormatter);
-    } 
+    }
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
-            ResourceType resourceType, OutputType outputType, OutputScaleType outputScaleType,
+            ResourceType resourceType, GenerateType generateType,
+            String genListName, String[] fieldNames,
+            OutputScaleType outputScaleType,
             Path srcPath, String srcRegex, Path destFilePath,
             Locale locale, Path templateFile,
             String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
             int retryInterval,
             boolean isAutoSplitMode) {
-        super();
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
         this.openaiApikey = openaiApikey;
         this.resourceType = resourceType;
-        this.outputType = outputType;
+        this.generateType = generateType;
+        this.genListName = genListName;
+        this.fieldNames = fieldNames;
         this.outputScaleType = outputScaleType;
         this.srcPath = srcPath;
         this.srcRegex = srcRegex;
@@ -262,8 +285,16 @@ public class Parameter {
         return resourceType;
     }
 
-    public OutputType getOutputType() {
-        return outputType;
+    public GenerateType getGenerateType() {
+        return generateType;
+    }
+
+    public String getGenListName() {
+        return genListName;
+    }
+
+    public String[] getFiledNames() {
+        return fieldNames;
     }
 
     public OutputScaleType getOutputScaleType() {
@@ -318,12 +349,13 @@ public class Parameter {
     public String toString() {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
-                + ", outputType=" + outputType + ", outputScaleType=" + outputScaleType
-                + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
-                + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
-                + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
-                + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
-                + ", retryInterval=" + retryInterval + ", isAutoSplitMode="
-                + isAutoSplitMode + "]";
+                + ", generateType=" + generateType + ", genListName=" + genListName
+                + ", fieldNames=" + Arrays.toString(fieldNames) + ", outputScaleType="
+                + outputScaleType + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex
+                + ", destFilePath=" + destFilePath + ", locale=" + locale
+                + ", templateFile=" + templateFile + ", proxyURL=" + proxyURL
+                + ", connectTimeout=" + connectTimeout + ", requestTimeout="
+                + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
+                + retryInterval + ", isAutoSplitMode=" + isAutoSplitMode + "]";
     }
 }

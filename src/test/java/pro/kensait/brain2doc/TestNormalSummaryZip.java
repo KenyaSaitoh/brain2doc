@@ -10,7 +10,7 @@ public class TestNormalSummaryZip {
                 "E:\\Download\\SpringBootJpa_Web-master.zip " +
                 "--resource " +
                 "java " +
-                "--output " +
+                "--gen " +
                 "review " +
                 // "summary " +
                 "--dest " +

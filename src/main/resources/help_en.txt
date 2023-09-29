@@ -20,7 +20,7 @@
     <b>shell</> : Shell scripts (targeting ".sh", ".bash", ".ksh", ".bash" extensions)
     <b>others</> : Generic resources other than the above
 
-<b>--output</>
+<b>--gen</>
     Specify what processing should be performed on the resource and what you want to output (default is "others")
     Available output types are:
     <b>spec</> : Specification document

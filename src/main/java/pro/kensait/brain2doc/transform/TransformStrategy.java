@@ -3,7 +3,7 @@ package pro.kensait.brain2doc.transform;
 import java.nio.file.Path;
 import java.util.List;
 
-import pro.kensait.brain2doc.params.OutputType;
+import pro.kensait.brain2doc.params.GenerateType;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public interface TransformStrategy {
@@ -11,7 +11,7 @@ public interface TransformStrategy {
             List<String> responseContents, int seqNum);
 
     public static TransformStrategy getOutputStrategy(ResourceType resourceType,
-            OutputType outputType) {
+            GenerateType generateType) {
         if (resourceType == ResourceType.JAVA) {
             return new JavaGeneralTransformStrategy();
         }

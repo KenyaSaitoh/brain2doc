@@ -8,8 +8,8 @@ import java.util.Map;
 
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.TemplateHolder;
+import pro.kensait.brain2doc.params.GenerateType;
 import pro.kensait.brain2doc.params.OutputScaleType;
-import pro.kensait.brain2doc.params.OutputType;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public class TemplateAttacher {
@@ -17,22 +17,31 @@ public class TemplateAttacher {
     @SuppressWarnings("rawtypes")
     public static List<String> attach(List<String> inputFileLines,
             ResourceType resourceType,
-            OutputType outputType,
+            GenerateType generateType,
+            String genListName,
+            String[] fieldNames,
             OutputScaleType outputSizeType,
             Locale locale,
             Path templateFile) {
         TemplateHolder th = TemplateHolder.getInstance();
         Map templateMap = th.getTemplateMap(locale, templateFile);
-
+        Map messageMap = (Map) templateMap.get("message");
         Map resourceMap = (Map) templateMap.get(resourceType.getName());
         if (resourceMap == null || resourceMap.isEmpty())
             throw new IllegalArgumentException("テンプレート（リソース）の誤り");
 
-        String templateStr = (String) resourceMap.get(outputType.getName());
-        if (templateStr == null || templateStr.isEmpty())
-            throw new IllegalArgumentException("テンプレートの誤り");
+        String templateStr = (String) messageMap.get("common");
+        String added = null;
+        if (generateType != null) {
+            added = (String) resourceMap.get(generateType.getName());
+            if (added == null) {
+                throw new IllegalArgumentException("テンプレートの誤り");
+            }
+        } else {
+            added = getListTemplateStr(messageMap, genListName, fieldNames);
+        }
+        templateStr += added;
 
-        Map messageMap = (Map) templateMap.get("message");
         List<String> requestLines = new ArrayList<>();
         requestLines.add(templateStr);
         requestLines.add((String) (messageMap.get("constraints")));
@@ -43,7 +52,7 @@ public class TemplateAttacher {
                 (String) (messageMap.get("input")) +
                 Const.SEPARATOR);
 
-        // TODO System.out.println(requestLines);
+        System.out.println(requestLines);
         requestLines.addAll(inputFileLines);
         return requestLines;
     }
@@ -66,5 +75,16 @@ public class TemplateAttacher {
         default:
             return "";
         }
+    }
+
+    private static String getListTemplateStr(Map messageMap, String genListName,
+            String[] fieldNames) {
+        String str1 = (String) (messageMap.get("list-prefix")) +
+                genListName +
+                (String) (messageMap.get("list-suffix"));
+        String str2 = (String) (messageMap.get("fields-prefix")) + "[" +
+                fieldNames + "]" +
+                (String) (messageMap.get("fields-suffix"));
+        return str1 + str2;
     }
 }

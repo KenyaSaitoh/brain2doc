@@ -11,8 +11,8 @@ public class TestConst {
                 "D:\\GitHubRepos\\brain2doc\\src\\main\\java " +
                 "--resource " +
                 "java " +
-                "--output " +
-                "const " +
+                "--gen-list " +
+                "定数一覧 " +
                 "--output-scale " +
                 "small " +
                 "--dest " +

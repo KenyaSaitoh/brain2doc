@@ -10,7 +10,7 @@ public class TestNormal {
                 "C:\\tmp\\params " +
                 "--resource " +
                 "java " +
-                "--output " +
+                "--gen " +
                 "spec " +
                 "--output-scale " +
                 "medium " + 
