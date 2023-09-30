@@ -29,7 +29,6 @@
     spec    : 仕様書
     summary : サマリー
     review  : レビュー結果・改善提案
-    er      : E-R図（リソースがsqlの場合のみ）
     others  : 上記以外の汎用的な出力（"--gen"、"--gen-table"の指定がなかった場合のデフォルト）
 
 --gen-table
