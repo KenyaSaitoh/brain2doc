@@ -2,15 +2,26 @@ package pro.kensait.brain2doc.process;
 
 import static pro.kensait.brain2doc.common.ConsoleColor.*;
 
+import java.util.concurrent.CountDownLatch;
+
 public class ConsoleProgressTask implements Runnable {
     private static final String DONE_BAR = "=> ";
     private static final String BAR = "=";
-    private static final int INTERVAL = 3000;
-    private static final int DELAY = 1500;
+    private static final int INTERVAL = 2000;
+    private CountDownLatch startSignal;
     private boolean isDone;
 
-    public ConsoleProgressTask(boolean isDone) {
+    public ConsoleProgressTask(CountDownLatch startSignal, boolean isDone) {
+        this.startSignal = startSignal;
         this.isDone = isDone;
+    }
+
+    public CountDownLatch getStartSignal() {
+        return startSignal;
+    }
+
+    public void setStartSignal(CountDownLatch startSignal) {
+        this.startSignal = startSignal;
     }
 
     public boolean isDone() {
@@ -23,12 +34,16 @@ public class ConsoleProgressTask implements Runnable {
 
     @Override
     public void run() {
-        sleepAWhile(DELAY);
-        while (! isDone) {
-            System.out.print(BAR);
-            sleepAWhile(INTERVAL);
+        try {
+            startSignal.await();
+            while (! isDone) {
+                System.out.print(BAR);
+                sleepAWhile(INTERVAL);
+            }
+            System.out.println(DONE_BAR + ANSI_BLUE + "done!" + ANSI_RESET);
+        } catch (InterruptedException ie) {
+            throw new RuntimeException(ie);
         }
-        System.out.print(DONE_BAR + ANSI_BLUE + "done!" + ANSI_RESET);
     }
 
     private void sleepAWhile(long time) {

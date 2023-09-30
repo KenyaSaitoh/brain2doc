@@ -16,8 +16,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import pro.kensait.brain2doc.common.Const;
-import pro.kensait.brain2doc.config.ConstValueHolder;
+import pro.kensait.brain2doc.config.ConstMapHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
@@ -38,6 +40,7 @@ import pro.kensait.brain2doc.openai.ApiResult;
 import pro.kensait.brain2doc.openai.SuccessResponseBody;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.params.ResourceType;
+import pro.kensait.brain2doc.process.TemplateAttacher.Prompt;
 import pro.kensait.brain2doc.transform.TransformStrategy;
 
 public class Flow {
@@ -50,6 +53,8 @@ public class Flow {
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
+    private static final String PROMPT_HEADING = "### PROMPT CONTENT (without source)";
+    private static final String PROCESS_PROGRESS_HEADING = "### PROGRESS";
 
     private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
@@ -154,28 +159,36 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        System.out.print(ANSI_BOLD + ANSI_PURPLE + "# Processing [" +
-                inputFilePath.getFileName() + "] " + ANSI_RESET);
+        Runnable printProcessing = () -> {
+            System.out.print("processing [" + ANSI_BOLD + ANSI_PURPLE +
+                    inputFilePath.getFileName() + ANSI_RESET + "] ");
+        };
+        // 最初のファイルではPROMPTを先に表示するため、ここではPROGRESSを表示しない
+        if (! param.isPrintPrompt()) {
+            printProcessing.run(); // 2ファイル目以降はPROGRESSを表示する
+        }
 
         // コンソールへの進捗バー表示スレッドを起動する
-        ConsoleProgressTask cpt = new ConsoleProgressTask(false);
+        CountDownLatch startSignal = new CountDownLatch(1);
+        ConsoleProgressTask cpt = new ConsoleProgressTask(startSignal, false);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<?> future = executorService.submit(cpt);
 
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
         try {
-            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1, 0);
-        } catch(OpenAITokenLimitOverException oe) {
+            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1, 0,
+                    startSignal, printProcessing);
+        } catch (OpenAITokenLimitOverException oe) {
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
             return; // 次のファイルへ
-        } catch(OpenAIRateLimitExceededException ore) {
+        } catch (OpenAIRateLimitExceededException ore) {
             addReport(inputFilePath, LIMIT_EXCEEDED_MESSAGE, 0);
             throw ore; // プログラム停止
-        } catch(OpenAIClientException oce) {
+        } catch (OpenAIClientException oce) {
             addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
             throw oce; // プログラム停止
-        } catch(OpenAIRetryCountOverException ore) {
+        } catch (OpenAIRetryCountOverException ore) {
             addReport(inputFilePath, TIMEOUT_MESSAGE, 0);
             throw ore; // プログラム停止
         }
@@ -201,14 +214,15 @@ public class Flow {
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
-        System.out.println("");
     }
 
     private static List<ApiResult> askToOpenAi(
             List<String> inputFileLines,
             String inputFileContent,
             int splitConut,
-            int prevSplitCount) {
+            int prevSplitCount,
+            CountDownLatch startSignal,
+            Runnable printProcessing) {
         // TODO
         // System.out.println(splitConut + "," + prevSplitCount);
         if (prevSplitCount != 0) {
@@ -231,7 +245,7 @@ public class Flow {
         for (int i = 0; i < splittedInputFileLists.size(); i++) {
             List<String> eachInputFileLines = splittedInputFileLists.get(i);
             // 分割された入力ファイルに、テンプレートをアタッチする
-            List<String> requestLines = TemplateAttacher.attach(eachInputFileLines,
+            Prompt prompt = TemplateAttacher.attach(eachInputFileLines,
                     param.getResourceType(),
                     param.getGenerateType(),
                     param.getGenTable(),
@@ -239,10 +253,21 @@ public class Flow {
                     param.getOutputScaleType(),
                     param.getLocale(),
                     param.getTemplateFile(),
-                    param.isPrintPrompt(),
                     i);
 
-            String requestContent = toStringFromStrList(requestLines);
+            // 実行ごとに初回のみ
+            if (param.isPrintPrompt()) {
+                // プログレスバーより先にプロンプトを出力する
+                printPrompt(prompt.getPromptMessage());
+                System.out.println(PROCESS_PROGRESS_HEADING);
+                printProcessing.run();
+                param.setPrintPrompt(false);
+            }
+
+            // プログレスバーの表示を開始する
+            startSignal.countDown();
+
+            String requestContent = toStringFromStrList(prompt.getRequestLines());
 
             // OpenAIのAPIを呼び出す
             ApiResult apiResult = null;
@@ -270,14 +295,17 @@ public class Flow {
                         Double tokenCount = extractToken(requestContent, errorMessage);
                         if (tokenCount == null)
                             throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
-                        Double tokenCountLimit = Double.parseDouble(
-                                ConstValueHolder.getProperty("token-count-limit"));
+                        @SuppressWarnings("rawtypes")
+                        Map tokenLimitMap = (Map) (ConstMapHolder.getConstMap()
+                                .get("token-count-limit"));
+                        int tokenCountLimit = (int)
+                                (tokenLimitMap.get(param.getOpenaiModel()));
                         int newSplitConut = SplitUtil.calcSplitCount(
                                 tokenCount, tokenCountLimit);
 
                         // 分割数を指定して再帰呼び出しする
                         return askToOpenAi(inputFileLines, inputFileContent,
-                                newSplitConut, splitConut);
+                                newSplitConut, splitConut, startSignal, printProcessing);
                     }
                     throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
 
@@ -354,6 +382,12 @@ public class Flow {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+    }
+
+    private static void printPrompt(String promptMessage) {
+        System.out.println(PROMPT_HEADING);
+        System.out.print(ANSI_CYAN +  promptMessage);
+        System.out.println(ANSI_RESET);
     }
 
     private static void addReport(Path inputFilePath, String message, long interval) {

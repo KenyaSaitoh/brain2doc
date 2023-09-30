@@ -37,7 +37,7 @@ public class Parameter {
     private int retryCount; // デフォルト値はプロパティファイルから
     private int retryInterval; // デフォルト値はプロパティファイルから
     private boolean isAutoSplitMode; // デフォルト値false
-    private boolean printPrompt; // デフォルト値false
+    private boolean printPrompt;
 
     synchronized public static void setUp(String[] args) {
         // ローカル変数とデフォルト値の設定
@@ -67,7 +67,6 @@ public class Parameter {
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
         boolean isAutoSplitMode = false;
-        boolean printPrompt = false;
 
         // 引数として指定されたパラメータの取得と設定
         try {
@@ -155,8 +154,6 @@ public class Parameter {
                         retryInterval = Integer.parseInt(args[++i]);
                     } else if (args[i].equalsIgnoreCase("--auto-split")) {
                         isAutoSplitMode = true;
-                    } else if (args[i].equalsIgnoreCase("--print-prompt")) {
-                        printPrompt = true;
                     } else {
                         throw new IllegalArgumentException(
                                 "パラメータが不正です => \"" + args[i] + "\"");
@@ -234,7 +231,7 @@ public class Parameter {
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
                 proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
-                isAutoSplitMode, printPrompt);
+                isAutoSplitMode, true);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
@@ -362,6 +359,10 @@ public class Parameter {
 
     public boolean isPrintPrompt() {
         return printPrompt;
+    }
+
+    public void setPrintPrompt(boolean printPrompt) {
+        this.printPrompt = printPrompt;
     }
 
     @Override

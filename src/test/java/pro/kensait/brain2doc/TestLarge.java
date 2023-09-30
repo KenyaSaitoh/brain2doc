@@ -18,9 +18,9 @@ public class TestLarge {
                 "--dest " +
                 "C:/tmp/output " +
                 "--auto-split " +
-                "--print-prompt " +
                 "--model " +
-                "gpt-3.5-turbo";
+                "gpt-3.5-turbo" +
+                "";
         String[] params = parameter.split(" ");
         Main.main(params);
     }
