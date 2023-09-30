@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Locale;
 
 import pro.kensait.brain2doc.common.Const;
@@ -24,8 +23,8 @@ public class Parameter {
     private String openaiApikey; // デフォルト値は環境変数から
     private ResourceType resourceType; // デフォルト値はプロパティファイルから
     private GenerateType generateType; // デフォルト値はプロパティファイルから
-    private String genListName = null;
-    private String[] fieldNames = null;
+    private String genTable = null; // 任意指定
+    private String fields = null; // 任意指定
     private OutputScaleType outputScaleType; // デフォルト値はプロパティファイルから
     private Path srcPath; // 指定必須
     private String srcRegex; // 任意指定
@@ -38,18 +37,19 @@ public class Parameter {
     private int retryCount; // デフォルト値はプロパティファイルから
     private int retryInterval; // デフォルト値はプロパティファイルから
     private boolean isAutoSplitMode; // デフォルト値false
+    private boolean printPrompt; // デフォルト値false
 
     synchronized public static void setUp(String[] args) {
+        // ローカル変数とデフォルト値の設定
         String openaiUrl = DefaultValueHolder.getProperty("openai_url");
         String openaiModel = DefaultValueHolder.getProperty("openai_model");
         String openaiApiKey = System.getenv(OPENAI_API_KEY);
         // TODO System.out.println("###" + openaiApiKey);
         ResourceType resourceType = ResourceType.valueOf(
                 DefaultValueHolder.getProperty("resource").toUpperCase());
-        GenerateType generateType = GenerateType.valueOf(
-                DefaultValueHolder.getProperty("generate").toUpperCase());
-        String genListName = null;
-        String[] fieldNames = null;
+        GenerateType generateType = null;
+        String genTable = null;
+        String fields = null;
         OutputScaleType outputScaleType = OutputScaleType.valueOf(
                 DefaultValueHolder.getProperty("output_scale").toUpperCase());
         String srcParam = null;
@@ -67,7 +67,9 @@ public class Parameter {
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
         boolean isAutoSplitMode = false;
+        boolean printPrompt = false;
 
+        // 引数として指定されたパラメータの取得と設定
         try {
             for (int i = 0; i < args.length; i++) {
                 try {
@@ -96,14 +98,14 @@ public class Parameter {
                             continue;
                         generateType = GenerateType
                                 .getGenerateTypeByName(args[++i].toLowerCase());
-                    } else if (args[i].equalsIgnoreCase("--gen-list")) {
+                    } else if (args[i].equalsIgnoreCase("--gen-table")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        genListName = args[++i];
-                    } else if (args[i].equalsIgnoreCase("--field-names")) {
+                        genTable = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--fields")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
-                        fieldNames = args[++i].split(",");
+                        fields = args[++i];
                     } else if (args[i].equalsIgnoreCase("--output-scale")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -153,6 +155,8 @@ public class Parameter {
                         retryInterval = Integer.parseInt(args[++i]);
                     } else if (args[i].equalsIgnoreCase("--auto-split")) {
                         isAutoSplitMode = true;
+                    } else if (args[i].equalsIgnoreCase("--print-prompt")) {
+                        printPrompt = true;
                     } else {
                         throw new IllegalArgumentException(
                                 "パラメータが不正です => \"" + args[i] + "\"");
@@ -169,19 +173,28 @@ public class Parameter {
         }
 
         // APIKeyのチェック
-        if (openaiApiKey == null || openaiApiKey.isBlank())
+        if (openaiApiKey == null || openaiApiKey.isEmpty())
             throw new IllegalArgumentException("APIキーが指定されていません");
 
         // 生成種別のチェック
-        if (generateType == null && (genListName == null || genListName.isBlank())) {
-            throw new IllegalArgumentException();
+        if (generateType == null) {
+            if (genTable == null || genTable.isEmpty()) {
+                generateType = GenerateType.OTHERS;
+            } else {
+                if (fields == null || fields.isEmpty()) {
+                    throw new IllegalArgumentException("テーブルのフィールド名が指定されていません");
+                }
+            }
+        } else {
+            if (genTable != null && ! genTable.isEmpty()) {
+                throw new IllegalArgumentException("\"gen\"と\"gen-table\"を同時に指定することはできません");
+            }
         }
-
         // 入力元パスをチェックし、パラメータから入力元パスと入力元ディレクトリを決める
-        if (srcParam == null || srcParam.isBlank())
+        if (srcParam == null || srcParam.isEmpty())
             throw new IllegalArgumentException("ソースが指定されていません");
         Path srcPath = Paths.get(srcParam);
-        if (!Files.exists(srcPath)) {
+        if (! Files.exists(srcPath)) {
             throw new IllegalArgumentException("ソースが存在しません");
         }
 
@@ -194,7 +207,7 @@ public class Parameter {
 
         // 出力先パスを決める
         Path destPath = null;
-        if (destParam == null || destParam.isBlank()) {
+        if (destParam == null || destParam.isEmpty()) {
             // destオプションの指定がなかった場合は、destPathはソースパス＋デフォルト名
             destPath = Paths.get(srcDirPath.toString(),
                     getDefaultOutputFileName(resourceType, generateType));
@@ -216,19 +229,19 @@ public class Parameter {
                 : null;
 
         parameter = new Parameter(openaiUrl, openaiModel, openaiApiKey,
-                resourceType, generateType, genListName, fieldNames,
+                resourceType, generateType, genTable, fields,
                 outputScaleType,
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
                 proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
-                isAutoSplitMode);
+                isAutoSplitMode, printPrompt);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
             GenerateType generateType) {
         return DefaultValueHolder.getProperty("output_file_name") + "-" +
                 resourceType.getName() + "-" +
-                generateType.getName() + "-" +
+                (generateType != null ? generateType.getName() : "table") + "-" +
                 getCurrentDateTimeStr() +
                 Const.OUTPUT_FILE_EXT;
     }
@@ -241,20 +254,21 @@ public class Parameter {
 
     private Parameter(String openaiURL, String openaiModel, String openaiApikey,
             ResourceType resourceType, GenerateType generateType,
-            String genListName, String[] fieldNames,
+            String genTableName, String fieldsName,
             OutputScaleType outputScaleType,
             Path srcPath, String srcRegex, Path destFilePath,
             Locale locale, Path templateFile,
             String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
             int retryInterval,
-            boolean isAutoSplitMode) {
+            boolean isAutoSplitMode,
+            boolean printPrompt) {
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
         this.openaiApikey = openaiApikey;
         this.resourceType = resourceType;
         this.generateType = generateType;
-        this.genListName = genListName;
-        this.fieldNames = fieldNames;
+        this.genTable = genTableName;
+        this.fields = fieldsName;
         this.outputScaleType = outputScaleType;
         this.srcPath = srcPath;
         this.srcRegex = srcRegex;
@@ -267,6 +281,7 @@ public class Parameter {
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
         this.isAutoSplitMode = isAutoSplitMode;
+        this.printPrompt = printPrompt;
     }
 
     public String getOpenaiURL() {
@@ -289,12 +304,12 @@ public class Parameter {
         return generateType;
     }
 
-    public String getGenListName() {
-        return genListName;
+    public String getGenTable() {
+        return genTable;
     }
 
-    public String[] getFiledNames() {
-        return fieldNames;
+    public String getFields() {
+        return fields;
     }
 
     public OutputScaleType getOutputScaleType() {
@@ -345,17 +360,21 @@ public class Parameter {
         return isAutoSplitMode;
     }
 
+    public boolean isPrintPrompt() {
+        return printPrompt;
+    }
+
     @Override
     public String toString() {
         return "Parameter [openaiURL=" + openaiURL + ", openaiModel=" + openaiModel
                 + ", openaiApikey=" + openaiApikey + ", resourceType=" + resourceType
-                + ", generateType=" + generateType + ", genListName=" + genListName
-                + ", fieldNames=" + Arrays.toString(fieldNames) + ", outputScaleType="
-                + outputScaleType + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex
-                + ", destFilePath=" + destFilePath + ", locale=" + locale
-                + ", templateFile=" + templateFile + ", proxyURL=" + proxyURL
-                + ", connectTimeout=" + connectTimeout + ", requestTimeout="
-                + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
-                + retryInterval + ", isAutoSplitMode=" + isAutoSplitMode + "]";
+                + ", generateType=" + generateType + ", genTable=" + genTable
+                + ", fields=" + fields + ", outputScaleType=" + outputScaleType
+                + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
+                + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
+                + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
+                + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
+                + ", retryInterval=" + retryInterval + ", isAutoSplitMode="
+                + isAutoSplitMode + ", printPrompt=" + printPrompt + "]";
     }
 }

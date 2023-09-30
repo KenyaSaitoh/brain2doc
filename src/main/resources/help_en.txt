@@ -1,84 +1,88 @@
-[Parameter Specification]
+[Specifying Parameters]
 
-<b>--url</>
+<b>--url</b>
     Specify the API URL (default is "https://api.openai.com/v1/chat/completions")
 
-<b>--model</>
-    Specify the gpt model (default is "gpt-3.5-turbo")
+<b>--model</b>
+    Specify the gpt model (default is "gpt-4")
 
-<b>--apikey</>
-    Specify the API key (if not specified, it will be fetched from the environment variable "OPENAI_API_KEY")
+<b>--apikey</b>
+    Specify the API key (if not specified, it is retrieved from the environment variable "OPENAI_API_KEY")
 
-<b>--resource</>
-    Specify the type of input resource (default is "others")
-    Available resource types are:
-    <b>java</> : Java source code (targeting files with ".java" extension)
-    <b>js</> : JavaScript source code (targeting files with ".js" extension)
-    <b>python</> : Python source code (targeting files with ".py" extension)
-    <b>sql</> : SQL code (targeting files with ".sql" extension)
-    <b>page</> : Page files (targeting ".page", ".html", ".htm", ".xhtml", ".jsp" extensions)
-    <b>shell</> : Shell scripts (targeting ".sh", ".bash", ".ksh", ".bash" extensions)
-    <b>others</> : Generic resources other than the above
+<b>--resource</b>
+    Specify the type of resource to input (default is "others")
+    Available types are:
+    <b>java</b> : Java source code (targets files with ".java" extension)
+    <b>js</b> : JavaScript source code (targets files with ".js" extension)
+    <b>python</b> : Python source code (targets files with ".py" extension)
+    <b>sql</b> : SQL code (targets files with ".sql" extension)
+    <b>page</b> : Page files (targets files with extensions "page", ".html", ".htm", ".xhtml", ".jsp")
+    <b>shell</b> : Shell script (targets files with ".sh", ".bash", ".ksh", ".bash" extensions)
+    <b>others</b> : General resources other than the above
 
-<b>--gen</>
-    Specify what processing should be performed on the resource and what you want to output (default is "others")
-    Available output types are:
-    <b>spec</> : Specification document
-    <b>summary</> : Summary
-    <b>review</> : Review results & improvement suggestions
-    <b>api</> : API list (only when resource is java)
-    <b>const</> : List of constants (only when resource is java)
-    <b>message</> : List of messages (only when resource is java)
-    <b>exception</> : List of exceptions (only when resource is java)
-    <b>validation</> : List of validations (only when resource is java)
-    <b>er</> : E-R diagram (only when resource is sql)
-    <b>others</> : Generic outputs other than the above
+<b>--gen</b>
+    Specify what you want to generate from the resource (cannot specify both "--gen" and "--gen-table")
+    Available types are:
+    <b>spec</b> : Specification
+    <b>summary</b> : Summary
+    <b>review</b> : Review results and improvement suggestions
+    <b>er</b> : E-R diagram (only when the resource is sql)
+    <b>others</b> : General output other than the above (default if neither "--gen" nor "--gen-table" is specified)
 
-<b>--output-scale</>
+<b>--gen-table</b>
+    If you want to generate a list from the resource, specify its name (cannot specify both "--gen" and "--gen-table")
+
+<b>--fields</b>
+    If generating a list from a resource, enumerate the column names (mandatory for "--gen-table")
+
+<b>--output-scale</b>
     Specify the approximate size of the output (default is "nolimit")
-    <b>small</> : Small size (about 50 characters)
-    <b>medium</> : Medium size (about 200 characters)
-    <b>large</> : Large size (about 500 characters)
-    <b>nolimit</> : No limit
+    <b>small</b> : Small size (about 50 characters)
+    <b>medium</b> : Medium size (about 200 characters)
+    <b>large</b> : Large size (about 500 characters)
+    <b>nolimit</b> : No limit
 
-<b>--src</>
-    Specify the file or directory of the source to be read (mandatory specification)
-    When specifying a directory, files are processed recursively
-    When specifying a ZIP file, the contents are also processed recursively
+<b>--src</b>
+    Specify the file or directory of the source to be read (<b>mandatory</b>)
+    If a directory is specified, files are processed recursively.
+    If a ZIP file is specified, the contents are processed recursively.
 
-<b>--regex</>
+<b>--regex</b>
     Specify a regular expression string to filter the sources to be read (optional)
 
-<b>--dest</>
-    Specify the directory name or filename of the output markdown file in full path
-    If a directory name is specified, the default filename becomes "brain2doc-{resource name}-{output type}-{yMMddHHmmss}.md"
-    (Example: "brain2doc-java-review-20230924104914.md")
-    If this option isn't specified, it will be output in the same directory as the source file with the default filename
+<b>--dest</b>
+    Specify the full path of the directory or file name of the markdown file to output.
+    If a directory name is specified, the default file name is "brain2doc-{resource name}-{output type name}-{yMMddHHmmss}.md"
+    (e.g. "brain2doc-java-review-20230924104914.md")
+    If this option is not specified, it will be output in the same directory as the source file with the default file name.
 
-<b>--lang</>
-    Specify the input/output language (default is Japanese)
-    <b>ja</> : Japanese
-    <b>en</> : English
+<b>--lang</b>
+    Specify the input and output language (default is Japanese)
+    <b>ja</b> : Japanese
+    <b>en</b> : English
 
-<b>--template</>
-    Specify any template file in full path (optional)
-    Only differences from the default template file will be overwritten
+<b>--template</b>
+    Specify the full path of any template file (optional)
+    Only the differences from the default template file are overwritten.
 
-<b>--proxyURL</>
-    Specify the proxy server URL when making API calls
+<b>--proxyURL</b>
+    Specify the proxy server URL when calling the API.
 
-<b>--connect-timeout</>
-    Specify the connection timeout duration in seconds for API calls (default is 10 seconds)
+<b>--connect-timeout</b>
+    Specify the connection timeout time in seconds when calling the API (default is 10 seconds)
 
-<b>--timeout</>
-    Specify the reading timeout duration in seconds for API calls (default is 300 seconds)
+<b>--timeout</b>
+    Specify the read timeout time in seconds when calling the API (default is 300 seconds)
 
-<b>--retry-count</>
-    Specify the maximum number of retries for API calls when a reading timeout occurs (default is 3 times)
+<b>--retry-count</b>
+    Specify the maximum number of retries when a read timeout occurs during an API call (default is 3 times)
 
-<b>--retry-interval</>
-    Specify the retry interval in seconds when a reading timeout occurs for API calls (default is 60 seconds)
+<b>--retry-interval</b>
+    Specify the retry interval in seconds when a read timeout occurs during an API call (default is 60 seconds)
 
-<b>--auto-split</>
-    If this option is specified, if a single API call reaches the token limit, it will automatically switch to a mode that splits and resends it to the appropriate size
-    If not specified, the corresponding source will be skipped
+<b>--auto-split</b>
+    If this option is specified, when a single API call reaches the token limit, it automatically switches to a mode that splits into appropriate sizes and resends.
+    If not specified, the source will be skipped.
+
+<b>--print-prompt</b>
+    If this option is specified, the prompt automatically created from the template is displayed for each API call.

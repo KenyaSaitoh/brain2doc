@@ -4,7 +4,6 @@ public enum GenerateType {
     SPEC("spec"),
     SUMMARY("summary"),
     REVIEW("review"),
-    ER_DIAGLAM("er"),
     OTHERS("others");
 
     private String name;

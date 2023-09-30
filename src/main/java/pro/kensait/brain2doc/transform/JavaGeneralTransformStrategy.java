@@ -24,17 +24,16 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
         String outputContent = Const.MARKDOWN_HEADING + 
                 packageName + "." + "**" + className + "**" +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 "ファイルリンク: " + url +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 responseContent +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 Const.MARKDOWN_HORIZON + 
-                Const.SEPARATOR;
-                
+                Const.LINE_SEP;
         return outputContent;
     }
 

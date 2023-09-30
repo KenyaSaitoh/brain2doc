@@ -1,5 +1,8 @@
 package pro.kensait.brain2doc.process;
 
+import static pro.kensait.brain2doc.common.ConsoleColor.*;
+import static pro.kensait.brain2doc.common.Const.*;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -27,6 +30,7 @@ import java.util.zip.ZipInputStream;
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.ConstValueHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
 import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
 import pro.kensait.brain2doc.openai.ApiClient;
@@ -40,7 +44,9 @@ public class Flow {
     private static final String ZIP_FILE_EXT = ".zip";
     private static final String SUCCESS_MESSAGE = "SUCCESS";
     private static final String TIMEOUT_MESSAGE = "TIMEOUT";
+    private static final String LIMIT_EXCEEDED_MESSAGE = "LIMIT_EXCEEDED";
     private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
+    private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
@@ -101,7 +107,6 @@ public class Flow {
                     return;
                 }
                 List<String> inputFileLines = Files.readAllLines(inputFilePath);
-                System.out.print("Processing [" + inputFilePath.getFileName() + "] ");
                 mainProcess(inputFilePath, inputFileLines);
             }
         } catch(IOException ioe) {
@@ -118,7 +123,6 @@ public class Flow {
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName();
                 Path inputFilePath = Paths.get(srcPath.toString(), entryName);
-                System.out.print("Processing [" + entryName + "] ");
                 if (resourceType.matchesExt(entryName)) {
                     String ext = resourceType.getMatchExt(entryName.toString());
                     // 正規表現がパラメータとして指定されており、かつ、
@@ -150,6 +154,9 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
+        System.out.print(ANSI_BOLD + ANSI_PURPLE + "# Processing [" +
+                inputFilePath.getFileName() + "] " + ANSI_RESET);
+
         // コンソールへの進捗バー表示スレッドを起動する
         ConsoleProgressTask cpt = new ConsoleProgressTask(false);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -162,6 +169,9 @@ public class Flow {
         } catch(OpenAITokenLimitOverException oe) {
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
             return; // 次のファイルへ
+        } catch(OpenAIRateLimitExceededException ore) {
+            addReport(inputFilePath, LIMIT_EXCEEDED_MESSAGE, 0);
+            throw ore; // プログラム停止
         } catch(OpenAIClientException oce) {
             addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
             throw oce; // プログラム停止
@@ -194,9 +204,13 @@ public class Flow {
         System.out.println("");
     }
 
-    private static List<ApiResult> askToOpenAi(List<String> inputFileLines,
-            String inputFileContent, int splitConut, int prevSplitCount) {
-        // TODO System.out.println(splitConut + "," + prevSplitCount);
+    private static List<ApiResult> askToOpenAi(
+            List<String> inputFileLines,
+            String inputFileContent,
+            int splitConut,
+            int prevSplitCount) {
+        // TODO
+        // System.out.println(splitConut + "," + prevSplitCount);
         if (prevSplitCount != 0) {
             if (splitConut <= prevSplitCount) {
                 throw new OpenAITokenLimitOverException(
@@ -220,11 +234,13 @@ public class Flow {
             List<String> requestLines = TemplateAttacher.attach(eachInputFileLines,
                     param.getResourceType(),
                     param.getGenerateType(),
-                    param.getGenListName(),
-                    param.getFiledNames(),
+                    param.getGenTable(),
+                    param.getFields(),
                     param.getOutputScaleType(),
                     param.getLocale(),
-                    param.getTemplateFile());
+                    param.getTemplateFile(),
+                    param.isPrintPrompt(),
+                    i);
 
             String requestContent = toStringFromStrList(requestLines);
 
@@ -245,23 +261,32 @@ public class Flow {
                 // トークンリミットオーバーの場合
                 if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
                         oce.getClientErrorBody().getError().getCode())) {
+
                     if (param.isAutoSplitMode()) { // 自動分割モードの場合
 
                         // エラーメッセージからトークン数を抽出し、分割数を計算する
-                        Double tokenCount = extractToken(requestContent,
-                                oce.getClientErrorBody().getError().getMessage());
+                        String errorMessage =
+                                oce.getClientErrorBody().getError().getMessage();
+                        Double tokenCount = extractToken(requestContent, errorMessage);
                         if (tokenCount == null)
                             throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
                         Double tokenCountLimit = Double.parseDouble(
                                 ConstValueHolder.getProperty("token-count-limit"));
-                        int newSplitConut = SplitUtil.calcSplitCount(tokenCount, tokenCountLimit);
+                        int newSplitConut = SplitUtil.calcSplitCount(
+                                tokenCount, tokenCountLimit);
 
                         // 分割数を指定して再帰呼び出しする
                         return askToOpenAi(inputFileLines, inputFileContent,
                                 newSplitConut, splitConut);
                     }
                     throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
+
+                } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
+                        oce.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
                 }
+                // RetryCountOverでもRateLimitExceededでもない場合は、OpenAIClientExceptionを再スローする
+                throw oce;
             }
             apiResultList.add(apiResult);
         }
@@ -284,7 +309,7 @@ public class Flow {
     private static String toStringFromStrList(List<String> strList) {
         String content = "";
         for (String line : strList) {
-            content += line + Const.SEPARATOR;
+            content += line + LINE_SEP;
         }
         return content;
     }
@@ -303,7 +328,7 @@ public class Flow {
             List<String> responseChoices) {
         List<String> responseLines = new ArrayList<>();
         for (String responseChoice :responseChoices) {
-            for (String line : responseChoice.split(Const.SEPARATOR)) {
+            for (String line : responseChoice.split(Const.LINE_SEP)) {
                 responseLines.add(line);
             }
         }
@@ -311,10 +336,21 @@ public class Flow {
     }
 
     private static void write(String responseContent) {
+        Path targetDir;
+        if (Files.isDirectory(param.getDestFilePath())) {
+            targetDir = param.getDestFilePath();
+        } else {
+            targetDir = param.getDestFilePath().getParent();
+        }
+        try {
+            Files.createDirectories(targetDir);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
         try (FileWriter writer = new FileWriter(param.getDestFilePath().toString(),
                 true)) {
-           writer.append(responseContent);
-           writer.flush();
+            writer.append(responseContent);
+            writer.flush();
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }

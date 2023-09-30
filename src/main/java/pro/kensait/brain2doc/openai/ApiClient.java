@@ -1,8 +1,13 @@
 package pro.kensait.brain2doc.openai;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Builder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
@@ -29,10 +34,7 @@ public class ApiClient {
             int retryInterval) {
 
         // HttpClientオブジェクトを生成する
-        HttpClient client = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .connectTimeout(Duration.ofSeconds(connectTimeout))
-                .build();
+        HttpClient client = createHttpClient(proxyURL, connectTimeout);
 
         Message message = new Message("user", requestContent);
         RequestBody requestBody = new RequestBody(openAiModel, List.of(message), 0.7F);
@@ -93,7 +95,7 @@ public class ApiClient {
                     responseStr);
             return new ApiResult(responseBody, interval);
         } else if (400 <= statusCode && statusCode < 500) {
-            // トークンリミットオーバーを含むOpenAIClientExceptionを返す
+            // RetryCountOverやRateLimitExceededを含むOpenAIClientExceptionを返す
             ClientErrorBody responseBody = getResponseBody(ClientErrorBody.class,
                     responseStr);
             throw new OpenAIClientException(responseBody);
@@ -131,5 +133,26 @@ public class ApiClient {
         } catch(InterruptedException ie) {
             throw new RuntimeException(ie);
         }
+    }
+
+    private static HttpClient createHttpClient(String proxyURL, int connectTimeout) {
+        Builder builder = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .connectTimeout(Duration.ofSeconds(connectTimeout));
+
+        if (proxyURL != null && ! proxyURL.isEmpty()) {
+            URI proxyUri;
+            try {
+                proxyUri = new URI(proxyURL);
+            } catch (URISyntaxException ue) {
+                throw new RuntimeException(ue);
+            }
+            InetSocketAddress proxyAddress =
+                    new InetSocketAddress(proxyUri.getHost(), proxyUri.getPort());
+            ProxySelector proxySelector =
+                    new StaticProxySelector(Proxy.Type.HTTP, proxyAddress);
+            return builder.proxy(proxySelector).build();
+        }
+        return builder.build();
     }
 }

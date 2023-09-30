@@ -28,20 +28,35 @@ public class TemplateHolder {
     synchronized public Map getTemplateMap(Locale locale, Path templateFile) {
         if (templateMap == null) {
             Yaml yaml = new Yaml();
-            if (templateFile == null) { // 外部ファイルの指定がない場合
-                String templateFileName = TEMPLATE_FILE_PREFIX + locale.getLanguage() +
-                        TEMPLATE_FILE_EXT;
-                ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-                templateMap = yaml.loadAs(
-                        classloader.getResourceAsStream(templateFileName), Map.class);
-            } else { // 外部ファイルの指定がある場合
+            String templateFileName = TEMPLATE_FILE_PREFIX + locale.getLanguage() +
+                    TEMPLATE_FILE_EXT;
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            templateMap = yaml.loadAs(
+                    classloader.getResourceAsStream(templateFileName), Map.class);
+            if (templateFile != null) {
+                // 外部ファイルの指定がある場合
                 try (InputStream is = Files.newInputStream(templateFile)) {
-                    templateMap = yaml.loadAs(is, Map.class);
+                    Map outerTemplateMap = yaml.loadAs(is, Map.class);
+                    // マージする
+                    templateMap = merge(templateMap, outerTemplateMap);
                 } catch (IOException ioe) {
-                    throw new IllegalArgumentException("テンプレートファイルの指定に誤りがあります");
+                    throw new IllegalArgumentException("テンプレートファイルに誤りがあります");
                 }
             }
         }
         return templateMap;
+    }
+
+    // MapとMapをマージする
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Map merge(Map source, Map target) {
+        for (Object key : target.keySet()) {
+            if (source.get(key) instanceof Map && target.get(key) instanceof Map) {
+                merge((Map) source.get(key), (Map) target.get(key));
+            } else {
+                source.put(key, target.get(key));
+            }
+        }
+        return source;
     }
 }

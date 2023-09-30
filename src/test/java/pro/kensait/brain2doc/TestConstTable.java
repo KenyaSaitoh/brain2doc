@@ -2,23 +2,23 @@ package pro.kensait.brain2doc;
 
 import org.junit.jupiter.api.Test;
 
-public class TestLargeEn {
+public class TestConstTable {
 
     @Test
-    public void testLargeRequest() {
+    public void testTable() {
         String parameter = "" +
                 "--src " +
-                "C:\\tmp\\large " +
+                "D:\\GitHubRepos\\brain2doc\\src\\main\\java " +
                 "--resource " +
                 "java " +
-                "--gen " +
-                "spec " +
+                "--gen-table " +
+                "定数一覧 " +
+                "--fields " +
+                "定数名、内容 " +
                 "--output-scale " +
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--lang " + 
-                "ja " +
                 "--auto-split" +
                 "";
         String[] params = parameter.split(" ");

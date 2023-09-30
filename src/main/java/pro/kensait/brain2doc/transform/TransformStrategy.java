@@ -15,6 +15,6 @@ public interface TransformStrategy {
         if (resourceType == ResourceType.JAVA) {
             return new JavaGeneralTransformStrategy();
         }
-        return new OtherTransformStrategy();
+        return new GenericTransformStrategy();
     }
 }

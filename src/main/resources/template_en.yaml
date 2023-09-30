@@ -1,34 +1,99 @@
 message:
-  summary: Please provide a brief summary.
-  char-limit-prefix: The answer should be
+  common:
+    "[Instruction]\n
+    You are a \"Professional Engineer\"."
+  continuing: "Continuation of the previous source."
+  constraints: "[Constraints]"
+  char-limit-prefix: Response should be
   char-limit-suffix: characters or less.
-  markdown-level: Please set the Markdown header to level 3 or above.
-  lang: Please answer in English.
+  markdown-level: Please set the Markdown heading to level 3 or higher.
+  lang: Please respond in English.
+  input: "[Input Source]"
+  table-prefix: From the provided input source,
+  table-suffix: 
+    provide a list in Markdown table format.
+    If not available, no answer is required.
+  fields-prefix: The column names of the table should be,
+  fields-suffix: thank you.
+  default-gen: |
+    Based on the constraints provided, please analyze the input source.
+    Please output the results in Markdown format.
 java: 
   spec: |
-    Please output the specification of the Java program in Markdown format.
-    Use the title "Class Specification".
-  refactor: |
-    Please provide suggestions for refactoring the Java program in Markdown format.
-    Use the title "Refactoring Proposal".
-sql:
-  spec: |
-    Please output the specification of the Java program in Markdown format.
-  refactoring: |
-    Please output the specification of the Java program in Markdown format.
-page:
-  spec: |
-    Please output the specification of the Java program in Markdown format.
-  refactoring: |
-    Please output the specification of the Java program in Markdown format.
+    Based on the constraints and input source, please produce the best class specification in Markdown format.
+    The title should be "Class Specification".
+    Please output each member's specifications in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "Class Overview".
+    Please output each member's overview in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
 javascript:
   spec: |
-    Please output the specification of the Java program in Markdown format.
-  refactoring: |
-    Please output the specification of the Java program in Markdown format.
+    Based on the constraints and input source, please produce the best class specification in Markdown format.
+    The title should be "JavaScript Code Specification".
+    Please output in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "JavaScript Code Overview".
+    Please output in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
+python:
+  spec: |
+    Based on the constraints and input source, please produce the best Python specification in Markdown format.
+    The title should be "Python Code Specification".
+    Please output in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "Python Code Overview".
+    Please output in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
+sql:
+  spec: |
+    Based on the constraints and input source, please produce the best SQL specification in Markdown format.
+    The title should be "SQL Specification".
+    Please output each member's specifications in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "SQL Overview".
+    Please output each member's overview in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best SQL code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
+page:
+  spec: |
+    Based on the constraints and input source, please produce the best page specification in Markdown format.
+    The title should be "Page Specification".
+    Please output each member's specifications in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "Page Overview".
+    Please output each member's overview in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
 shellscript:
   spec: |
-    Please output the specification of the Java program in Markdown format.
-  refactoring: |
-    Please output the specification of the Java program in Markdown format.
+    Based on the constraints and input source, please produce the best class specification in Markdown format.
+    The title should be "Shell Script Specification".
+    Please output in Markdown table format.
+  summary: |
+    Based on the constraints and input source, please produce the best summary in Markdown format.
+    The title should be "Shell Script Overview".
+    Please output in Markdown table format.
+  review: |
+    Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
+    The title should be "Review Results & Improvement Suggestions".
+    The contents of the code review and refactoring suggestions should be in Markdown table format.
 

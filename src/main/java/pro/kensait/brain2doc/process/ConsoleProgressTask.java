@@ -3,6 +3,10 @@ package pro.kensait.brain2doc.process;
 import static pro.kensait.brain2doc.common.ConsoleColor.*;
 
 public class ConsoleProgressTask implements Runnable {
+    private static final String DONE_BAR = "=> ";
+    private static final String BAR = "=";
+    private static final int INTERVAL = 3000;
+    private static final int DELAY = 1500;
     private boolean isDone;
 
     public ConsoleProgressTask(boolean isDone) {
@@ -19,14 +23,19 @@ public class ConsoleProgressTask implements Runnable {
 
     @Override
     public void run() {
+        sleepAWhile(DELAY);
         while (! isDone) {
-            System.out.print(".");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException ie) {
-                throw new RuntimeException(ie);
-            }
+            System.out.print(BAR);
+            sleepAWhile(INTERVAL);
         }
-        System.out.print(ANSI_BLUE + "done!" + ANSI_RESET);
+        System.out.print(DONE_BAR + ANSI_BLUE + "done!" + ANSI_RESET);
+    }
+
+    private void sleepAWhile(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException ie) {
+            throw new RuntimeException(ie);
+        }
     }
 }

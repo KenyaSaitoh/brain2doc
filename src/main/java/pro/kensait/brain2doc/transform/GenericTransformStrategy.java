@@ -5,7 +5,7 @@ import java.util.List;
 
 import pro.kensait.brain2doc.common.Const;
 
-public class OtherTransformStrategy implements TransformStrategy {
+public class GenericTransformStrategy implements TransformStrategy {
     @Override
     public String transform(Path inputFilePath, String requestContent,
             List<String> responseLines, int seqNum) {
@@ -18,16 +18,16 @@ public class OtherTransformStrategy implements TransformStrategy {
         String outputContent = Const.MARKDOWN_HEADING + 
                 "**" + fileName + "**" +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 "ファイルリンク: " + url +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 responseContent +
-                Const.SEPARATOR +
-                Const.SEPARATOR +
+                Const.LINE_SEP +
+                Const.LINE_SEP +
                 Const.MARKDOWN_HORIZON + 
-                Const.SEPARATOR;
+                Const.LINE_SEP;
         return outputContent;
     }
 }

@@ -1,26 +1,32 @@
 package pro.kensait.brain2doc;
 
 import static pro.kensait.brain2doc.common.ConsoleColor.*;
+import static pro.kensait.brain2doc.common.Const.*;
 
 import java.util.List;
 import java.util.Locale;
 
 import pro.kensait.brain2doc.config.HelpMessageHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.process.Flow;
 
 public class Main {
+    private static final String JAPANESE = "ja";
+    private static final String ENGLISH = "en";
+    private static final String REPORT_HEADING = "### REPORT";
+
     public static void main(String[] args) {
         if (args == null || args.length == 0 ||
                 (args.length == 1 && (args[0] == "-help" || args[0] == "--help"))) {
             String lang = Locale.getDefault().getLanguage();
-            if (lang != null && ! lang.isEmpty() && ! lang.equals("ja")) {
-                printHelpMessage("en");
+            if (lang != null && ! lang.isEmpty() && ! lang.equals(JAPANESE)) {
+                printHelpMessage(ENGLISH);
                 return;
             }
-            printHelpMessage("ja");
+            printHelpMessage(JAPANESE);
             return;
         }
 
@@ -30,10 +36,18 @@ public class Main {
 
         Flow.init(param);
         try {
-            System.out.println("Starting process flow!");
+            printBanner();
             Flow.startAndFork();
-        } catch(OpenAIClientException | OpenAIRetryCountOverException oe) {
-            System.err.println("\n\nError occured!!!!!");
+        } catch (OpenAIRetryCountOverException oe) {
+            System.err.println(LINE_SEP + "OpenAI RetryCountOver occured!!!!!");
+            printReport();
+            System.exit(1);
+        } catch(OpenAIRateLimitExceededException oe) {
+            System.err.println(LINE_SEP + "OpenAI RateLimitExceeded occured!!!!!");
+            printReport();
+            System.exit(1);
+        } catch(OpenAIClientException oe) {
+            System.err.println(LINE_SEP + "OpenAI ClientError occured!!!!!");
             printReport();
             System.exit(1);
         }
@@ -50,13 +64,23 @@ public class Main {
         }
     }
 
+    private static void printBanner() {
+        System.out.print(ANSI_BOLD + ANSI_GREEN);
+        System.out.println("##############################");
+        System.out.println("#                            #");
+        System.out.println("#    Welcome to Brain2doc    #");
+        System.out.println("#                            #");
+        System.out.println("##############################");
+        System.out.println(ANSI_RESET);
+    }
+    
     private static void printReport() {
         // TODO
         if (Flow.getReportList().isEmpty()) {
-            System.out.println("There is no target resource.\n");
+            System.out.println("There is no target resource." + LINE_SEP);
             return;
         }
-        System.out.println("\n########## REPORT ##########");
+        System.out.println(LINE_SEP + REPORT_HEADING);
         for (String report : Flow.getReportList()) {
             System.out.println(report);
         }

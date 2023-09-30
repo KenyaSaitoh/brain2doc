@@ -15,7 +15,8 @@ public class TestNormal {
                 "--output-scale " +
                 "medium " + 
                 "--dest " +
-                "C:/tmp " + 
+                "C:/tmp/aaa/sdsaaa/tmp2.md " + 
+                "--print-prompt" +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);
@@ -28,7 +29,7 @@ public class TestNormal {
                 "C:\\tmp\\params " +
                 "--resource " +
                 "java " +
-                "--output " +
+                "--gen " +
                 "review " +
                 "--dest " +
                 "C:/tmp " + 

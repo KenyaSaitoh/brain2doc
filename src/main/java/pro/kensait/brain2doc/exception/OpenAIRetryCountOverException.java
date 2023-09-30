@@ -6,7 +6,8 @@ public class OpenAIRetryCountOverException extends RuntimeException {
         super();
     }
 
-    public OpenAIRetryCountOverException(String message, Throwable cause, boolean enableSuppression,
+    public OpenAIRetryCountOverException(String message, Throwable cause,
+            boolean enableSuppression,
             boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

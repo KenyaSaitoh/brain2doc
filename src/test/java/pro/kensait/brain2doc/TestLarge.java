@@ -17,8 +17,10 @@ public class TestLarge {
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--auto-split" +
-                "";
+                "--auto-split " +
+                "--print-prompt " +
+                "--model " +
+                "gpt-3.5-turbo";
         String[] params = parameter.split(" ");
         Main.main(params);
     }
