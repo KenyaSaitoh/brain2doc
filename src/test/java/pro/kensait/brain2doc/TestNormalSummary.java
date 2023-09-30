@@ -15,7 +15,7 @@ public class TestNormalSummary {
                 "--output-scale " +
                 "medium " + 
                 "--dest " +
-                "C:/tmp " + 
+                "C:/tmp/output " + 
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

@@ -40,7 +40,7 @@ public class TemplateAttacher {
                 templateStr = (String) messageMap.get("default-gen");
             }
         } else {
-            templateStr = getTableTemplateStr(messageMap, genTable, fields);
+            templateStr = getTableTemplateStr(messageMap, genTable, fields) + LINE_SEP;
         }
 
         String continuing = count != 0 ?

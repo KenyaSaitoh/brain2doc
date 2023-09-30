@@ -83,6 +83,4 @@
 <b>--auto-split</b>
     If this option is specified, when a single API call reaches the token limit, it automatically switches to a mode that splits into appropriate sizes and resends.
     If not specified, the source will be skipped.
-
-<b>--print-prompt</b>
-    If this option is specified, the prompt automatically created from the template is displayed for each API call.
+    

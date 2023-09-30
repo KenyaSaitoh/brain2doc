@@ -20,7 +20,6 @@ public class TestAPITable {
                 "--dest " +
                 "C:/tmp/output " +
                 "--auto-split " +
-                "--print-prompt " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

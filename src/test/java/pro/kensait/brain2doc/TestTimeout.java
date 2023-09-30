@@ -14,7 +14,7 @@ public class TestTimeout {
                 "--gen " +
                 "refactoring " +
                 "--dest " +
-                "C:/tmp " + 
+                "C:/tmp/output " + 
                 "--connect-timeout " +
                 "1 " +
                 "--timeout " +
