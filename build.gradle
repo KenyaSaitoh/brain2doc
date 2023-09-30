@@ -56,7 +56,7 @@ jar {
 }
 
 application {
-    mainClassName = "pro.kensait.brain2doc.Main"
+    mainClass = "pro.kensait.brain2doc.Main"
 }
 
 // Eclipseプラグイン設定
