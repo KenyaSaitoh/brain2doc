@@ -1,10 +1,8 @@
 # brain2doc
 
-###
+### パラメータの指定方法
 
 ```
-[パラメータの指定方法]
-
 <b>--url</>
     APIのURLを指定する（デフォルトは"https://api.openai.com/v1/chat/completions"）
 
