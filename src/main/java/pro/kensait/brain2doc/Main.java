@@ -1,6 +1,5 @@
 package pro.kensait.brain2doc;
 
-import static pro.kensait.brain2doc.common.ConsoleColor.*;
 import static pro.kensait.brain2doc.common.Const.*;
 
 import java.util.List;
@@ -52,26 +51,23 @@ public class Main {
             System.exit(1);
         }
         printReport();
+        System.exit(0);
     }
 
     private static void printHelpMessage(String lang) {
         List<String> messageList = HelpMessageHolder.getInstance().getHelpMessage(lang);
         for (String line : messageList) {
-            System.out.println(line
-                    .replaceAll("<r>", ANSI_RED)
-                    .replaceAll("<b>", ANSI_BLUE)
-                    .replaceAll("</>", ANSI_RESET));
+            System.out.println(line);
         }
     }
 
     private static void printBanner() {
-        System.out.print(ANSI_BOLD + ANSI_GREEN);
         System.out.println("##############################");
         System.out.println("#                            #");
         System.out.println("#    Welcome to Brain2doc    #");
         System.out.println("#                            #");
         System.out.println("##############################");
-        System.out.println(ANSI_RESET);
+        System.out.println("");
     }
     
     private static void printReport() {

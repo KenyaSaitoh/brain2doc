@@ -1,7 +1,5 @@
 package pro.kensait.brain2doc.process;
 
-import static pro.kensait.brain2doc.common.ConsoleColor.*;
-
 import java.util.concurrent.CountDownLatch;
 
 public class ConsoleProgressTask implements Runnable {
@@ -40,7 +38,7 @@ public class ConsoleProgressTask implements Runnable {
                 System.out.print(BAR);
                 sleepAWhile(INTERVAL);
             }
-            System.out.println(DONE_BAR + ANSI_BLUE + "done!" + ANSI_RESET);
+            System.out.println(DONE_BAR + "done!");
         } catch (InterruptedException ie) {
             throw new RuntimeException(ie);
         }

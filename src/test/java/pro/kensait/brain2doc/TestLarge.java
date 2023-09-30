@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 public class TestLarge {
 
-    @Test
+    //@Test
     public void testLargeRequest() {
         String parameter = "" +
                 "--src " +
@@ -18,6 +18,22 @@ public class TestLarge {
                 "--dest " +
                 "C:/tmp/output " +
                 "--auto-split " +
+                "--model " +
+                "gpt-3.5-turbo" +
+                "";
+        String[] params = parameter.split(" ");
+        Main.main(params);
+    }
+
+    @Test
+    public void testLargeRequest2() {
+        String parameter = "" +
+                "--src " +
+                "C:\\tmp\\large2 " +
+                "--resource " +
+                "java " +
+                "--gen " +
+                "review " +
                 "--model " +
                 "gpt-3.5-turbo" +
                 "";

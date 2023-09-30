@@ -1,6 +1,5 @@
 package pro.kensait.brain2doc.process;
 
-import static pro.kensait.brain2doc.common.ConsoleColor.*;
 import static pro.kensait.brain2doc.common.Const.*;
 
 import java.io.BufferedReader;
@@ -159,13 +158,12 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        Runnable printProcessing = () -> {
-            System.out.print("processing [" + ANSI_BOLD + ANSI_PURPLE +
-                    inputFilePath.getFileName() + ANSI_RESET + "] ");
+        Runnable startProgress = () -> {
+            System.out.print("processing [" + inputFilePath.getFileName() + "] ");
         };
         // 最初のファイルではPROMPTを先に表示するため、ここではPROGRESSを表示しない
         if (! param.isPrintPrompt()) {
-            printProcessing.run(); // 2ファイル目以降はPROGRESSを表示する
+            startProgress.run(); // 2ファイル目以降はPROGRESSを表示する
         }
 
         // コンソールへの進捗バー表示スレッドを起動する
@@ -176,11 +174,20 @@ public class Flow {
 
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
+        Runnable progressDone = () -> {
+            cpt.setDone(true);
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException ex) {
+                throw new RuntimeException(ex);
+            }
+        };
         try {
             apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1, 0,
-                    startSignal, printProcessing);
+                    startSignal, startProgress);
         } catch (OpenAITokenLimitOverException oe) {
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
+            progressDone.run();
             return; // 次のファイルへ
         } catch (OpenAIRateLimitExceededException ore) {
             addReport(inputFilePath, LIMIT_EXCEEDED_MESSAGE, 0);
@@ -208,12 +215,7 @@ public class Flow {
             write(outputFileContent);
             addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
         }
-        cpt.setDone(true);
-        try {
-            future.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException(ex);
-        }
+        progressDone.run();
     }
 
     private static List<ApiResult> askToOpenAi(
@@ -386,8 +388,7 @@ public class Flow {
 
     private static void printPrompt(String promptMessage) {
         System.out.println(PROMPT_HEADING);
-        System.out.print(ANSI_CYAN +  promptMessage);
-        System.out.println(ANSI_RESET);
+        System.out.println(promptMessage);
     }
 
     private static void addReport(Path inputFilePath, String message, long interval) {

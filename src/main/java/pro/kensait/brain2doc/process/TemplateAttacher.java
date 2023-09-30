@@ -50,7 +50,7 @@ public class TemplateAttacher {
                 continuing + LINE_SEP +
                 (String) (messageMap.get("constraints")) + LINE_SEP +
                 (String) (messageMap.get("lang")) + LINE_SEP +
-                getScaleString(messageMap, outputSizeType) + LINE_SEP +
+                getScaleString(messageMap, outputSizeType) +
                 (String) (messageMap.get("markdown-level") + LINE_SEP);
 
         List<String> requestLines = new ArrayList<>();
@@ -66,15 +66,18 @@ public class TemplateAttacher {
         case SMALL:
             return (String) (messageMap.get("char-limit-prefix")) +
                     OutputScaleType.SMALL.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix"));
+                    (String) (messageMap.get("char-limit-suffix")) +
+                    LINE_SEP;
         case MEDIUM:
             return (String) (messageMap.get("char-limit-prefix")) +
                     OutputScaleType.MEDIUM.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix"));
+                    (String) (messageMap.get("char-limit-suffix")) +
+                    LINE_SEP;
         case LARGE:
             return (String) (messageMap.get("char-limit-prefix")) +
                     OutputScaleType.LARGE.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix"));
+                    (String) (messageMap.get("char-limit-suffix")) +
+                    LINE_SEP;
         default:
             return "";
         }
