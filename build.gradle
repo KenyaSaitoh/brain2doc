@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id "eclipse"
     id "com.github.johnrengelman.shadow" version "7.0.0"
     id "org.beryx.jlink" version "3.0.0"
 }
@@ -8,9 +9,6 @@ plugins {
 repositories {
     mavenCentral()
 }
-
-// プラグイン読み込み
-apply plugin: "eclipse"
 
 // 文字コード設定
 def defaultEncoding = "UTF-8"
@@ -51,17 +49,14 @@ processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// モジュール化対応
-plugins.withType(JavaPlugin).configureEach {
-    java {
-        modularity.inferModulePath = true
-    }
-}
-
 jar {
     manifest {
         attributes "Main-Class": "pro.kensait.brain2doc.Main"
     }
+}
+
+application {
+    mainClassName = "pro.kensait.brain2doc.Main"
 }
 
 // Eclipseプラグイン設定

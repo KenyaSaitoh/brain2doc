@@ -26,7 +26,6 @@
     <b>spec</b> : Specification
     <b>summary</b> : Summary
     <b>review</b> : Review results and improvement suggestions
-    <b>er</b> : E-R diagram (only when the resource is sql)
     <b>others</b> : General output other than the above (default if neither "--gen" nor "--gen-table" is specified)
 
 <b>--gen-table</b>
