@@ -2,7 +2,7 @@ package pro.kensait.brain2doc.params;
 
 public enum ResourceType {
     JAVA("java", ".java"),
-    JAVASCRIPT("js", ".js"),
+    JAVASCRIPT("js", ".js", ".ts"),
     PYTHON("python", ".py"),
     SQL("sql", ".sql"),
     PAGE("page", ".html", ".htm", ".xhtml", ".jsp"),

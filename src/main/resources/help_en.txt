@@ -13,7 +13,7 @@
     Specify the type of resource to input (default is "others")
     Available types are:
     <b>java</b> : Java source code (targets files with ".java" extension)
-    <b>js</b> : JavaScript source code (targets files with ".js" extension)
+    <b>js</b> : JavaScript or TypeScript source code (targets files with ".js" or ".ts" extensions).
     <b>python</b> : Python source code (targets files with ".py" extension)
     <b>sql</b> : SQL code (targets files with ".sql" extension)
     <b>page</b> : Page files (targets files with extensions "page", ".html", ".htm", ".xhtml", ".jsp")

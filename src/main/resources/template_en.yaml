@@ -31,7 +31,7 @@ java:
     Based on the constraints and input source, please provide the best code review and refactoring suggestions in Markdown format.
     The title should be "Review Results & Improvement Suggestions".
     The contents of the code review and refactoring suggestions should be in Markdown table format.
-javascript:
+js:
   spec: |
     Based on the constraints and input source, please produce the best class specification in Markdown format.
     The title should be "JavaScript Code Specification".

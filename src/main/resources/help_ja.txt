@@ -13,7 +13,7 @@
     入力となるリソースの種別を指定する（デフォルトは"others"）
     以下の種別あり
     <b>java</>   : Javaのソースコード（拡張子".java"が対象）
-    <b>js</>     : JavaScriptのソースコード（拡張子".js"が対象）
+    <b>js</>     : JavaScriptまたはTypeScriptのソースコード（拡張子".js", ".ts"が対象）
     <b>python</> : Pythonのソースコード（拡張子".py"が対象）
     <b>sql</>    : SQLコード（拡張子".sql"が対象）
     <b>page</>   : ページファイル（拡張子"page", ".html", ".htm", ".xhtml", ".jsp"が対象）
