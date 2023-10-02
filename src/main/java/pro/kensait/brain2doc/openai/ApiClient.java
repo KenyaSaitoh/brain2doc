@@ -44,6 +44,7 @@ public class ApiClient {
         // HttpClientオブジェクトを生成する
         HttpClient client = createHttpClient(proxyURL, connectTimeout);
 
+        // TODO user決め打ちになっている
         Message message = new Message("user", requestContent);
         RequestBody requestBody = new RequestBody(openAiModel, List.of(message), 0.7F);
         String requestStr = getRequestJson(requestBody);
