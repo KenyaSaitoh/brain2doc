@@ -2,7 +2,7 @@ package pro.kensait.brain2doc.exception;
 
 import pro.kensait.brain2doc.openai.ClientErrorBody;
 
-public class OpenAIRateLimitExceededException extends RuntimeException {
+public class OpenAIRateLimitExceededException extends OpenAIClientException {
     private ClientErrorBody clientErrorBody;
     
     public OpenAIRateLimitExceededException() {

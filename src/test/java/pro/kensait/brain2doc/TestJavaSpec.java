@@ -15,8 +15,6 @@ public class TestJavaSpec {
                 "spec " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--model " + 
-                "gpt-3.5-turbo " +
                 "--auto-split" +
                 "";
         String[] params = parameter.split(" ");

@@ -16,7 +16,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -31,9 +30,10 @@ import java.util.zip.ZipInputStream;
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.ConstMapHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
-import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
 import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
+import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.openai.ApiClient;
 import pro.kensait.brain2doc.openai.ApiResult;
 import pro.kensait.brain2doc.openai.SuccessResponseBody;
@@ -43,15 +43,18 @@ import pro.kensait.brain2doc.process.TemplateAttacher.Prompt;
 import pro.kensait.brain2doc.transform.TransformStrategy;
 
 public class Flow {
+
     private static final String ZIP_FILE_EXT = ".zip";
+
     private static final String SUCCESS_MESSAGE = "SUCCESS";
     private static final String TIMEOUT_MESSAGE = "TIMEOUT";
     private static final String LIMIT_EXCEEDED_MESSAGE = "LIMIT_EXCEEDED";
-    private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
-    private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
+    private static final String INVALID_API_KEY_MESSAGE = "INVALID_API_KEY";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
+
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
+
     private static final String PROMPT_HEADING = "### PROMPT CONTENT (without source)";
     private static final String PROCESS_PROGRESS_HEADING = "### PROGRESS";
 
@@ -189,15 +192,18 @@ public class Flow {
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
             progressDone.run();
             return; // 次のファイルへ
-        } catch (OpenAIRateLimitExceededException ore) {
+        } catch (OpenAIRateLimitExceededException oe) {
             addReport(inputFilePath, LIMIT_EXCEEDED_MESSAGE, 0);
-            throw ore; // プログラム停止
-        } catch (OpenAIClientException oce) {
+            throw oe; // プログラム停止
+        } catch (OpenAIInvalidAPIKeyException oe) {
+            addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0);
+            throw oe; // プログラム停止
+        } catch (OpenAIClientException oe) {
             addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
-            throw oce; // プログラム停止
-        } catch (OpenAIRetryCountOverException ore) {
+            throw oe; // プログラム停止
+        } catch (RetryCountOverException oe) {
             addReport(inputFilePath, TIMEOUT_MESSAGE, 0);
-            throw ore; // プログラム停止
+            throw oe; // プログラム停止
         }
 
         for (int i = 0; i < apiResultList.size(); i++) {
@@ -283,40 +289,30 @@ public class Flow {
                         param.getRequestTimeout(),
                         param.getRetryCount(),
                         param.getRetryInterval());
-            } catch (OpenAIClientException oce) {
 
-                // トークンリミットオーバーの場合
-                if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
-                        oce.getClientErrorBody().getError().getCode())) {
+            // トークンリミットオーバーの場合
+            } catch (OpenAITokenLimitOverException oe) {
+                if (param.isAutoSplitMode()) { // 自動分割モードの場合
 
-                    if (param.isAutoSplitMode()) { // 自動分割モードの場合
+                    // エラーメッセージからトークン数を抽出し、分割数を計算する
+                    String errorMessage =
+                            oe.getClientErrorBody().getError().getMessage();
+                    Double tokenCount = extractToken(requestContent, errorMessage);
+                    if (tokenCount == null)
+                        throw new OpenAITokenLimitOverException(oe.getClientErrorBody());
+                    @SuppressWarnings("rawtypes")
+                    Map tokenLimitMap = (Map) (ConstMapHolder.getConstMap()
+                            .get("token-count-limit"));
+                    int tokenCountLimit = (int)
+                            (tokenLimitMap.get(param.getOpenaiModel()));
+                    int newSplitConut = SplitUtil.calcSplitCount(
+                            tokenCount, tokenCountLimit);
 
-                        // エラーメッセージからトークン数を抽出し、分割数を計算する
-                        String errorMessage =
-                                oce.getClientErrorBody().getError().getMessage();
-                        Double tokenCount = extractToken(requestContent, errorMessage);
-                        if (tokenCount == null)
-                            throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
-                        @SuppressWarnings("rawtypes")
-                        Map tokenLimitMap = (Map) (ConstMapHolder.getConstMap()
-                                .get("token-count-limit"));
-                        int tokenCountLimit = (int)
-                                (tokenLimitMap.get(param.getOpenaiModel()));
-                        int newSplitConut = SplitUtil.calcSplitCount(
-                                tokenCount, tokenCountLimit);
-
-                        // 分割数を指定して再帰呼び出しする
-                        return askToOpenAi(inputFileLines, inputFileContent,
-                                newSplitConut, splitConut, startSignal, printProcessing);
-                    }
-                    throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
-
-                } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
-                        oce.getClientErrorBody().getError().getCode())) {
-                    throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
+                    // 分割数を指定して再帰呼び出しする
+                    return askToOpenAi(inputFileLines, inputFileContent,
+                            newSplitConut, splitConut, startSignal, printProcessing);
                 }
-                // RetryCountOverでもRateLimitExceededでもない場合は、OpenAIClientExceptionを再スローする
-                throw oce;
+                throw oe;
             }
             apiResultList.add(apiResult);
         }

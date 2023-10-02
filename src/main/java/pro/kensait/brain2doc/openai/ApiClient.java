@@ -14,15 +14,23 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.kensait.brain2doc.exception.OpenAIClientException;
-import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
-import pro.kensait.brain2doc.exception.OpenAITimeoutException;
+import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
+import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
+import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
+import pro.kensait.brain2doc.exception.RetryCountOverException;
+import pro.kensait.brain2doc.exception.TimeoutException;
 
 public class ApiClient {
+    private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
+    private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
+    private static final String INVALID_API_KEY_CODE = "invalid_api_key";    
+    
     public static ApiResult ask(String requestContent,
             String openaiURL,
             String openAiModel,
@@ -60,12 +68,36 @@ public class ApiClient {
         while (count <= retryCount) {
             try {
                 return sendRequest(client, request, retryCount, retryInterval);
-            } catch(OpenAITimeoutException oae) {
+            } catch (OpenAIClientException oce) {
+                // APIキーが異なる場合は、即例外スロー
+                if (Objects.equals(INVALID_API_KEY_CODE,
+                        oce.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAIInvalidAPIKeyException(oce.getClientErrorBody());
+
+                // トークンリミットオーバーの場合は、即例外スロー → その後分割実行
+                } else if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
+                        oce.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
+
+                // レートリミットオーバーの場合は、リトライ
+                } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
+                        oce.getClientErrorBody().getError().getCode())) {
+                    // TODO
+                    //System.out.println("###############" + retryCount + "," + retryInterval);
+                    count++;
+                    if (count == retryCount) {
+                        throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
+                    }
+                    sleep(retryInterval);
+                }
+
+            // タイムアウトの場合はリトライ
+            } catch(TimeoutException te) {
                 sleep(retryInterval);
                 count++;
             }
         }
-        throw new OpenAIRetryCountOverException("リトライ回数オーバー");
+        throw new RetryCountOverException("リトライ回数オーバー");
     }
 
     private static ApiResult sendRequest(HttpClient client, HttpRequest request,
@@ -79,10 +111,10 @@ public class ApiClient {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             finishTime = LocalTime.now();
         } catch (HttpTimeoutException hte) { // タイムアウト
-            throw new OpenAITimeoutException(
+            throw new TimeoutException(
                     "OpenAIサービス呼び出しでタイムアウトが発生しました", hte);
         } catch (IOException | InterruptedException ex) {
-            throw new OpenAITimeoutException(ex);
+            throw new TimeoutException(ex);
         }
 
         Duration duration = Duration.between(startTime, finishTime);

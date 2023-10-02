@@ -2,36 +2,36 @@ package pro.kensait.brain2doc.exception;
 
 import pro.kensait.brain2doc.openai.ClientErrorBody;
 
-public class OpenAITokenLimitOverException extends OpenAIClientException {
+public class OpenAIInvalidAPIKeyException extends OpenAIClientException {
     private ClientErrorBody clientErrorBody;
     private int tokenCount;
     
-    public OpenAITokenLimitOverException() {
+    public OpenAIInvalidAPIKeyException() {
         super();
     }
 
-    public OpenAITokenLimitOverException(String message, Throwable cause,
+    public OpenAIInvalidAPIKeyException(String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public OpenAITokenLimitOverException(String message, Throwable cause) {
+    public OpenAIInvalidAPIKeyException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public OpenAITokenLimitOverException(String message) {
+    public OpenAIInvalidAPIKeyException(String message) {
         super(message);
     }
 
-    public OpenAITokenLimitOverException(Throwable cause) {
+    public OpenAIInvalidAPIKeyException(Throwable cause) {
         super(cause);
     }
 
-    public OpenAITokenLimitOverException(ClientErrorBody clientErrorBody) {
+    public OpenAIInvalidAPIKeyException(ClientErrorBody clientErrorBody) {
         this.clientErrorBody = clientErrorBody;
     }
 
-    public OpenAITokenLimitOverException(ClientErrorBody clientErrorBody,
+    public OpenAIInvalidAPIKeyException(ClientErrorBody clientErrorBody,
             int tokenCount) {
         this.clientErrorBody = clientErrorBody;
         this.tokenCount = tokenCount;

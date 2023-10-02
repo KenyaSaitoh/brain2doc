@@ -176,7 +176,8 @@ public class Parameter {
         // 生成種別のチェック
         if (generateType == null) {
             if (genTable == null || genTable.isEmpty()) {
-                generateType = GenerateType.OTHERS;
+                generateType = GenerateType.valueOf(
+                        DefaultValueHolder.getProperty("generate").toUpperCase());
             } else {
                 if (fields == null || fields.isEmpty()) {
                     throw new IllegalArgumentException("テーブルのフィールド名が指定されていません");
@@ -187,6 +188,7 @@ public class Parameter {
                 throw new IllegalArgumentException("\"gen\"と\"gen-table\"を同時に指定することはできません");
             }
         }
+
         // 入力元パスをチェックし、パラメータから入力元パスと入力元ディレクトリを決める
         if (srcParam == null || srcParam.isEmpty())
             throw new IllegalArgumentException("ソースが指定されていません");

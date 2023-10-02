@@ -7,8 +7,9 @@ import java.util.Locale;
 
 import pro.kensait.brain2doc.config.HelpMessageHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
-import pro.kensait.brain2doc.exception.OpenAIRetryCountOverException;
+import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.process.Flow;
 
@@ -37,12 +38,16 @@ public class Main {
         try {
             printBanner();
             Flow.startAndFork();
-        } catch (OpenAIRetryCountOverException oe) {
+        } catch (RetryCountOverException oe) {
             System.err.println(LINE_SEP + "OpenAI RetryCountOver occured!!!!!");
             printReport();
             System.exit(1);
         } catch(OpenAIRateLimitExceededException oe) {
             System.err.println(LINE_SEP + "OpenAI RateLimitExceeded occured!!!!!");
+            printReport();
+            System.exit(1);
+        } catch(OpenAIInvalidAPIKeyException oe) {
+            System.err.println(LINE_SEP + "OpenAI InvalidAPIKey occured!!!!!");
             printReport();
             System.exit(1);
         } catch(OpenAIClientException oe) {
