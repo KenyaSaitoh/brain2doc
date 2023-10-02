@@ -4,7 +4,7 @@
     APIのURLを指定する（デフォルトは"https://api.openai.com/v1/chat/completions"）
 
 <b>--model</>           
-    gptのモデルを指定する（デフォルトは"gpt-4"）
+    gptのモデルを指定する（デフォルトは"gpt-4-32k"）
 
 <b>--apikey</>
     APIキーを指定する（指定がない場合は環境変数"OPENAI_API_KEY"より取得）

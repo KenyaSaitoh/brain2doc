@@ -15,8 +15,8 @@ public class TestPythonSummary {
                 "summary " +
                 "--dest " +
                 "C:/tmp/output " +
-                "--model " + 
-                "gpt-3.5-turbo " +
+            //   "--model " + 
+            //    "gpt-3.5-turbo " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

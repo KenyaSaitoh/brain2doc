@@ -44,6 +44,7 @@ public class Main {
             System.exit(1);
         } catch(OpenAIRateLimitExceededException oe) {
             System.err.println(LINE_SEP + "OpenAI RateLimitExceeded occured!!!!!");
+            System.out.println(oe.getClientErrorBody());
             printReport();
             System.exit(1);
         } catch(OpenAIInvalidAPIKeyException oe) {
