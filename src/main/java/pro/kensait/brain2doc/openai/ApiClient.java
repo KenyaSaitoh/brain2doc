@@ -59,14 +59,8 @@ public class ApiClient {
                 .timeout(Duration.ofSeconds(requestTimeout))
                 .build();
 
-        // リトライなし
-        if (retryCount == 0) {
-            return sendRequest(client, request, retryCount, retryInterval);
-        }
-
-        // リトライあり
         int count = 0;
-        while (count <= retryCount) {
+        while (true) {
             try {
                 return sendRequest(client, request, retryCount, retryInterval);
             } catch (OpenAIClientException oce) {
@@ -80,22 +74,17 @@ public class ApiClient {
                         oce.getClientErrorBody().getError().getCode())) {
                     throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
 
-                // レートリミットオーバーの場合は、リトライ
+                // レートリミットオーバーの場合は、即例外スロー → その後分割実行
                 } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
                         oce.getClientErrorBody().getError().getCode())) {
-                    // TODO
-                    //System.out.println("###############" + retryCount + "," + retryInterval);
-                    count++;
-                    if (count == retryCount) {
-                        throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
-                    }
-                    sleep(retryInterval);
+                    throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
                 }
 
-            // タイムアウトの場合はリトライ
             } catch(TimeoutException te) {
-                sleep(retryInterval);
+                if (count == retryCount) break;
+                // タイムアウトの場合はリトライ
                 count++;
+                sleep(retryInterval);
             }
         }
         throw new RetryCountOverException("リトライ回数オーバー");
@@ -123,6 +112,9 @@ public class ApiClient {
 
         int statusCode = response.statusCode();
         String responseStr = response.body();
+        // TODO
+        //System.out.println(responseStr);
+        
         if (200 <= statusCode && statusCode < 300) {
             SuccessResponseBody responseBody = getResponseBody(SuccessResponseBody.class,
                     responseStr);

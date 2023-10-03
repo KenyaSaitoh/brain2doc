@@ -16,8 +16,6 @@ public class TestJavaSpec {
                 "--dest " +
                 "C:/tmp/output " +
                 "--auto-split " +
-                "--retry-interval " + 
-                "600 " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

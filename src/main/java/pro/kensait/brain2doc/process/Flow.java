@@ -48,8 +48,8 @@ public class Flow {
 
     private static final String SUCCESS_MESSAGE = "SUCCESS";
     private static final String TIMEOUT_MESSAGE = "TIMEOUT";
-    private static final String LIMIT_EXCEEDED_MESSAGE = "LIMIT_EXCEEDED";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
+    private static final String RATE_LIMIT_EXCEEDED_MESSAGE = "RATE_LIMIT_EXCEEDED";
     private static final String INVALID_API_KEY_MESSAGE = "INVALID_API_KEY";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
 
@@ -186,15 +186,19 @@ public class Flow {
             }
         };
         try {
-            apiResultList = askToOpenAi(inputFileLines, inputFileContent, 1, 0,
+            apiResultList = askToOpenAi(inputFileLines, inputFileContent,
+                    1, // ファイル分割数
+                    0, // 前回分割数（初回は0）
+                    1, // 実行回数（初回は1）
                     startSignal, startProgress);
         } catch (OpenAITokenLimitOverException oe) {
             addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
             progressDone.run();
             return; // 次のファイルへ
         } catch (OpenAIRateLimitExceededException oe) {
-            addReport(inputFilePath, LIMIT_EXCEEDED_MESSAGE, 0);
-            throw oe; // プログラム停止
+            addReport(inputFilePath, RATE_LIMIT_EXCEEDED_MESSAGE, 0);
+            progressDone.run();
+            return; // 次のファイルへ
         } catch (OpenAIInvalidAPIKeyException oe) {
             addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0);
             throw oe; // プログラム停止
@@ -229,10 +233,9 @@ public class Flow {
             String inputFileContent,
             int splitConut,
             int prevSplitCount,
+            int tryCount,
             CountDownLatch startSignal,
             Runnable printProcessing) {
-        // TODO
-        // System.out.println(splitConut + "," + prevSplitCount);
         if (prevSplitCount != 0) {
             if (splitConut <= prevSplitCount) {
                 throw new OpenAITokenLimitOverException(
@@ -309,9 +312,29 @@ public class Flow {
                             tokenCount, tokenCountLimit);
 
                     // 分割数を指定して再帰呼び出しする
+                    tryCount++;
                     return askToOpenAi(inputFileLines, inputFileContent,
-                            newSplitConut, splitConut, startSignal, printProcessing);
+                            newSplitConut, splitConut, tryCount,
+                            startSignal, printProcessing);
                 }
+                throw oe;
+
+            // レートリミットオーバーの場合
+            } catch (OpenAIRateLimitExceededException oe) {
+                if (param.isAutoSplitMode()) { // 自動分割モードの場合
+                    // gpt-4でOpenAIRateLimitExceededExceptionした場合は、
+                    // エラーメッセージからトークン数が分かるわけではないので、分割数は
+                    // 以下のように決める。
+                    // 要は、2度目のときは2分割、3度目のときは3分割と、リトライ回数に応じて
+                    // 分割数を加算する。
+                    tryCount++;
+                    int newSplitConut = tryCount;
+
+                    // 分割数を指定して再帰呼び出しする
+                    return askToOpenAi(inputFileLines, inputFileContent,
+                            newSplitConut, splitConut, tryCount,
+                            startSignal, printProcessing);
+                    }
                 throw oe;
             }
             apiResultList.add(apiResult);
