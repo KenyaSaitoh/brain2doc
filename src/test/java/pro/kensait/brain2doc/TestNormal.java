@@ -6,7 +6,6 @@ public class TestNormal {
     @Test
     public void testSimple1() {
         String parameter = "" +
-                "--src " +
                 "C:\\tmp\\params " +
                 "--resource " +
                 "java " +

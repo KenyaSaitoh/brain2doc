@@ -7,7 +7,6 @@ public class TestOuterTemplate {
     @Test
     public void testLargeRequest() {
         String parameter = "" +
-                "--src " +
                 "D:\\GitHubRepos\\brain2doc\\src\\main\\ " +
                 "--resource " +
                 "java " +

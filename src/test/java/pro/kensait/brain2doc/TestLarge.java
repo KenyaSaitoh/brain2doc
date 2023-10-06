@@ -4,10 +4,9 @@ import org.junit.jupiter.api.Test;
 
 public class TestLarge {
 
-    //@Test
+    @Test
     public void testLargeRequest() {
         String parameter = "" +
-                "--src " +
                 "C:\\tmp\\large2 " +
                 "--resource " +
                 "java " +
@@ -28,7 +27,6 @@ public class TestLarge {
     @Test
     public void testLargeRequest2() {
         String parameter = "" +
-                "--src " +
                 "C:\\tmp\\large2 " +
                 "--resource " +
                 "java " +

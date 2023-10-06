@@ -7,7 +7,6 @@ public class TestLargeEn {
     @Test
     public void testLargeRequest() {
         String parameter = "" +
-                "--src " +
                 "C:\\tmp\\large " +
                 "--resource " +
                 "java " +

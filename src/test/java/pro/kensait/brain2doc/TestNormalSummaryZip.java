@@ -6,7 +6,6 @@ public class TestNormalSummaryZip {
     @Test
     public void testSimple1() {
         String parameter = "" +
-                "--src " +
                 "E:\\Download\\SpringBootJpa_Web-master.zip " +
                 "--resource " +
                 "java " +

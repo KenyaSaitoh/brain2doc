@@ -31,6 +31,7 @@ public class Parameter {
     private Path destFilePath; // デフォルト値はソースパスと同じディレクトリの固定ファイル名
     private Locale locale; // デフォルト値はプロパティファイルから
     private Path templateFile; // 任意指定
+    private int maxSplitCount;
     private String proxyURL; // 任意指定
     private int connectTimeout; // デフォルト値はプロパティファイルから
     private int requestTimeout; // デフォルト値はプロパティファイルから
@@ -52,14 +53,16 @@ public class Parameter {
         String fields = null;
         OutputScaleType outputScaleType = OutputScaleType.valueOf(
                 DefaultValueHolder.getProperty("output_scale").toUpperCase());
-        String srcParam = null;
+        
         String srcRegex = null;
         String destParam = null;
         String langParam = DefaultValueHolder.getProperty("lang");
         String templateFileParam = null;
-        String proxyURL = null;
         int connectTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("connect_timeout"));
+        String proxyURL = null;
+        int maxSplitCount = Integer.parseInt(
+                DefaultValueHolder.getProperty("max_split_count"));
         int requestTimeout = Integer.parseInt(
                 DefaultValueHolder.getProperty("timeout"));
         int retryCount = Integer.parseInt(
@@ -68,9 +71,14 @@ public class Parameter {
                 DefaultValueHolder.getProperty("retry_interval"));
         boolean isAutoSplitMode = false;
 
+        // ソースパスの設定
+        String srcParam = args[0];
+        if (srcParam == null || srcParam.isEmpty() || srcParam.startsWith("-"))
+            throw new IllegalArgumentException("ソースが指定されていません");
+
         // 引数として指定されたパラメータの取得と設定
         try {
-            for (int i = 0; i < args.length; i++) {
+            for (int i = 1; i < args.length; i++) {
                 try {
                     if (args[i].equalsIgnoreCase("--url")) {
                         if (args[i + 1].startsWith("-"))
@@ -112,10 +120,6 @@ public class Parameter {
                                 .getOutputScaleTypeByName(args[++i].toLowerCase());
                         if (outputScaleType == null)
                             throw new IllegalArgumentException();
-                    } else if (args[i].equalsIgnoreCase("--src")) {
-                        if (args[i + 1].startsWith("-"))
-                            continue;
-                        srcParam = args[++i];
                     } else if (args[i].equalsIgnoreCase("--regex")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -132,6 +136,10 @@ public class Parameter {
                         if (args[i + 1].startsWith("-"))
                             continue;
                         templateFileParam = args[++i];
+                    } else if (args[i].equalsIgnoreCase("--max-split-count")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        maxSplitCount = Integer.parseInt(args[++i]);
                     } else if (args[i].equalsIgnoreCase("--proxyURL")) {
                         if (args[i + 1].startsWith("-"))
                             continue;
@@ -169,10 +177,6 @@ public class Parameter {
             // 無視する
         }
 
-        // APIKeyのチェック
-        if (openaiApiKey == null || openaiApiKey.isEmpty())
-            throw new IllegalArgumentException("APIキーが指定されていません");
-
         // 生成種別のチェック
         if (generateType == null) {
             if (genTable == null || genTable.isEmpty()) {
@@ -190,8 +194,6 @@ public class Parameter {
         }
 
         // 入力元パスをチェックし、パラメータから入力元パスと入力元ディレクトリを決める
-        if (srcParam == null || srcParam.isEmpty())
-            throw new IllegalArgumentException("ソースが指定されていません");
         Path srcPath = Paths.get(srcParam);
         if (! Files.exists(srcPath)) {
             throw new IllegalArgumentException("ソースが存在しません");
@@ -232,6 +234,7 @@ public class Parameter {
                 outputScaleType,
                 srcPath, srcRegex, destPath,
                 locale, templateFile,
+                maxSplitCount,
                 proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
                 isAutoSplitMode, true);
     }
@@ -257,8 +260,9 @@ public class Parameter {
             OutputScaleType outputScaleType,
             Path srcPath, String srcRegex, Path destFilePath,
             Locale locale, Path templateFile,
-            String proxyURL, int connectTimeout, int requestTimeout, int retryCount,
-            int retryInterval,
+            int maxSplitCount,
+            String proxyURL, int connectTimeout, int requestTimeout,
+            int retryCount, int retryInterval,
             boolean isAutoSplitMode,
             boolean printPrompt) {
         this.openaiURL = openaiURL;
@@ -274,6 +278,7 @@ public class Parameter {
         this.destFilePath = destFilePath;
         this.locale = locale;
         this.templateFile = templateFile;
+        this.maxSplitCount = maxSplitCount;
         this.proxyURL = proxyURL;
         this.connectTimeout = connectTimeout;
         this.requestTimeout = requestTimeout;
@@ -335,6 +340,10 @@ public class Parameter {
         return templateFile;
     }
 
+    public int getMaxSplitCount() {
+        return maxSplitCount;
+    }
+
     public String getProxyURL() {
         return proxyURL;
     }
@@ -375,9 +384,10 @@ public class Parameter {
                 + ", fields=" + fields + ", outputScaleType=" + outputScaleType
                 + ", srcPath=" + srcPath + ", srcRegex=" + srcRegex + ", destFilePath="
                 + destFilePath + ", locale=" + locale + ", templateFile=" + templateFile
-                + ", proxyURL=" + proxyURL + ", connectTimeout=" + connectTimeout
-                + ", requestTimeout=" + requestTimeout + ", retryCount=" + retryCount
-                + ", retryInterval=" + retryInterval + ", isAutoSplitMode="
-                + isAutoSplitMode + ", printPrompt=" + printPrompt + "]";
+                + ", maxSplitCount=" + maxSplitCount + ", proxyURL=" + proxyURL
+                + ", connectTimeout=" + connectTimeout + ", requestTimeout="
+                + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
+                + retryInterval + ", isAutoSplitMode=" + isAutoSplitMode
+                + ", printPrompt=" + printPrompt + "]";
     }
 }

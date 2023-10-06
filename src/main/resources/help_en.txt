@@ -1,88 +1,95 @@
-[Specifying Parameters]
+### How to Start the Tool
+
+```
+java -jar <any location>/brain2doc.jar [SOURCE] [OPTIONS]
+```
+
+[SOURCE] is to specify the file or directory of the source to be loaded (mandatory specification).
+If a directory is specified, files will be processed recursively.
+ZIP files will also be processed recursively.
+
+### How to Specify [OPTIONS]
 
 --help
-    Display the method of specifying parameters
+    Displays how to start the tool and how to specify options.
 
 --url
-    Specify the API URL (default is "https://api.openai.com/v1/chat/completions")
+    Specify the API URL (default is "https://api.openai.com/v1/chat/completions").
 
 --model
-    Specify the gpt model (default is "gpt-4")
+    Specify the gpt model (default is "gpt-4").
 
 --apikey
-    Specify the API key (if not specified, it is retrieved from the environment variable "OPENAI_API_KEY")
+    Specify the API key (if not specified, it will be retrieved from the environment variable "OPENAI_API_KEY").
 
 --resource
-    Specify the type of resource to input (default is "others")
+    Specify the type of input resource (default is "others").
     Available types are:
-    java : Java source code (targets files with ".java" extension)
-    js : JavaScript or TypeScript source code (targets files with ".js" or ".ts" extensions).
-    python : Python source code (targets files with ".py" extension)
-    sql : SQL code (targets files with ".sql" extension)
-    page : Page files (targets files with extensions "page", ".html", ".htm", ".xhtml", ".jsp")
-    shell : Shell script (targets files with ".sh", ".bash", ".ksh", ".bash" extensions)
-    others : General resources other than the above
+    java : Java source code (".java" extension is targeted).
+    js : JavaScript or TypeScript source code (".js", ".ts" extensions are targeted).
+    python : Python source code (".py" extension is targeted).
+    sql : SQL code (".sql" extension is targeted).
+    page : Page file (extensions ".page", ".html", ".htm", ".xhtml", ".jsp" are targeted).
+    shell : Shell script (extensions ".sh", ".bash", ".ksh", ".bash" are targeted).
+    others : General resources other than the above.
 
 --gen
-    Specify what you want to generate from the resource (cannot specify both "--gen" and "--gen-table")
+    Specify what you want to generate from the resource (you can't specify both "--gen" and "--gen-table").
     Available types are:
-    spec : Specification
-    summary : Summary
-    review : Review results and improvement suggestions
-    others : General output other than the above (default if neither "--gen" nor "--gen-table" is specified)
+    spec : Specification document.
+    summary : Summary.
+    review : Review results & improvement suggestions.
+    others : General output if neither "--gen" nor "--gen-table" are specified.
 
 --gen-table
-    If you want to generate a list from the resource, specify its name (cannot specify both "--gen" and "--gen-table")
+    If you want to generate a list from the resource, specify its name (you can't specify both "--gen" and "--gen-table").
 
 --fields
-    If generating a list from a resource, enumerate the column names (mandatory for "--gen-table")
+    If generating a list from the resource, enumerate the column names (mandatory when "--gen-table" is specified).
 
 --output-scale
-    Specify the approximate size of the output (default is "nolimit")
-    small : Small size (about 50 characters)
-    medium : Medium size (about 200 characters)
-    large : Large size (about 500 characters)
-    nolimit : No limit
-
---src
-    Specify the file or directory of the source to be read (mandatory)
-    If a directory is specified, files are processed recursively.
-    If a ZIP file is specified, the contents are processed recursively.
+    Specify the size (roughly) of the output result (default is "nolimit").
+    small : Small size (around 50 characters).
+    medium : Medium size (around 200 characters).
+    large : Large size (around 500 characters).
+    nolimit : No limit.
 
 --regex
-    Specify a regular expression string to filter the sources to be read (optional)
+    Specify a regular expression string to filter the sources to be loaded (optional).
 
 --dest
-    Specify the full path of the directory or file name of the markdown file to output.
-    If a directory name is specified, the default file name is "brain2doc-{resource name}-{output type name}-{yMMddHHmmss}.md"
-    (e.g. "brain2doc-java-review-20230924104914.md")
-    If this option is not specified, it will be output in the same directory as the source file with the default file name.
+    Specify the directory or file name of the markdown file to be outputted in full path.
+    If a directory name is specified, the default file name is "brain2doc-{resource name}-{output type}-{yMMddHHmmss}.md".
+    (Example: "brain2doc-java-review-20230924104914.md").
+    If this option is not specified, it will be outputted in the same directory as the source file with the default file name.
 
 --lang
-    Specify the input and output language (default is Japanese)
-    ja : Japanese
-    en : English
+    Specify the input and output language (default is Japanese).
+    ja : Japanese.
+    en : English.
 
 --template
-    Specify the full path of any template file (optional)
-    Only the differences from the default template file are overwritten.
+    Specify any template file in full path (optional).
+    Only the difference from the default template file will be overwritten.
+
+--max-split-count
+    Specify the maximum file split number.
+    If a token limit overrun or rate limit overrun occurs, the file will be split automatically, but if the split number exceeds the number specified in this option, the processing of the source file will be skipped (default 10).
 
 --proxyURL
     Specify the proxy server URL when calling the API.
 
 --connect-timeout
-    Specify the connection timeout time in seconds when calling the API (default is 10 seconds)
+    Specify the connection timeout time in seconds for the API call (default is 10 seconds).
 
 --timeout
-    Specify the read timeout time in seconds when calling the API (default is 300 seconds)
+    Specify the read timeout time in seconds for the API call (default is 300 seconds).
 
 --retry-count
-    Specify the maximum number of retries when a read timeout occurs during an API call (default is 3 times)
+    Specify the maximum retry count when a read timeout occurs during the API call (default is 3 times).
 
 --retry-interval
-    Specify the retry interval in seconds when a read timeout occurs during an API call (default is 60 seconds)
+    Specify the retry interval in seconds when a read timeout occurs during the API call (default is 60 seconds).
 
 --auto-split
-    If this option is specified, when a single API call reaches the token limit, it automatically switches to a mode that splits into appropriate sizes and resends.
-    If not specified, the source will be skipped.
-    
+    When this option is specified, if a single API call reaches the token limit, it switches to a mode where it is automatically split into an appropriate size and resent. If not specified, the source in question will be skipped.

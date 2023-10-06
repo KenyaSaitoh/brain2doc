@@ -7,7 +7,6 @@ public class TestTimeout {
     @Test
     public void testTimeout() {
         String parameter = "" +
-                "--src " +
                 "D:\\GitHubRepos\\learn_java_basic\\15_enum\\src\\pro\\kensait\\java\\basic\\lsn_15_1_3 " +
                 "--resource " +
                 "java " +

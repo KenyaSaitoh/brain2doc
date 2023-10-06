@@ -311,8 +311,14 @@ public class Flow {
                     int newSplitConut = SplitUtil.calcSplitCount(
                             tokenCount, tokenCountLimit);
 
-                    // 分割数を指定して再帰呼び出しする
+                    // 分割数が設定値を超えていた場合は再帰呼び出ししない
+                    if (param.getMaxSplitCount() <= newSplitConut) {
+                        throw oe;
+                    }
+
                     tryCount++;
+
+                    // 分割数を指定して再帰呼び出しする
                     return askToOpenAi(inputFileLines, inputFileContent,
                             newSplitConut, splitConut, tryCount,
                             startSignal, printProcessing);
@@ -329,6 +335,11 @@ public class Flow {
                     // 分割数を加算する。
                     tryCount++;
                     int newSplitConut = tryCount;
+
+                    // 分割数が設定値を超えていた場合は再帰呼び出ししない
+                    if (param.getMaxSplitCount() <= newSplitConut) {
+                        throw oe;
+                    }
 
                     // 分割数を指定して再帰呼び出しする
                     return askToOpenAi(inputFileLines, inputFileContent,

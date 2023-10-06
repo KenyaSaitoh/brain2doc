@@ -7,7 +7,6 @@ public class TestPythonSummary {
     @Test
     public void testPythonSummary() {
         String parameter = "" +
-                "--src " +
                 "D:\\Java\\brain2doc-src\\python-patterns-master\\patterns\\creational " +
                 "--resource " +
                 "python " +

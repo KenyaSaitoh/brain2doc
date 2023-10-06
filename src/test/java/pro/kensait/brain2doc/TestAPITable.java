@@ -7,7 +7,6 @@ public class TestAPITable {
     @Test
     public void testTable() {
         String parameter = "" +
-                "--src " +
                 "D:\\GitHubRepos\\spring_boot2_repo\\spring_rs_person\\src\\main\\java " +
                 "--resource " +
                 "java " +
