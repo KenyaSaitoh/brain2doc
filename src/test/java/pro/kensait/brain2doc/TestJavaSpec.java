@@ -14,6 +14,8 @@ public class TestJavaSpec {
                 "spec " +
                 "--dest " +
                 "C:/tmp/output " +
+                "--output-scale " + 
+                "small " + 
                 "--auto-split " +
                 "";
         String[] params = parameter.split(" ");

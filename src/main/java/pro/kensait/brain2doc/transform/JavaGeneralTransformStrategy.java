@@ -26,7 +26,7 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
                 Const.LINE_SEP +
                 Const.LINE_SEP +
-                "ファイルリンク: " + url +
+                "ファイルパス: " + url +
                 Const.LINE_SEP +
                 Const.LINE_SEP +
                 responseContent +

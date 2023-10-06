@@ -32,7 +32,20 @@ public class TemplateAttacher {
         if (resourceMap == null || resourceMap.isEmpty())
             throw new IllegalArgumentException("テンプレート（リソース）の記述誤り");
 
-        String commonStr = (String) messageMap.get("common");
+        // systemメッセージの構築
+        String systemStr = (String) messageMap.get("system") + LINE_SEP;
+
+        // assistantメッセージの構築
+        String continuing = count != 0 ?
+                (String) messageMap.get("continuing") + LINE_SEP : "";
+        String assistantMessage =  (String) (messageMap.get("constraints")) + 
+                continuing + LINE_SEP +
+                (String) (messageMap.get("lang")) + LINE_SEP +
+                getScaleString(messageMap, outputSizeType) +
+                (String) (messageMap.get("markdown-level") + LINE_SEP);
+
+        // userメッセージの構築
+        String titleStr = (String) messageMap.get("title");
         String templateStr = null;
         if (generateType != null) {
             templateStr = (String) resourceMap.get(generateType.getName());
@@ -42,22 +55,13 @@ public class TemplateAttacher {
         } else {
             templateStr = getTableTemplateStr(messageMap, genTable, fields) + LINE_SEP;
         }
+        String userMessage = titleStr + LINE_SEP + templateStr; 
 
-        String continuing = count != 0 ?
-                (String) messageMap.get("continuing") + LINE_SEP : "";
-        String promptMessage = commonStr + LINE_SEP +
-                templateStr + 
-                continuing + LINE_SEP +
-                (String) (messageMap.get("constraints")) + LINE_SEP +
-                (String) (messageMap.get("lang")) + LINE_SEP +
-                getScaleString(messageMap, outputSizeType) +
-                (String) (messageMap.get("markdown-level") + LINE_SEP);
-
-        List<String> requestLines = new ArrayList<>();
-        requestLines.add(promptMessage);
-        requestLines.add(LINE_SEP + (String) (messageMap.get("input")) + LINE_SEP);
-        requestLines.addAll(inputFileLines);
-        return new Prompt(promptMessage, requestLines);
+        List<String> userMessageLines = new ArrayList<>();
+        userMessageLines.add(userMessage);
+        userMessageLines.add(LINE_SEP + (String) (messageMap.get("input")) + LINE_SEP);
+        userMessageLines.addAll(inputFileLines);
+        return new Prompt(systemStr, assistantMessage, userMessage, userMessageLines);
     }
 
     @SuppressWarnings("rawtypes")
@@ -96,17 +100,28 @@ public class TemplateAttacher {
     }
 
     public static class Prompt {
-        private String promptMessage;
-        private List<String> requestLines;
-        public Prompt(String promptMessage, List<String> requestLines) {
-            this.promptMessage = promptMessage;
-            this.requestLines = requestLines;
+        private final String systemMessage;
+        private final String assistantMessage;
+        private final String userMessage;
+        private final List<String> userMessageLines;
+        public Prompt(String systemMessage, String assistantMessage, String userMessage,
+                List<String> userMessageLines) {
+            this.systemMessage = systemMessage;
+            this.assistantMessage = assistantMessage;
+            this.userMessage = userMessage;
+            this.userMessageLines = userMessageLines;
         }
-        public String getPromptMessage() {
-            return promptMessage;
+        public String getSystemMessage() {
+            return systemMessage;
         }
-        public List<String> getRequestLines() {
-            return requestLines;
+        public String getAssistantMessage() {
+            return assistantMessage;
+        }
+        public String getUserMessage() {
+            return userMessage;
+        }
+        public List<String> getUserMessageLines() {
+            return userMessageLines;
         }
     }
 }

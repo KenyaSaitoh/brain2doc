@@ -31,7 +31,10 @@ public class ApiClient {
     private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
     private static final String INVALID_API_KEY_CODE = "invalid_api_key";    
     
-    public static ApiResult ask(String requestContent,
+    public static ApiResult ask(
+            String systemMessageStr,
+            String assistantMessageStr,
+            String userMessageContent,
             String openaiURL,
             String openAiModel,
             String openAiApiKey,
@@ -44,9 +47,15 @@ public class ApiClient {
         // HttpClientオブジェクトを生成する
         HttpClient client = createHttpClient(proxyURL, connectTimeout);
 
-        // TODO user決め打ちになっている
-        Message message = new Message("user", requestContent);
-        RequestBody requestBody = new RequestBody(openAiModel, List.of(message), 0.7F);
+        Message systemMessage = new Message("system", systemMessageStr);
+        Message assistantMessage = new Message("assistant", assistantMessageStr);
+        Message userMessage = new Message("user", userMessageContent);
+
+        RequestBody requestBody = new RequestBody(
+                openAiModel,
+                List.of(systemMessage, assistantMessage, userMessage),
+                0.7F);
+
         String requestStr = getRequestJson(requestBody);
         // System.out.println(requestStr);
 

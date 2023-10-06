@@ -269,7 +269,7 @@ public class Flow {
             // 実行ごとに初回のみ
             if (param.isPrintPrompt()) {
                 // プログレスバーより先にプロンプトを出力する
-                printPrompt(prompt.getPromptMessage());
+                printPrompt(prompt);
                 System.out.println(PROCESS_PROGRESS_HEADING);
                 printProcessing.run();
                 param.setPrintPrompt(false);
@@ -278,12 +278,15 @@ public class Flow {
             // プログレスバーの表示を開始する
             startSignal.countDown();
 
-            String requestContent = toStringFromStrList(prompt.getRequestLines());
+            String userMessageContent = toStringFromStrList(prompt.getUserMessageLines());
 
             // OpenAIのAPIを呼び出す
             ApiResult apiResult = null;
             try {
-                apiResult = ApiClient.ask(requestContent,
+                apiResult = ApiClient.ask(
+                        prompt.getSystemMessage(),
+                        prompt.getAssistantMessage(),
+                        userMessageContent,
                         param.getOpenaiURL(),
                         param.getOpenaiModel(),
                         param.getOpenaiApikey(),
@@ -300,7 +303,7 @@ public class Flow {
                     // エラーメッセージからトークン数を抽出し、分割数を計算する
                     String errorMessage =
                             oe.getClientErrorBody().getError().getMessage();
-                    Double tokenCount = extractToken(requestContent, errorMessage);
+                    Double tokenCount = extractToken(userMessageContent, errorMessage);
                     if (tokenCount == null)
                         throw new OpenAITokenLimitOverException(oe.getClientErrorBody());
                     @SuppressWarnings("rawtypes")
@@ -310,6 +313,11 @@ public class Flow {
                             (tokenLimitMap.get(param.getOpenaiModel()));
                     int newSplitConut = SplitUtil.calcSplitCount(
                             tokenCount, tokenCountLimit);
+
+                    // TODO
+                    System.out.println("OpenAITokenLimitOverException");
+                    System.out.println("getMaxSplitCount ---> " + param.getMaxSplitCount());
+                    System.out.println("newSplitConut ---> " + newSplitConut);
 
                     // 分割数が設定値を超えていた場合は再帰呼び出ししない
                     if (param.getMaxSplitCount() <= newSplitConut) {
@@ -335,6 +343,11 @@ public class Flow {
                     // 分割数を加算する。
                     tryCount++;
                     int newSplitConut = tryCount;
+
+                    // TODO
+                    System.out.println("OpenAIRateLimitExceededException");
+                    System.out.println("getMaxSplitCount ---> " + param.getMaxSplitCount());
+                    System.out.println("newSplitConut ---> " + newSplitConut);
 
                     // 分割数が設定値を超えていた場合は再帰呼び出ししない
                     if (param.getMaxSplitCount() <= newSplitConut) {
@@ -416,9 +429,11 @@ public class Flow {
         }
     }
 
-    private static void printPrompt(String promptMessage) {
+    private static void printPrompt(Prompt prompt) {
         System.out.println(PROMPT_HEADING);
-        System.out.println(promptMessage);
+        System.out.println(prompt.getSystemMessage());
+        System.out.println(prompt.getAssistantMessage());
+        System.out.println(prompt.getUserMessage());
     }
 
     private static void addReport(Path inputFilePath, String message, long interval) {
