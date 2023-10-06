@@ -1,11 +1,11 @@
 package pro.kensait.brain2doc.transform;
 
+import static pro.kensait.brain2doc.common.Const.*;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import pro.kensait.brain2doc.common.Const;
 
 public class JavaGeneralTransformStrategy implements TransformStrategy {
     private static final String PACKAGE_REGEX = "package (.*);";
@@ -21,19 +21,19 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
         String className = inputFilePath.getFileName().toString()
                 .replaceAll("(.*)\\.java", "$1");
         String url = inputFilePath.toUri().toString();
-        String outputContent = Const.MARKDOWN_HEADING + 
+        String outputContent = MARKDOWN_HEADING + 
                 packageName + "." + "**" + className + "**" +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
-                Const.LINE_SEP +
-                Const.LINE_SEP +
+                LINE_SEP +
+                LINE_SEP +
                 "ファイルパス: " + url +
-                Const.LINE_SEP +
-                Const.LINE_SEP +
+                LINE_SEP +
+                LINE_SEP +
                 responseContent +
-                Const.LINE_SEP +
-                Const.LINE_SEP +
-                Const.MARKDOWN_HORIZON + 
-                Const.LINE_SEP;
+                LINE_SEP +
+                LINE_SEP +
+                MARKDOWN_HORIZON + 
+                LINE_SEP;
         return outputContent;
     }
 
