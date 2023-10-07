@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import pro.kensait.brain2doc.config.HelpMessageHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
 import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.RetryCountOverException;
@@ -38,21 +39,25 @@ public class Main {
         try {
             printBanner();
             Flow.startAndFork();
-        } catch (RetryCountOverException oe) {
-            System.err.println(LINE_SEP + "OpenAI RetryCountOver occured!!!!!");
+        } catch(OpenAIInvalidAPIKeyException oe) {
+            System.err.println(LINE_SEP + "OpenAI API Key is Invalid occured!!!!!");
+            printReport();
+            System.exit(1);
+        } catch(OpenAIInsufficientQuotaException oe) {
+            System.err.println(LINE_SEP + "OpenAI Quota is Insufficient!!!!!");
             printReport();
             System.exit(1);
         } catch(OpenAIRateLimitExceededException oe) {
-            System.err.println(LINE_SEP + "OpenAI RateLimitExceeded occured!!!!!");
+            System.err.println(LINE_SEP + "OpenAI Rate Limit Exceeded!!!!!");
             System.out.println(oe.getClientErrorBody());
-            printReport();
-            System.exit(1);
-        } catch(OpenAIInvalidAPIKeyException oe) {
-            System.err.println(LINE_SEP + "OpenAI InvalidAPIKey occured!!!!!");
             printReport();
             System.exit(1);
         } catch(OpenAIClientException oe) {
             System.err.println(LINE_SEP + "OpenAI ClientError occured!!!!!");
+            printReport();
+            System.exit(1);
+        } catch (RetryCountOverException oe) {
+            System.err.println(LINE_SEP + "Retry Count is Over!!!!!");
             printReport();
             System.exit(1);
         }

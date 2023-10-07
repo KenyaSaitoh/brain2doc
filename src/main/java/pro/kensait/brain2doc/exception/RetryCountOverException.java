@@ -1,7 +1,6 @@
 package pro.kensait.brain2doc.exception;
 
 public class RetryCountOverException extends RuntimeException {
-
     public RetryCountOverException() {
         super();
     }

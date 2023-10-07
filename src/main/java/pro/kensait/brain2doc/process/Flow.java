@@ -30,6 +30,7 @@ import java.util.zip.ZipInputStream;
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.ConstMapHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
 import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
@@ -48,10 +49,11 @@ public class Flow {
 
     private static final String SUCCESS_MESSAGE = "SUCCESS";
     private static final String TIMEOUT_MESSAGE = "TIMEOUT";
+    private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
+    private static final String INVALID_API_KEY_MESSAGE = "INVALID_API_KEY";
+    private static final String INSUFFICIENT_QUOTA_MESSAGE = "INSUFFICIENT_QUOTA";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String RATE_LIMIT_EXCEEDED_MESSAGE = "RATE_LIMIT_EXCEEDED";
-    private static final String INVALID_API_KEY_MESSAGE = "INVALID_API_KEY";
-    private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
 
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
 
@@ -191,22 +193,25 @@ public class Flow {
                     0, // 前回分割数（初回は0）
                     1, // 実行回数（初回は1）
                     startSignal, startProgress);
+        } catch (OpenAIInvalidAPIKeyException oe) {
+            addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0, 0L);
+            throw oe; // プログラム停止
+        } catch (OpenAIInsufficientQuotaException oe) {
+            addReport(inputFilePath, INSUFFICIENT_QUOTA_MESSAGE, 0, 0L);
+            throw oe; // プログラム停止
         } catch (OpenAITokenLimitOverException oe) {
-            addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0);
+            addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0, 0L);
             progressDone.run();
             return; // 次のファイルへ
         } catch (OpenAIRateLimitExceededException oe) {
-            addReport(inputFilePath, RATE_LIMIT_EXCEEDED_MESSAGE, 0);
+            addReport(inputFilePath, RATE_LIMIT_EXCEEDED_MESSAGE, 0, 0L);
             progressDone.run();
             return; // 次のファイルへ
-        } catch (OpenAIInvalidAPIKeyException oe) {
-            addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0);
-            throw oe; // プログラム停止
         } catch (OpenAIClientException oe) {
-            addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0);
+            addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0, 0L);
             throw oe; // プログラム停止
         } catch (RetryCountOverException oe) {
-            addReport(inputFilePath, TIMEOUT_MESSAGE, 0);
+            addReport(inputFilePath, TIMEOUT_MESSAGE, 0, 0L);
             throw oe; // プログラム停止
         }
 
@@ -223,7 +228,9 @@ public class Flow {
                     responseLines,
                     i + 1);
             write(outputFileContent);
-            addReport(inputFilePath, SUCCESS_MESSAGE, apiResult.getInterval());
+            addReport(inputFilePath, SUCCESS_MESSAGE,
+                    apiResult.getResponseBody().getUsage().getCompletionTokens(),
+                    apiResult.getInterval());
         }
         progressDone.run();
     }
@@ -436,7 +443,8 @@ public class Flow {
         System.out.println(prompt.getUserMessage());
     }
 
-    private static void addReport(Path inputFilePath, String message, long interval) {
+    private static void addReport(Path inputFilePath, String message,
+            int tokenCount, long interval) {
         String report = inputFilePath.getFileName().toString() + "," +
                 message + "," + interval;
         reportList.add(report);

@@ -4,7 +4,6 @@ import pro.kensait.brain2doc.openai.ClientErrorBody;
 
 public class OpenAIInvalidAPIKeyException extends OpenAIClientException {
     private ClientErrorBody clientErrorBody;
-    private int tokenCount;
     
     public OpenAIInvalidAPIKeyException() {
         super();
@@ -31,17 +30,7 @@ public class OpenAIInvalidAPIKeyException extends OpenAIClientException {
         this.clientErrorBody = clientErrorBody;
     }
 
-    public OpenAIInvalidAPIKeyException(ClientErrorBody clientErrorBody,
-            int tokenCount) {
-        this.clientErrorBody = clientErrorBody;
-        this.tokenCount = tokenCount;
-    }
-
     public ClientErrorBody getClientErrorBody() {
         return clientErrorBody;
-    }
-
-    public int getTokenCount() {
-        return tokenCount;
     }
 }

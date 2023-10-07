@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import pro.kensait.brain2doc.exception.OpenAIClientException;
+import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
 import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
 import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
 import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
@@ -27,10 +28,13 @@ import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.exception.TimeoutException;
 
 public class ApiClient {
+
+    private static final float TEMPERATURE = 0.7F;
+    private static final String INVALID_API_KEY_CODE = "invalid_api_key";
+    private static final String INSUFFICIENT_QUOTA_CODE = "insufficient_quota";
     private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
     private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
-    private static final String INVALID_API_KEY_CODE = "invalid_api_key";    
-    
+
     public static ApiResult ask(
             String systemMessageStr,
             String assistantMessageStr,
@@ -54,10 +58,9 @@ public class ApiClient {
         RequestBody requestBody = new RequestBody(
                 openAiModel,
                 List.of(systemMessage, assistantMessage, userMessage),
-                0.7F);
+                TEMPERATURE);
 
         String requestStr = getRequestJson(requestBody);
-        // System.out.println(requestStr);
 
         // HttpRequestオブジェクトを生成する
         HttpRequest request = HttpRequest.newBuilder()
@@ -71,23 +74,29 @@ public class ApiClient {
         int count = 0;
         while (true) {
             try {
-                return sendRequest(client, request, retryCount, retryInterval);
-            } catch (OpenAIClientException oce) {
-                // APIキーが異なる場合は、即例外スロー
+                return sendRequest(client, request);
+            } catch (OpenAIClientException oe) {
+                // APIキーが異なる場合は、即例外スロー → その後プログラム停止
                 if (Objects.equals(INVALID_API_KEY_CODE,
-                        oce.getClientErrorBody().getError().getCode())) {
-                    throw new OpenAIInvalidAPIKeyException(oce.getClientErrorBody());
+                        oe.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAIInvalidAPIKeyException(oe.getClientErrorBody());
+
+                // クオータ不足の場合は、即例外スロー → その後プログラム停止
+                } else if (Objects.equals(INSUFFICIENT_QUOTA_CODE,
+                        oe.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAIInsufficientQuotaException(oe.getClientErrorBody());
 
                 // トークンリミットオーバーの場合は、即例外スロー → その後分割実行
                 } else if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
-                        oce.getClientErrorBody().getError().getCode())) {
-                    throw new OpenAITokenLimitOverException(oce.getClientErrorBody());
+                        oe.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAITokenLimitOverException(oe.getClientErrorBody());
 
                 // レートリミットオーバーの場合は、即例外スロー → その後分割実行
                 } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
-                        oce.getClientErrorBody().getError().getCode())) {
-                    throw new OpenAIRateLimitExceededException(oce.getClientErrorBody());
+                        oe.getClientErrorBody().getError().getCode())) {
+                    throw new OpenAIRateLimitExceededException(oe.getClientErrorBody());
                 }
+                throw oe;
 
             } catch(TimeoutException te) {
                 if (count == retryCount) break;
@@ -99,8 +108,7 @@ public class ApiClient {
         throw new RetryCountOverException("リトライ回数オーバー");
     }
 
-    private static ApiResult sendRequest(HttpClient client, HttpRequest request,
-            int retryCount, int retryInterval) {
+    private static ApiResult sendRequest(HttpClient client, HttpRequest request) {
         // HttpRequestを送信し、HTTPサーバーを同期で呼び出す
         HttpResponse<String> response = null;
         LocalTime startTime = null;
@@ -121,9 +129,7 @@ public class ApiClient {
 
         int statusCode = response.statusCode();
         String responseStr = response.body();
-        // TODO
-        //System.out.println(responseStr);
-        
+
         if (200 <= statusCode && statusCode < 300) {
             SuccessResponseBody responseBody = getResponseBody(SuccessResponseBody.class,
                     responseStr);
