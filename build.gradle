@@ -1,6 +1,7 @@
 // 初期化処理
 buildscript {
     ext {
+        brain2docBaseName = "brain2doc"
         brain2docVersion = "0.1.1"
     }
 }
@@ -75,9 +76,15 @@ eclipse {
 }
 
 shadowJar {
-    archiveBaseName.set("brain2doc")
+    archiveBaseName.set(brain2docBaseName)
     archiveVersion.set(brain2docVersion)
     archiveClassifier.set("")
+    doLast {
+        copy {
+            from "build/libs/${brain2docBaseName}-${brain2docVersion}.jar"
+            into "${rootDir}/releases"
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
