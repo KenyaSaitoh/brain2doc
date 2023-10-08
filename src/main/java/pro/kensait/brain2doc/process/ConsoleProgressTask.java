@@ -1,11 +1,13 @@
 package pro.kensait.brain2doc.process;
 
+import static pro.kensait.brain2doc.common.Util.*;
+
 import java.util.concurrent.CountDownLatch;
 
 public class ConsoleProgressTask implements Runnable {
     private static final String DONE_BAR = "=> ";
     private static final String BAR = "=";
-    private static final int INTERVAL = 2000;
+    private static final int INTERVAL = 2;
     private CountDownLatch startSignal;
     private boolean isDone;
 
@@ -39,14 +41,6 @@ public class ConsoleProgressTask implements Runnable {
                 sleepAWhile(INTERVAL);
             }
             System.out.println(DONE_BAR + "done!");
-        } catch (InterruptedException ie) {
-            throw new RuntimeException(ie);
-        }
-    }
-
-    private void sleepAWhile(long time) {
-        try {
-            Thread.sleep(time);
         } catch (InterruptedException ie) {
             throw new RuntimeException(ie);
         }

@@ -1,6 +1,7 @@
 package pro.kensait.brain2doc.process;
 
 import static pro.kensait.brain2doc.common.Const.*;
+import static pro.kensait.brain2doc.common.Util.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -45,8 +46,8 @@ import pro.kensait.brain2doc.transform.TransformStrategy;
 
 public class Flow {
 
+    // Const
     private static final String ZIP_FILE_EXT = ".zip";
-
     private static final String SUCCESS_MESSAGE = "SUCCESS";
     private static final String TIMEOUT_MESSAGE = "TIMEOUT";
     private static final String CLIENT_ERROR_MESSAGE = "CLIENT_ERROR";
@@ -54,11 +55,11 @@ public class Flow {
     private static final String INSUFFICIENT_QUOTA_MESSAGE = "INSUFFICIENT_QUOTA";
     private static final String TOKEN_LIMIT_OVER_MESSAGE = "TOKEN_LIMIT_OVER";
     private static final String RATE_LIMIT_EXCEEDED_MESSAGE = "RATE_LIMIT_EXCEEDED";
-
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
-
     private static final String PROMPT_HEADING = "### PROMPT CONTENT (without source)";
     private static final String PROCESS_PROGRESS_HEADING = "### PROGRESS";
+    private static final String REPORT_TITLE = "|ソースファイル名|ステータス|リクエストトークン数|レスポンストークン数|処理時間|";
+    private static final String REPORT_TABLE_DIVIDER = "||||||";
 
     private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
@@ -66,6 +67,8 @@ public class Flow {
     synchronized public static void init(Parameter paramValues) {
         param = paramValues;
         reportList.clear();
+        reportList.add(REPORT_TITLE);
+        reportList.add(REPORT_TABLE_DIVIDER);
     }
 
     public static List<String> getReportList() {
@@ -163,12 +166,12 @@ public class Flow {
     }
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
-        Runnable startProgress = () -> {
+        Runnable startProgressTask = () -> {
             System.out.print("processing [" + inputFilePath.getFileName() + "] ");
         };
         // 最初のファイルではPROMPTを先に表示するため、ここではPROGRESSを表示しない
         if (! param.isPrintPrompt()) {
-            startProgress.run(); // 2ファイル目以降はPROGRESSを表示する
+            startProgressTask.run(); // 2ファイル目以降はPROGRESSを表示する
         }
 
         // コンソールへの進捗バー表示スレッドを起動する
@@ -179,7 +182,7 @@ public class Flow {
 
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
-        Runnable progressDone = () -> {
+        Runnable progressDoneTask = () -> {
             cpt.setDone(true);
             try {
                 future.get();
@@ -192,26 +195,26 @@ public class Flow {
                     1, // ファイル分割数
                     0, // 前回分割数（初回は0）
                     1, // 実行回数（初回は1）
-                    startSignal, startProgress);
+                    startSignal, startProgressTask);
         } catch (OpenAIInvalidAPIKeyException oe) {
-            addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0, 0L);
+            addReport(inputFilePath, INVALID_API_KEY_MESSAGE, 0, 0, 0L);
             throw oe; // プログラム停止
         } catch (OpenAIInsufficientQuotaException oe) {
-            addReport(inputFilePath, INSUFFICIENT_QUOTA_MESSAGE, 0, 0L);
+            addReport(inputFilePath, INSUFFICIENT_QUOTA_MESSAGE, 0, 0, 0L);
             throw oe; // プログラム停止
         } catch (OpenAITokenLimitOverException oe) {
-            addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0, 0L);
-            progressDone.run();
+            addReport(inputFilePath, TOKEN_LIMIT_OVER_MESSAGE, 0, 0, 0L);
+            progressDoneTask.run();
             return; // 次のファイルへ
         } catch (OpenAIRateLimitExceededException oe) {
-            addReport(inputFilePath, RATE_LIMIT_EXCEEDED_MESSAGE, 0, 0L);
-            progressDone.run();
+            addReport(inputFilePath, RATE_LIMIT_EXCEEDED_MESSAGE, 0, 0, 0L);
+            progressDoneTask.run();
             return; // 次のファイルへ
         } catch (OpenAIClientException oe) {
-            addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0, 0L);
+            addReport(inputFilePath, CLIENT_ERROR_MESSAGE, 0, 0, 0L);
             throw oe; // プログラム停止
         } catch (RetryCountOverException oe) {
-            addReport(inputFilePath, TIMEOUT_MESSAGE, 0, 0L);
+            addReport(inputFilePath, TIMEOUT_MESSAGE, 0, 0, 0L);
             throw oe; // プログラム停止
         }
 
@@ -229,10 +232,11 @@ public class Flow {
                     i + 1);
             write(outputFileContent);
             addReport(inputFilePath, SUCCESS_MESSAGE,
+                    apiResult.getResponseBody().getUsage().getPromptTokens(),
                     apiResult.getResponseBody().getUsage().getCompletionTokens(),
                     apiResult.getInterval());
         }
-        progressDone.run();
+        progressDoneTask.run();
     }
 
     private static List<ApiResult> askToOpenAi(
@@ -242,7 +246,7 @@ public class Flow {
             int prevSplitCount,
             int tryCount,
             CountDownLatch startSignal,
-            Runnable printProcessing) {
+            Runnable startProgressTask) {
         if (prevSplitCount != 0) {
             if (splitConut <= prevSplitCount) {
                 throw new OpenAITokenLimitOverException(
@@ -278,7 +282,7 @@ public class Flow {
                 // プログレスバーより先にプロンプトを出力する
                 printPrompt(prompt);
                 System.out.println(PROCESS_PROGRESS_HEADING);
-                printProcessing.run();
+                startProgressTask.run();
                 param.setPrintPrompt(false);
             }
 
@@ -289,8 +293,10 @@ public class Flow {
 
             // OpenAIのAPIを呼び出す
             ApiResult apiResult = null;
-            try {  // OpenAITokenLimitOverExceptionまたはレートリミットオーバーの場合はリトライするため、
-                   //例外ハンドリングする
+            
+            // OpenAITokenLimitOverExceptionまたはレートリミットオーバーの場合はリトライするため、
+            // 例外ハンドリングする
+            try { 
                 apiResult = ApiClient.ask(
                         prompt.getSystemMessage(),
                         prompt.getAssistantMessage(),
@@ -332,7 +338,7 @@ public class Flow {
                     // 分割数を指定して再帰呼び出しする
                     return askToOpenAi(inputFileLines, inputFileContent,
                             newSplitConut, splitConut, tryCount,
-                            startSignal, printProcessing);
+                            startSignal, startProgressTask);
                 }
                 throw oe;
 
@@ -352,10 +358,13 @@ public class Flow {
                         throw oe;
                     }
 
+                    // 次の呼び出し前に、一定期間、間隔をあける
+                    sleepAWhile(param.getRetryInterval());
+
                     // 分割数を指定して再帰呼び出しする
                     return askToOpenAi(inputFileLines, inputFileContent,
                             newSplitConut, splitConut, tryCount,
-                            startSignal, printProcessing);
+                            startSignal, startProgressTask);
                     }
                 throw oe;
             }
@@ -435,9 +444,14 @@ public class Flow {
     }
 
     private static void addReport(Path inputFilePath, String message,
-            int tokenCount, long interval) {
-        String report = inputFilePath.getFileName().toString() + "," +
-                message + "," + interval;
+            int resuestTokenCount, int responseTokenCount,
+            long interval) {
+        String report = "|" +
+            inputFilePath.getFileName().toString() + "|" + 
+            message + "|" + 
+            resuestTokenCount + "|" +
+            responseTokenCount + "|"  +
+            interval + "|";
         reportList.add(report);
     }
 }

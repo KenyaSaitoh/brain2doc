@@ -1,3 +1,11 @@
+// 初期化処理
+buildscript {
+    ext {
+        brain2docVersion = "0.1.1"
+    }
+}
+
+// プラグイン設定
 plugins {
     id "java"
     id "eclipse"
@@ -68,6 +76,8 @@ eclipse {
 
 shadowJar {
     archiveBaseName.set("brain2doc")
+    archiveVersion.set(brain2docVersion)
+    archiveClassifier.set("")
 }
 
 tasks.withType(JavaCompile) {

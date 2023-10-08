@@ -1,5 +1,7 @@
 package pro.kensait.brain2doc.openai;
 
+import static pro.kensait.brain2doc.common.Util.*;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -27,7 +29,7 @@ import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
 import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.exception.TimeoutException;
 
-public class ApiClient {
+;public class ApiClient {
 
     private static final float TEMPERATURE = 0.7F;
     private static final String INVALID_API_KEY_CODE = "invalid_api_key";
@@ -105,7 +107,7 @@ public class ApiClient {
                 if (count == retryCount) break;
                 // タイムアウトの場合はリトライ
                 count++;
-                sleep(retryInterval);
+                sleepAWhile(retryInterval);
             }
         }
         throw new RetryCountOverException("リトライ回数オーバー");
@@ -168,14 +170,6 @@ public class ApiClient {
             throw new RuntimeException(e);
         }
         return responseBody;
-    }
-
-    private static void sleep(int retryInterval) {
-        try {
-            Thread.sleep(retryInterval * 1000);
-        } catch(InterruptedException ie) {
-            throw new RuntimeException(ie);
-        }
     }
 
     private static HttpClient createHttpClient(String proxyURL, int connectTimeout) {

@@ -6,7 +6,7 @@ message:
   continuing: "先ほどのソースの続きです。"
   char-limit-prefix: 回答は
   char-limit-suffix: 文字以内でお願いします。
-  markdown-level: マークダウンの見出しはレベル3以上にしてください。
+  markdown-level: マークダウンの見出しは、タイトルにレベル2を使用し、それ以外はレベル4以上にしてください。
   lang: 回答は日本語でお願いします。
   # user
   title: "[命令書]"
