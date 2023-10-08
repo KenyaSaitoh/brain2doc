@@ -89,16 +89,19 @@ public class ApiClient {
                 // トークンリミットオーバーの場合は、即例外スロー → その後分割実行
                 } else if (Objects.equals(CONTEXT_LENGTH_EXCEEDED_CODE,
                         oe.getClientErrorBody().getError().getCode())) {
+                    System.out.print("[CONTEXT_LENGTH_EXCEEDED]");
                     throw new OpenAITokenLimitOverException(oe.getClientErrorBody());
 
                 // レートリミットオーバーの場合は、即例外スロー → その後分割実行
                 } else if (Objects.equals(RATE_LIMIT_EXCEEDED_CODE,
                         oe.getClientErrorBody().getError().getCode())) {
+                    System.out.print("[RATE_LIMIT_EXCEEDED]");
                     throw new OpenAIRateLimitExceededException(oe.getClientErrorBody());
                 }
                 throw oe;
 
             } catch(TimeoutException te) {
+                System.out.print("[TIME_OUT]");
                 if (count == retryCount) break;
                 // タイムアウトの場合はリトライ
                 count++;

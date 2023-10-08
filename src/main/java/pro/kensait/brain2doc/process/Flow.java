@@ -289,7 +289,8 @@ public class Flow {
 
             // OpenAIのAPIを呼び出す
             ApiResult apiResult = null;
-            try {
+            try {  // OpenAITokenLimitOverExceptionまたはレートリミットオーバーの場合はリトライするため、
+                   //例外ハンドリングする
                 apiResult = ApiClient.ask(
                         prompt.getSystemMessage(),
                         prompt.getAssistantMessage(),
@@ -321,11 +322,6 @@ public class Flow {
                     int newSplitConut = SplitUtil.calcSplitCount(
                             tokenCount, tokenCountLimit);
 
-                    // TODO
-                    System.out.println("OpenAITokenLimitOverException");
-                    System.out.println("getMaxSplitCount ---> " + param.getMaxSplitCount());
-                    System.out.println("newSplitConut ---> " + newSplitConut);
-
                     // 分割数が設定値を超えていた場合は再帰呼び出ししない
                     if (param.getMaxSplitCount() <= newSplitConut) {
                         throw oe;
@@ -350,11 +346,6 @@ public class Flow {
                     // 分割数を加算する。
                     tryCount++;
                     int newSplitConut = tryCount;
-
-                    // TODO
-                    System.out.println("OpenAIRateLimitExceededException");
-                    System.out.println("getMaxSplitCount ---> " + param.getMaxSplitCount());
-                    System.out.println("newSplitConut ---> " + newSplitConut);
 
                     // 分割数が設定値を超えていた場合は再帰呼び出ししない
                     if (param.getMaxSplitCount() <= newSplitConut) {
