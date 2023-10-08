@@ -64,6 +64,9 @@ public class TemplateAttacher {
         return new Prompt(systemStr, assistantMessage, userMessage, userMessageLines);
     }
 
+    /*
+     * 出力内容の大きさを指定するための文字列を取得する
+     */
     @SuppressWarnings("rawtypes")
     private static String getScaleString(Map messageMap, OutputScaleType outputSizeType) {
         switch (outputSizeType) {
@@ -87,6 +90,9 @@ public class TemplateAttacher {
         }
     }
 
+    /*
+     * 一覧形式のテンプレートを返す
+     */
     @SuppressWarnings("rawtypes")
     private static String getTableTemplateStr(Map messageMap, String genTable,
             String fields) {
@@ -99,6 +105,9 @@ public class TemplateAttacher {
         return str1 + str2;
     }
 
+    /*
+     * プロンプトを表すクラス
+     */
     public static class Prompt {
         private final String systemMessage;
         private final String assistantMessage;

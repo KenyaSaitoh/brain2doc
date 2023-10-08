@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+/*
+ * パラメータのデフォルト値をプロパティから読み込んで保持するクラス
+ */
 public class DefaultValueHolder {
     private static Properties props;
     static {

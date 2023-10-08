@@ -44,6 +44,9 @@ import pro.kensait.brain2doc.params.ResourceType;
 import pro.kensait.brain2doc.process.TemplateAttacher.Prompt;
 import pro.kensait.brain2doc.transform.TransformStrategy;
 
+/*
+ * 処理フローを表すクラス
+ */
 public class Flow {
 
     // Const
@@ -87,6 +90,9 @@ public class Flow {
         }
     }
 
+    /*
+     * ディレクトリを渡り歩く
+     */
     private static void walkDirectory(Path srcPath) {
         try {
         Files.walkFileTree(srcPath, new SimpleFileVisitor<Path>() { 
@@ -104,6 +110,9 @@ public class Flow {
         }
     }
 
+    /*
+     * ファイルを読み込む
+     */
     private static void readNormalFile(Path inputFilePath) {
         ResourceType resourceType = param.getResourceType();
         try {
@@ -126,6 +135,9 @@ public class Flow {
         }
     }
 
+    /*
+     * ZIPファイルを読み込んで渡り歩く
+     */
     private static void readZipFile(Path srcPath) {
         ResourceType resourceType = param.getResourceType();
         ZipInputStream zis = null;
@@ -165,10 +177,15 @@ public class Flow {
         }
     }
 
+    /*
+     * メイン処理
+     */
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
+        // 進捗が開始した時のタスク
         Runnable startProgressTask = () -> {
             System.out.print("- processing [" + inputFilePath.getFileName() + "] ");
         };
+
         // 最初のファイルではPROMPTを先に表示するため、ここではPROGRESSを表示しない
         if (! param.isPrintPrompt()) {
             startProgressTask.run(); // 2ファイル目以降はPROGRESSを表示する
@@ -182,6 +199,8 @@ public class Flow {
 
         String inputFileContent = toStringFromStrList(inputFileLines);
         List<ApiResult> apiResultList = null;
+
+        // 進捗が終了した時のタスク
         Runnable progressDoneTask = () -> {
             cpt.setDone(true);
             try {
@@ -239,6 +258,9 @@ public class Flow {
         progressDoneTask.run();
     }
 
+    /*
+     * OpenAIのAPIを呼び出す
+     */
     private static List<ApiResult> askToOpenAi(
             List<String> inputFileLines,
             String inputFileContent,
@@ -377,6 +399,9 @@ public class Flow {
         return apiResultList;
     }
 
+    /*
+     * レスポンスメッセージからトークン数を抽出する
+     */
     private static Double extractToken(String content, String message) {
         Matcher matcher = Pattern.compile(EXTRACT_TOKEN_COUNT_REGEX).matcher(message);
         if (matcher.find()) {
@@ -385,11 +410,17 @@ public class Flow {
         return null; 
     }
 
+    /*
+     * ファイル系から拡張子を取り除いて返す
+     */
     private static String extractNameWithoutExt(String fileName, String ext) {
         int lastExtIndex = fileName.lastIndexOf(ext);
         return fileName.substring(0, lastExtIndex);
     }
 
+    /*
+     * 文字列リストから文字列を返す
+     */
     private static String toStringFromStrList(List<String> strList) {
         String content = "";
         for (String line : strList) {
@@ -398,6 +429,9 @@ public class Flow {
         return content;
     }
 
+    /*
+     * レスポンスに含まれるChoiceから、文字列リストを返す
+     */
     private static List<String> toChoicesFromResponce(SuccessResponseBody responseBody) {
         List<String> responseChoiceList = new ArrayList<>();
         responseBody.getChoices().forEach(choice -> {
@@ -407,7 +441,9 @@ public class Flow {
         return responseChoiceList;
     }
     
-    // 複数のChoiceがリストで返されるので、それを文字列リストに変換する
+    /*
+     * 複数のChoiceがリストで返されるので、それを文字列リストに変換する
+     */
     private static List<String> toLineListFromChoices(
             List<String> responseChoices) {
         List<String> responseLines = new ArrayList<>();
@@ -419,6 +455,9 @@ public class Flow {
         return responseLines;
     }
 
+    /*
+     * 結果を書き込む
+     */
     private static void write(String responseContent) {
         Path targetDir;
         if (Files.isDirectory(param.getDestFilePath())) {
@@ -440,6 +479,9 @@ public class Flow {
         }
     }
 
+    /*
+     * プロンプトをコンソールに表示する
+     */
     private static void printPrompt(Prompt prompt) {
         System.out.println(PROMPT_HEADING + LINE_SEP);
         System.out.println(prompt.getSystemMessage());
@@ -447,6 +489,9 @@ public class Flow {
         System.out.println(prompt.getUserMessage());
     }
 
+    /*
+     * レポートに処理結果を追加する
+     */
     private static void addReport(Path inputFilePath, String message,
             int resuestTokenCount, int responseTokenCount,
             long interval) {

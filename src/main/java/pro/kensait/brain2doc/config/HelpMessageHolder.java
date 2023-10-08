@@ -8,6 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * ヘルプメッセージを所定のテキストファイルから読み込んで、言語種別ごとに保持するクラス
+ */
 public class HelpMessageHolder {
     private static final String HELP_FILE_PREFIX = "help_";
     private static final String HELP_FILE_EXT = ".txt";

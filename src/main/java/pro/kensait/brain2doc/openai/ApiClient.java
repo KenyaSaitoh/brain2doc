@@ -30,13 +30,16 @@ import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.exception.TimeoutException;
 
 ;public class ApiClient {
-
+    // 定数
     private static final float TEMPERATURE = 0.7F;
     private static final String INVALID_API_KEY_CODE = "invalid_api_key";
     private static final String INSUFFICIENT_QUOTA_CODE = "insufficient_quota";
     private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
     private static final String RATE_LIMIT_EXCEEDED_CODE = "rate_limit_exceeded";
 
+    /*
+     * OpenAIのAPIを呼び出す（例外の種類に応じてリトライする）
+     */
     public static ApiResult ask(
             String systemMessageStr,
             String assistantMessageStr,
@@ -83,7 +86,7 @@ import pro.kensait.brain2doc.exception.TimeoutException;
                         oe.getClientErrorBody().getError().getCode())) {
                     throw new OpenAIInvalidAPIKeyException(oe.getClientErrorBody());
 
-                // クオータ不足の場合は、即例外スロー → その後プログラム停止
+                // クォータ不足の場合は、即例外スロー → その後プログラム停止
                 } else if (Objects.equals(INSUFFICIENT_QUOTA_CODE,
                         oe.getClientErrorBody().getError().getCode())) {
                     throw new OpenAIInsufficientQuotaException(oe.getClientErrorBody());
@@ -98,6 +101,8 @@ import pro.kensait.brain2doc.exception.TimeoutException;
                         oe.getClientErrorBody().getError().getCode())) {
                     throw new OpenAIRateLimitExceededException(oe.getClientErrorBody());
                 }
+
+                // それ以外の場合はそのまま例外をスロー
                 throw oe;
 
             } catch(TimeoutException te) {
@@ -111,6 +116,9 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         throw new RetryCountOverException("リトライ回数オーバー");
     }
 
+    /*
+     * OpenAIのAPIを実際に呼び出す
+     */
     private static ApiResult sendRequest(HttpClient client, HttpRequest request) {
         // HttpRequestを送信し、HTTPサーバーを同期で呼び出す
         HttpResponse<String> response = null;
@@ -148,6 +156,9 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         }
     }
     
+    /*
+     * リクエストJSONを文字列に変換する
+     */
     private static String getRequestJson(RequestBody requestBody) {
         String json = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -159,6 +170,9 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         return json;
     }
 
+    /*
+     * レスポンスJSONをJavaオブジェクトに変換する
+     */
     private static <T> T getResponseBody(Class<T> clazz, String responseStr) {
         ObjectMapper mapper = new ObjectMapper();
         T responseBody = null;
@@ -170,6 +184,9 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         return responseBody;
     }
 
+    /*
+     * HttpClientを生成して返す（プロキシの設定があった場合はそれも加味する）
+     */
     private static HttpClient createHttpClient(String proxyURL, int connectTimeout) {
         Builder builder = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)

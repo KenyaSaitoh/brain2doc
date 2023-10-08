@@ -9,6 +9,9 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
+/*
+ * プロンプトのテンプレートを保持するクラス
+ */
 public class TemplateHolder {
     private static final String TEMPLATE_FILE_PREFIX = "template_";
     private static final String TEMPLATE_FILE_EXT = ".yaml";
@@ -47,7 +50,10 @@ public class TemplateHolder {
         return templateMap;
     }
 
-    // MapとMapをマージする
+    /*
+     * 組み込みのテンプレートファイルと、オプションとして指定された外部のテンプレートファイルを、
+     * Mapとしてマージする（外部ファイルの記述内容が優先）
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private static Map merge(Map source, Map target) {
         for (Object key : target.keySet()) {
