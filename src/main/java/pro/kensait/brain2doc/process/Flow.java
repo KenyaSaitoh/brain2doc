@@ -58,8 +58,8 @@ public class Flow {
     private static final String EXTRACT_TOKEN_COUNT_REGEX = "resulted in (\\d+) tokens";
     private static final String PROMPT_HEADING = "### PROMPT CONTENT (without source)";
     private static final String PROCESS_PROGRESS_HEADING = "### PROGRESS";
-    private static final String REPORT_TITLE = "|ソースファイル名|ステータス|リクエストトークン数|レスポンストークン数|処理時間|";
-    private static final String REPORT_TABLE_DIVIDER = "||||||";
+    private static final String REPORT_TITLE = "|SOURCE|STATUS|REQUEST TOKEN|RESPONSE TOKEN|PROCESS TIME|";
+    private static final String REPORT_TABLE_DIVIDER = "|-|-|-|-|-|";
 
     private static Parameter param; // このクラス内のみで使われるグローバルな変数
     private static List<String> reportList = new CopyOnWriteArrayList<String>(); 
@@ -167,7 +167,7 @@ public class Flow {
 
     private static void mainProcess(Path inputFilePath, List<String> inputFileLines) {
         Runnable startProgressTask = () -> {
-            System.out.print("processing [" + inputFilePath.getFileName() + "] ");
+            System.out.print("- processing [" + inputFilePath.getFileName() + "] ");
         };
         // 最初のファイルではPROMPTを先に表示するため、ここではPROGRESSを表示しない
         if (! param.isPrintPrompt()) {
@@ -281,7 +281,7 @@ public class Flow {
             if (param.isPrintPrompt()) {
                 // プログレスバーより先にプロンプトを出力する
                 printPrompt(prompt);
-                System.out.println(PROCESS_PROGRESS_HEADING);
+                System.out.println(PROCESS_PROGRESS_HEADING + LINE_SEP);
                 startProgressTask.run();
                 param.setPrintPrompt(false);
             }
@@ -335,6 +335,8 @@ public class Flow {
 
                     tryCount++;
 
+                    System.out.print("[FILE_SPLIT]");
+
                     // 分割数を指定して再帰呼び出しする
                     return askToOpenAi(inputFileLines, inputFileContent,
                             newSplitConut, splitConut, tryCount,
@@ -357,6 +359,8 @@ public class Flow {
                     if (param.getMaxSplitCount() <= newSplitConut) {
                         throw oe;
                     }
+
+                    System.out.print("[FILE_SPLIT]");
 
                     // 次の呼び出し前に、一定期間、間隔をあける
                     sleepAWhile(param.getRetryInterval());
@@ -437,7 +441,7 @@ public class Flow {
     }
 
     private static void printPrompt(Prompt prompt) {
-        System.out.println(PROMPT_HEADING);
+        System.out.println(PROMPT_HEADING + LINE_SEP);
         System.out.println(prompt.getSystemMessage());
         System.out.println(prompt.getAssistantMessage());
         System.out.println(prompt.getUserMessage());

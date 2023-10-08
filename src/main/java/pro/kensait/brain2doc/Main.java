@@ -87,7 +87,7 @@ public class Main {
             System.out.println("There is no target resource." + LINE_SEP);
             return;
         }
-        System.out.println(LINE_SEP + REPORT_HEADING);
+        System.out.println(LINE_SEP + REPORT_HEADING + LINE_SEP);
         for (String report : Flow.getReportList()) {
             System.out.println(report);
         }
