@@ -6,22 +6,32 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 以下は、このツールによって生成した、このツール自体の仕様サマリーです。
 
+
 # pro.kensait.brain2doc.common.**Const**
 
 ファイルパス: file:///D:/GitHubRepos/brain2doc/src/main/java/pro/kensait/brain2doc/common/Const.java
 
 ## クラス概要
 
-このクラスは、プログラム全体で共有される定数を提供します。
+```java
+package pro.kensait.brain2doc.common;
+
+public class Const {
+    public static final String OUTPUT_FILE_EXT = ".md";
+    public static final String LINE_SEP = System.getProperty("line.separator");
+    public static final String MARKDOWN_HEADING = "# ";
+    public static final String MARKDOWN_HORIZON = "---";
+}
+```
 
 #### メンバ概要
 
-|メンバ名|説明|
+|メンバ|概要|
 |---|---|
-|OUTPUT_FILE_EXT|出力ファイルの拡張子を示す定数。値は ".md"|
-|LINE_SEP|システムの行区切り文字を示す定数。値は `System.getProperty("line.separator")` の結果|
-|MARKDOWN_HEADING|マークダウンの見出しを示す定数。値は "# "|
-|MARKDOWN_HORIZON|マークダウンの水平線を示す定数。値は "---"|
+|OUTPUT_FILE_EXT|".md"を表す定数。Markdownファイルの拡張子を示します。|
+|LINE_SEP|システムプロパティから取得した行区切り文字を表す定数。|
+|MARKDOWN_HEADING|"# "を表す定数。Markdownの見出しを示します。|
+|MARKDOWN_HORIZON|"---"を表す定数。Markdownの水平線を示します。|
 
 ---
 # pro.kensait.brain2doc.common.**Util**
@@ -30,13 +40,27 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`pro.kensait.brain2doc.common.Util`クラスは便利なユーティリティメソッドを提供します。
+```java
+package pro.kensait.brain2doc.common;
 
-#### メソッド概要
+public class Util {
+    public  static void sleepAWhile(int retryInterval) {
+        try {
+            Thread.sleep(retryInterval * 1000);
+        } catch(InterruptedException ie) {
+            throw new RuntimeException(ie);
+        }
+    }
+}
+```
 
-| メソッド名 | アクセス修飾子 | 引数 | 返り値 | 概要 |
-|:---------:|:--------------:|:---:|:-----:|:----|
-| sleepAWhile | public static | int retryInterval | void | 指定した秒数だけ処理を停止します。処理の中断が発生した場合は、RuntimeException をスローします。 |
+上記のJavaクラス「Util」は、特定の時間だけスリープするためのメソッドを持つユーティリティクラスです。
+
+#### メンバ概要
+
+|メンバ名|説明|
+|---|---|
+|sleepAWhile(int retryInterval)|引数として与えられたretryInterval（秒）だけスリープします。スリープ中に割り込みが発生した場合は、RuntimeExceptionをスローします。|
 
 
 ---
@@ -46,21 +70,14 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、`const.yaml`というYAMLファイルを読み込み、その内容をマップとして保持します。マップは静的に保持され、`getConstMap`メソッドを通じて取得することができます。
+このクラスは`pro.kensait.brain2doc.config`パッケージに属しており、Yamlフォーマットの設定ファイルを読み込み、その内容を保持する役割を持っています。
 
-#### メンバ概要
+#### メンバの概要
 
-| メンバ名 | 型 | 概要 |
-| --- | --- | --- |
-| map | Map | `const.yaml`の内容を保持するマップ |
-| classloader | ClassLoader | スレッドコンテキストのクラスローダー |
-| yaml | Yaml | YAMLファイルを操作するためのオブジェクト |
-
-#### メソッド概要
-
-| メソッド名 | 返却値 |概要 |
-| --- | --- | --- |
-| getConstMap | Map | `const.yaml`の内容を保持するマップを返す |
+| メンバ名 | メンバタイプ | 概要 |
+|:----------|:-------------|:-----|
+| map | static Map | Yamlファイルの内容を保持するためのマップです。`Thread.currentThread().getContextClassLoader().getResourceAsStream("const.yaml")`によってYamlファイルを読み込み、その内容をマップとして保持します。|
+| getConstMap() | static method | 保持しているマップを返すメソッドです。 |
 
 ---
 # pro.kensait.brain2doc.config.**DefaultValueHolder**
@@ -69,17 +86,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-### DefaultValueHolder
+**クラス名:** DefaultValueHolder
 
-このクラスは、プロパティファイル（default.properties）からプロパティを読み込み、アプリケーションで使用するデフォルト値を保持します。プロパティファイルはUTF-8形式でエンコードされています。
+**パッケージ:** pro.kensait.brain2doc.config
 
-#### メンバの概要
+**概要:** パラメータのデフォルト値をプロパティから読み込み、保持するクラスです。
 
-|メンバ名|説明|
-|---|---|
-|props|プロパティファイルから読み込んだプロパティを保持します。|
-|DefaultValueHolder|DefaultValueHolderクラスの静的初期化ブロックで、プロパティファイルからプロパティを読み込みます。|
-|getProperty|指定したキーに対応するプロパティ値を取得します。キーが存在しない場合はnullを返します。|
+**メソッド:**
+
+|メソッド名|説明|
+|:---|:---|
+|getProperty|指定されたキーに対応するプロパティの値を取得します。|
+
+**例外:**
+
+|例外|説明|
+|:---|:---|
+|IOException|プロパティファイルの読み込みに失敗した場合にスローされます。|
+
+**注意:** プロパティファイルは "default.properties" として、同一クラスローダー下に存在する必要があります。
 
 ---
 # pro.kensait.brain2doc.config.**HelpMessageHolder**
@@ -88,18 +113,20 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`HelpMessageHolder`クラスはヘルプメッセージを管理するクラスです。メッセージはテキストファイルから読み込まれ、指定した言語のヘルプメッセージを返します。シングルトンパターンが採用されています。
+`HelpMessageHolder`クラスは、ヘルプメッセージを所定のテキストファイルから読み込んで、言語種別ごとに保持するクラスです。
 
 #### メンバ概要
 
-| メンバ | 概要 |
-|---|---|
-| `HELP_FILE_PREFIX` | ヘルプファイルのプレフィックス |
-| `HELP_FILE_EXT` | ヘルプファイルの拡張子 |
-| `helpHolder` | `HelpMessageHolder`のインスタンス |
-| `helpMessage` | ヘルプメッセージのリスト |
-| `getInstance()` | `HelpMessageHolder`のインスタンスを返す |
-| `getHelpMessage(String lang)` | 指定した言語のヘルプメッセージを返す |
+| メンバ | 説明 |
+| --- | --- |
+| HELP_FILE_PREFIX | ヘルプファイルのプレフィックス |
+| HELP_FILE_EXT | ヘルプファイルの拡張子 |
+| helpHolder | HelpMessageHolderのインスタンス |
+| helpMessage | ヘルプメッセージを保持するList |
+| getInstance() | HelpMessageHolderのインスタンスを取得する |
+| getHelpMessage(String lang) | 指定した言語のヘルプメッセージを取得する |
+
+特に `getHelpMessage(String lang)` メソッドでは、指定した言語のヘルプメッセージをテキストファイルから読み込み、List形式で返却します。この際、ヘルプメッセージは初回読み込み時のみファイルから取得し、2回目以降は保持したメッセージを返却します。
 
 ---
 # pro.kensait.brain2doc.config.**TemplateHolder**
@@ -108,26 +135,19 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-該当のJavaクラスは `TemplateHolder` という名前で、設定テンプレートの保持と操作に関する機能を提供します。
+`TemplateHolder`クラスは、プロンプトのテンプレートを保持するクラスです。テンプレートはyaml形式のファイルから読み込まれ、マップとして保持されます。テンプレートファイルはロケールに基づいて選ばれ、外部から指定されたテンプレートファイルがある場合はそれとマージされます。
 
-#### メンバ
+#### メンバの概要
 
-|名前|型|説明|
-|---|---|---|
-|TEMPLATE_FILE_PREFIX|String|テンプレートファイルの接頭辞|
-|TEMPLATE_FILE_EXT|String|テンプレートファイルの拡張子|
-|templateHolder|TemplateHolder|TemplateHolderのインスタンス|
-|templateMap|Map|テンプレートのマップ|
-
-#### メソッド
-
-|名前|戻り値|説明|
-|---|---|---|
-|getInstance()|TemplateHolder|TemplateHolderのインスタンスを返す|
-|getTemplateMap(Locale,Path)|Map|指定されたロケールとパスに対するテンプレートマップを返す|
-|merge(Map,Map)|Map|二つのマップをマージする|
-
-このクラスはSingletonパターンを使用しており、`getInstance()`メソッドを通じて唯一のインスタンスにアクセスできます。また、`getTemplateMap()`メソッドは指定されたロケールとパスに対応するテンプレートマップを返し、もし外部からテンプレートファイルが指定された場合は、既存のテンプレートマップとマージします。
+| メンバ名 | 概要 |
+| :--- | :--- |
+| TEMPLATE_FILE_PREFIX | テンプレートファイル名のプレフィクス |
+| TEMPLATE_FILE_EXT | テンプレートファイルの拡張子 |
+| templateHolder | TemplateHolderクラスのインスタンス |
+| templateMap | テンプレートの内容を保持するマップ |
+| getInstance() | TemplateHolderのインスタンスを取得するメソッド |
+| getTemplateMap() | テンプレートの内容を保持するマップを取得するメソッド |
+| merge() | 2つのマップをマージするメソッド |
 
 ---
 # pro.kensait.brain2doc.exception.**OpenAIClientException**
@@ -136,19 +156,19 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは`OpenAIClientException`というRuntimeExceptionのサブクラスです。OpenAIのクライアントとの通信でエラーが発生した場合にこの例外クラスがスローされます。
+本クラスは、OpenAIのクライアントエラーを処理する例外クラス「OpenAIClientException」です。RuntimeExceptionを継承し、ClientErrorBodyオブジェクトを持つことが特徴です。
 
-#### メンバ概要
+#### メンバの概要
 
-| メソッド名 | 概要 |
-|:-----------|:-----|
-| OpenAIClientException() | デフォルトのコンストラクタ。何も引数を受け取らない |
-| OpenAIClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) | メッセージ、原因、抑制可能な例外、スタックトレース書き込み可能かのフラグを引数に持つコンストラクタ |
-| OpenAIClientException(String message, Throwable cause) | メッセージと原因を引数に持つコンストラクタ |
-| OpenAIClientException(String message) | メッセージのみを引数に持つコンストラクタ |
-| OpenAIClientException(Throwable cause) | 原因のみを引数に持つコンストラクタ |
-| OpenAIClientException(ClientErrorBody clientErrorBody) | ClientErrorBodyオブジェクトを引数に持つコンストラクタ |
-| getClientErrorBody() | clientErrorBodyフィールドのGetterメソッド |
+|メソッド名|説明|
+|:--|:--|
+|`OpenAIClientException()`|引数なしのコンストラクタ。|
+|`OpenAIClientException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)`|メッセージ、原因、抑制有効、スタックトレース書き込み可能かを引数に持つコンストラクタ。|
+|`OpenAIClientException(String message, Throwable cause)`|メッセージと原因を引数に持つコンストラクタ。|
+|`OpenAIClientException(String message)`|メッセージを引数に持つコンストラクタ。|
+|`OpenAIClientException(Throwable cause)`|原因を引数に持つコンストラクタ。|
+|`OpenAIClientException(ClientErrorBody clientErrorBody)`|ClientErrorBodyを引数に持つコンストラクタ。|
+|`getClientErrorBody()`|ClientErrorBodyオブジェクトを取得する。|
 
 ---
 # pro.kensait.brain2doc.exception.**OpenAIInsufficientQuotaException**
@@ -157,20 +177,21 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、OpenAIのクオータが不足した場合に発生する例外を表す`OpenAIInsufficientQuotaException`です。このクラスは`OpenAIClientException`を継承しています。
+`OpenAIInsufficientQuotaException`クラスは、OpenAIのクライアントでエラーが発生した際に投げられる例外を扱います。このクラスは、`OpenAIClientException`クラスを継承しています。
 
 #### メンバの概要
 
-|メンバ|説明|
-|---|---|
-|private ClientErrorBody clientErrorBody|エラー情報を保持するクライアントエラーボディ|
-|public OpenAIInsufficientQuotaException()|デフォルトコンストラクタ|
-|public OpenAIInsufficientQuotaException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)|メッセージ、原因、抑制許可フラグ、書き込み可能スタックトレースを引数にとるコンストラクタ|
-|public OpenAIInsufficientQuotaException(String message, Throwable cause)|メッセージと原因を引数にとるコンストラクタ|
-|public OpenAIInsufficientQuotaException(String message)|メッセージを引数にとるコンストラクタ|
-|public OpenAIInsufficientQuotaException(Throwable cause)|原因を引数にとるコンストラクタ|
-|public OpenAIInsufficientQuotaException(ClientErrorBody clientErrorBody)|クライアントエラーボディを引数にとるコンストラクタ|
-|public ClientErrorBody getClientErrorBody()|エラーボディを取得するメソッド|
+| メンバ | 説明 |
+| --- | --- |
+| `ClientErrorBody clientErrorBody` | エラーメッセージとエラーコードを含むオブジェクト |
+| `OpenAIInsufficientQuotaException()` | 引数なしのコンストラクタ |
+| `OpenAIInsufficientQuotaException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)` | メッセージ、原因、抑制の有効無効、スタックトレースの書き込みの有無を引数に取るコンストラクタ |
+| `OpenAIInsufficientQuotaException(String message, Throwable cause)` | メッセージと原因を引数に取るコンストラクタ |
+| `OpenAIInsufficientQuotaException(String message)` | メッセージを引数に取るコンストラクタ |
+| `OpenAIInsufficientQuotaException(Throwable cause)` | 原因を引数に取るコンストラクタ |
+| `OpenAIInsufficientQuotaException(ClientErrorBody clientErrorBody)` | エラーメッセージとエラーコードを含むオブジェクトを引数に取るコンストラクタ |
+| `ClientErrorBody getClientErrorBody()` | エラーメッセージとエラーコードを含むオブジェクトを取得するメソッド |
+
 
 ---
 # pro.kensait.brain2doc.exception.**OpenAIInvalidAPIKeyException**
@@ -179,25 +200,19 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`OpenAIInvalidAPIKeyException`は、OpenAIのクライアントエラーを表すクラスです。`OpenAIClientException`を継承しています。
+OpenAIInvalidAPIKeyExceptionクラスは、OpenAIClientExceptionクラスを継承したクラスです。OpenAIのAPIキーが無効な場合にこの例外がスローされます。
 
 #### メンバの概要
 
-|メンバ名|説明|
+| メソッド名 | メソッドの概要 |
 |:---|:---|
-|`clientErrorBody`|クライアントエラーメッセージを保持するオブジェクト|
-
-#### メソッドの概要
-
-|メソッド名|説明|
-|:---|:---|
-|`OpenAIInvalidAPIKeyException()`|デフォルトコンストラクタ|
-|`OpenAIInvalidAPIKeyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)`|メッセージ、原因、抑制の有効化、スタックトレースの書き込み可能性を指定して例外を構築するコンストラクタ|
-|`OpenAIInvalidAPIKeyException(String message, Throwable cause)`|指定された詳細メッセージと原因を使用して新しい例外を構築するコンストラクタ|
-|`OpenAIInvalidAPIKeyException(String message)`|指定された詳細メッセージを持つ新しい例外を構築するコンストラクタ|
-|`OpenAIInvalidAPIKeyException(Throwable cause)`|指定された原因を持つ新しい例外を構築するコンストラクタ|
-|`OpenAIInvalidAPIKeyException(ClientErrorBody clientErrorBody)`|クライアントエラーメッセージを保持するオブジェクトを指定して例外を構築するコンストラクタ|
-|`getClientErrorBody()`|クライアントエラーメッセージを保持するオブジェクトを取得するメソッド|
+| OpenAIInvalidAPIKeyException() | デフォルトのコンストラクタ。スーパークラスのデフォルトコンストラクタを呼び出します。 |
+| OpenAIInvalidAPIKeyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) | message, cause, enableSuppression, writableStackTraceを引数に取るコンストラクタ。スーパークラスの同名のコンストラクタを呼び出します。 |
+| OpenAIInvalidAPIKeyException(String message, Throwable cause) | messageとcauseを引数に取るコンストラクタ。スーパークラスの同名のコンストラクタを呼び出します。 |
+| OpenAIInvalidAPIKeyException(String message) | messageを引数に取るコンストラクタ。スーパークラスの同名のコンストラクタを呼び出します。 |
+| OpenAIInvalidAPIKeyException(Throwable cause) | causeを引数に取るコンストラクタ。スーパークラスの同名のコンストラクタを呼び出します。 |
+| OpenAIInvalidAPIKeyException(ClientErrorBody clientErrorBody) | clientErrorBodyを引数に取るコンストラクタ。clientErrorBodyフィールドに引数を設定します。 |
+| getClientErrorBody() | clientErrorBodyフィールドの値を取得します。 |
 
 
 ---
@@ -207,19 +222,21 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、OpenAIのAPIを使用中にレート制限を超えた場合にスローされる例外を表現しています。
+このクラスは`OpenAIRateLimitExceededException`という名前で、`OpenAIClientException`クラスを継承しています。OpenAI使用時にレート制限を超えた場合に使用される例外クラスです。
 
-#### メンバ一覧
+#### メンバ概要
 
-| メンバ名 | 説明 |
+| メンバ | 説明 |
 | --- | --- |
-| `OpenAIRateLimitExceededException()` | 引数なしのコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `OpenAIRateLimitExceededException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)` | メッセージと原因と抑制可能性と書き込み可能スタックトレースを引数にとるコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `OpenAIRateLimitExceededException(String message, Throwable cause)` | メッセージと原因を引数にとるコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `OpenAIRateLimitExceededException(String message)` | メッセージを引数にとるコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `OpenAIRateLimitExceededException(Throwable cause)` | 原因を引数にとるコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `OpenAIRateLimitExceededException(ClientErrorBody clientErrorBody)` | ClientErrorBodyを引数にとるコンストラクタ。スーパークラスの同名コンストラクタを呼び出す。 |
-| `getClientErrorBody()` | ClientErrorBodyを取得するメソッド。 |
+| `ClientErrorBody clientErrorBody` | ClientErrorBody クラスのインスタンス。エラー情報を保持しています。 |
+| `OpenAIRateLimitExceededException()` | デフォルトコンストラクタ。スーパークラスの同名コンストラクタを呼び出します。 |
+| `OpenAIRateLimitExceededException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)` | スーパークラスの同名コンストラクタを呼び出します。引数はエラーメッセージ、原因となる例外、例外抑制有効フラグ、スタックトレース書き込み可能フラグです。 |
+| `OpenAIRateLimitExceededException(String message, Throwable cause)` | スーパークラスの同名コンストラクタを呼び出します。引数はエラーメッセージと原因となる例外です。 |
+| `OpenAIRateLimitExceededException(String message)` | スーパークラスの同名コンストラクタを呼び出します。引数はエラーメッセージです。 |
+| `OpenAIRateLimitExceededException(Throwable cause)` | スーパークラスの同名コンストラクタを呼び出します。引数は原因となる例外です。 |
+| `OpenAIRateLimitExceededException(ClientErrorBody clientErrorBody)` | ClientErrorBody型の引数を持つコンストラクタ。clientErrorBodyフィールドに値をセットします。 |
+| `ClientErrorBody getClientErrorBody()` | clientErrorBodyフィールドのゲッターメソッド。clientErrorBodyの値を取得します。 |
+
 
 ---
 # pro.kensait.brain2doc.exception.**OpenAITokenLimitOverException**
@@ -228,22 +245,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`OpenAITokenLimitOverException`は、OpenAIのクライアント例外を表すクラスで、`OpenAIClientException`を継承しています。
+`OpenAITokenLimitOverException`は、OpenAIのトークン制限超過を表す例外クラスです。`OpenAIClientException`を継承しており、クライアントエラーボディを保持することが可能です。
 
-#### メンバー概要
+#### メンバ概要
 
-| メンバー名 | 概要 |
-|---|---|
-| `clientErrorBody` | クライアントのエラーボディを管理する `ClientErrorBody` オブジェクト |
-| `OpenAITokenLimitOverException()` | デフォルトコンストラクタ |
-| `OpenAITokenLimitOverException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)` | 例外メッセージ、原因、抑制可能な例外、スタックトレース書き込み許可を引数に取るコンストラクタ |
-| `OpenAITokenLimitOverException(String message, Throwable cause)` | 例外メッセージと原因を引数に取るコンストラクタ |
-| `OpenAITokenLimitOverException(String message)` | 例外メッセージを引数に取るコンストラクタ |
-| `OpenAITokenLimitOverException(Throwable cause)` | 原因を引数に取るコンストラクタ |
-| `OpenAITokenLimitOverException(ClientErrorBody clientErrorBody)` | `ClientErrorBody`オブジェクトを引数に取るコンストラクタ |
-| `getClientErrorBody()` | `clientErrorBody`オブジェクトを取得するメソッド |
+| メンバ名 | 説明 |
+|:--------:|:----|
+| clientErrorBody | クライアントエラーボディを保持します。|
 
-各コンストラクタは親クラスの同名コンストラクタを呼び出すことで、例外の詳細情報を設定します。`ClientErrorBody`オブジェクトについては、例外が発生した際の詳細なクライアントエラー情報を保持します。
+#### メソッド概要
+
+| メソッド名 | 説明 |
+|:--------:|:----|
+| OpenAITokenLimitOverException() | デフォルトコンストラクタ。|
+| OpenAITokenLimitOverException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) | 例外メッセージ、原因、抑制の有効化、書き込み可能スタックトレースを指定して例外を生成します。|
+| OpenAITokenLimitOverException(String message, Throwable cause) | 例外メッセージと原因を指定して例外を生成します。|
+| OpenAITokenLimitOverException(String message) | 例外メッセージを指定して例外を生成します。|
+| OpenAITokenLimitOverException(Throwable cause) | 原因を指定して例外を生成します。|
+| OpenAITokenLimitOverException(ClientErrorBody clientErrorBody) | クライアントエラーボディを指定して例外を生成します。|
+| getClientErrorBody() | 保持しているクライアントエラーボディを取得します。|
 
 ---
 # pro.kensait.brain2doc.exception.**RetryCountOverException**
@@ -252,18 +272,21 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`RetryCountOverException`クラスは、`RuntimeException`クラスを継承しています。このクラスは、リトライ回数の上限を超えた際にスローされる例外を定義します。
+パッケージ名: pro.kensait.brain2doc.exception
 
-#### メソッド詳細
+クラス名: RetryCountOverException
 
-| メソッド名 | 説明 |
-| ------ | ----------- |
-| RetryCountOverException() | 引数なしのコンストラクタ。 |
-| RetryCountOverException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) | メッセージ、原因、抑制可能なスタックトレースの有無を指定できるコンストラクタ。 |
-| RetryCountOverException(String message, Throwable cause) | メッセージと原因を指定できるコンストラクタ。 |
-| RetryCountOverException(String message) | メッセージを指定できるコンストラクタ。 |
-| RetryCountOverException(Throwable cause) | 原因を指定できるコンストラクタ。 |
+継承元: RuntimeException
 
+### メンバの概要
+
+|メンバ名|種類|概要|
+|---|---|---|
+|RetryCountOverException()|コンストラクタ|何も引数を取らない|
+|RetryCountOverException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)|コンストラクタ|メッセージ、原因、抑制の有無、スタックトレースの書き込み可能性を引数に取る|
+|RetryCountOverException(String message, Throwable cause)|コンストラクタ|メッセージと原因を引数に取る|
+|RetryCountOverException(String message)|コンストラクタ|メッセージのみを引数に取る|
+|RetryCountOverException(Throwable cause)|コンストラクタ|原因のみを引数に取る|
 
 ---
 # pro.kensait.brain2doc.exception.**TimeoutException**
@@ -272,15 +295,20 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`TimeoutException`は`RuntimeException`を継承した、タイムアウトに関する例外を扱うクラスです。以下の5つのコンストラクタが存在します。
+- **パッケージ名:** pro.kensait.brain2doc.exception
+- **クラス名:** TimeoutException
+- **親クラス:** RuntimeException
 
-|メンバ名|概要|
-|---|---|
-|`TimeoutException()`|メッセージや原因なしに例外を生成します。|
-|`TimeoutException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)`|メッセージ、原因、抑制の有効化、スタックトレースの書き込み可能性を指定して例外を生成します。|
-|`TimeoutException(String message, Throwable cause)`|メッセージと原因を指定して例外を生成します。|
-|`TimeoutException(String message)`|メッセージを指定して例外を生成します。|
-|`TimeoutException(Throwable cause)`|原因を指定して例外を生成します。|
+#### メンバの概要
+
+| メソッド名 | パラメータ | 概要 |
+| ------ | ------ | ------ |
+| TimeoutException() | - | 基本コンストラクタ。何も特別な動作を行わない。 |
+| TimeoutException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) | メッセージ:エラーメッセージ、原因:スロー可能な原因、抑制可能:例外抑制の有効/無効、スタックトレース書き込み可能:スタックトレースの書き込み可/不可 | メッセージ、原因、例外抑制の有効/無効、およびスタックトレースの書き込み可/不可に基づいて、新しいランタイム例外を構築します。 |
+| TimeoutException(String message, Throwable cause) | メッセージ:エラーメッセージ、原因:スロー可能な原因 | 指定された詳細メッセージと原因を持つ新しいランタイム例外を構築します。 |
+| TimeoutException(String message) | メッセージ:エラーメッセージ | 指定された詳細メッセージを持つ新しいランタイム例外を構築します。 |
+| TimeoutException(Throwable cause) | 原因:スロー可能な原因 | 指定された原因を持つ新しいランタイム例外を構築します。 |
+
 
 ---
 # pro.kensait.brain2doc.**Main**
@@ -289,19 +317,16 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、`Brain2doc`のメインクラスで、プログラムのエントリーポイントである`main`メソッドを含んでいます。異なる例外をキャッチして適切なメッセージを表示することで、オープンAIのAPI使用に関する問題を処理します。
+`Main`クラスは、`brain2doc`アプリケーションを起動するメインクラスです。
 
-#### メンバ概要
+#### メンバの概要
 
-|メンバ|説明|
-|---|---|
-|main|プログラムのエントリーポイント。コマンドライン引数を処理し、適切なメソッドを呼び出します。|
-|printHelpMessage|指定された言語のヘルプメッセージを表示します。|
-|printBanner|ウェルカムバナーを表示します。|
-|printReport|報告リストを表示します。報告リストが空の場合は、「対象リソースがありません」と表示します。|
-
-以上が、このクラスが持つ主要なメンバの概要です。
-
+| メンバ名  | 概要 |
+|:------------- |:---------------|
+| `main(String[] args)`      | メインメソッドです。引数がない場合やヘルプが求められた場合はヘルプメッセージを表示します。また、パラメータをセットアップし、処理フローを初期化して開始します。OpenAI関連のエラーが発生した場合やリトライカウントがオーバーした場合はエラーメッセージを表示して終了します。 |
+| `printHelpMessage(String lang)`      | ヘルプメッセージを表示するメソッドです。指定された言語でヘルプメッセージを表示します。      |
+| `printBanner()` | バナーメッセージを表示するメソッドです。|
+| `printReport()` | 処理結果のレポートを表示するメソッドです。レポートがない場合はその旨を表示します。|
 
 
 ---
@@ -311,22 +336,17 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、OpenAIのGPT-3を使用した会話型AIのためのAPIクライアントを提供します。
+以下の表は、`ApiClient` クラスの各メンバの概要を説明しています。
 
-#### メンバの概要
+| メンバ名 | 説明 |
+|------|------|
+| ask | OpenAIのAPIを呼び出すメソッドです。引数には各種メッセージ、APIのURL、モデル名、APIキー、プロキシURL、接続タイムアウト、リクエストタイムアウト、リトライカウント、リトライ間隔が必要です。APIキーが無効、クォータ不足、トークンリミットオーバー、レートリミットオーバーの場合は例外を投げます。 |
+| sendRequest | OpenAIのAPIを実際に呼び出すメソッドです。引数にはHttpClientオブジェクトとHttpRequestオブジェクトが必要です。このメソッドはHttpRequestを送信し、HTTPサーバーを同期で呼び出します。 |
+| getRequestJson | リクエストのJSONを文字列に変換するメソッドです。引数にはRequestBodyオブジェクトが必要です。 |
+| getResponseBody | レスポンスのJSONをJavaオブジェクトに変換するメソッドです。引数にはクラス型とレスポンス文字列が必要です。 |
+| createHttpClient | HttpClientを生成して返すメソッドです。引数にはプロキシURLと接続タイムアウトが必要です。プロキシの設定があった場合はそれも考慮します。 |
 
-| メンバ | 概要 |
-|:-----------|:------------|
-| TEMPERATURE | レスポンス生成時のランダム性を調整するための定数。 |
-| INVALID_API_KEY_CODE | APIキーが無効であることを表すエラーコード。 |
-| INSUFFICIENT_QUOTA_CODE | クオータが不足していることを表すエラーコード。 |
-| CONTEXT_LENGTH_EXCEEDED_CODE | トークンが上限を超えたことを表すエラーコード。 |
-| RATE_LIMIT_EXCEEDED_CODE | レートリミットが超過したことを表すエラーコード。 |
-| ask | OpenAI APIにリクエストを送信し、レスポンスを受け取るメソッド。 |
-| sendRequest | HTTPリクエストを送信し、HTTPサーバーからのレスポンスを受け取るメソッド。 |
-| getRequestJson | リクエストボディをJSON形式に変換するメソッド。 |
-| getResponseBody | レスポンスボディを指定したクラスのインスタンスに変換するメソッド。 |
-| createHttpClient | プロキシ設定を考慮したHTTPクライアントを生成するメソッド。 |
+このクラスはOpenAIのAPIを呼び出すために使用されます。メソッドを呼び出す際には適切な引数が必要で、例外が発生する可能性があります。また、このクラスはプロキシ設定も考慮してHttpClientを生成します。
 
 ---
 # pro.kensait.brain2doc.openai.**ApiResult**
@@ -335,22 +355,22 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`ApiResult`クラスは、APIからの戻り値を取り扱うためのクラスです。`responseBody`と`interval`という2つのメンバ変数を持っています。
+ApiResultクラスは、APIの結果を表すクラスです。このクラスは、成功したレスポンスの本文と、インターバル（長さ）の2つのメンバーを持っています。
 
 #### メンバの概要
 
-| メンバ名 | データ型 | 説明 |
-| -------- | -------- | ---- |
-| responseBody | SuccessResponseBody | APIからのレスポンスボディを保持 |
-| interval | long | APIからの応答時間を保持 |
-  
+| メンバ名 | タイプ | 説明 |
+| :--- | :--- | :--- |
+| responseBody | SuccessResponseBody | 成功したレスポンスの本文 |
+| interval | long | インターバル（長さ） |
+
 #### メソッドの概要
 
-| メソッド名 | 戻り値 | 説明 |
-| -------- | -------- | ---- |
-| getResponseBody | SuccessResponseBody | `responseBody`を返す |
-| getInterval | long | `interval`を返す |
-| toString | String | `ApiResult`の状態を文字列として返す |
+| メソッド名 | 戻り値のタイプ | 説明 |
+| :--- | :--- | :--- |
+| getResponseBody() | SuccessResponseBody | responseBodyメンバの値を取得 |
+| getInterval() | long | intervalメンバの値を取得 |
+| toString() | String | クラスの文字列表現を返す |
 
 ---
 # pro.kensait.brain2doc.openai.**Choice**
@@ -359,19 +379,27 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`Choice`クラスは、Jacksonライブラリを用いてJSONオブジェクトとして扱うためのクラスです。このクラスは以下のメンバを持っています。
+`Choice`クラスは、インデックス(`index`)、メッセージ(`message`)、終了理由(`finishReason`)の3つのメンバを持つクラスです。各メンバは独自のゲッターとセッターを持ち、オブジェクトの状態を管理します。
 
 #### メンバ概要
 
-| メンバ名 | データ型 | 説明 |
-|:---|:---|:---|
-| index | Integer | 選択肢のインデックスを表します。 |
-| message | Message | メッセージの内容を表すMessageオブジェクトです。 |
-| finishReason | String | 終了理由を示す文字列です。 |
+| メンバ名 | 型 | 説明 |
+| --- | --- | --- |
+| index | Integer | 選択肢のインデックス |
+| message | Message | メッセージオブジェクト |
+| finishReason | String | 終了理由 |
 
-各メンバには、getterとsetterのメソッドが用意されており、それぞれのメンバの値を取得したり変更したりすることができます。
+#### メソッド概要
 
-また、`toString()`メソッドをオーバーライドしており、インスタンスの状態を文字列として表現することができます。
+このクラスには以下の一般的なメソッドが含まれています。
+
+- `getIndex()`: インデックスを取得します。
+- `setIndex(Integer index)`: インデックスを設定します。
+- `getMessage()`: メッセージオブジェクトを取得します。
+- `setMessage(Message message)`: メッセージオブジェクトを設定します。
+- `getFinishReason()`: 終了理由を取得します。
+- `setFinishReason(String finishReason)`: 終了理由を設定します。
+- `toString()`: オブジェクトの文字列表現を取得します。
 
 ---
 # pro.kensait.brain2doc.openai.**ClientErrorBody**
@@ -380,23 +408,19 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、「pro.kensait.brain2doc.openai」パッケージに属する`ClientErrorBody`という名前のクラスです。このクラスは、エラーメッセージを取り扱うためのもので、エラー情報を保持し、取得、設定するためのメソッドが存在します。
+このクラスは、`ClientErrorBody`という名前で、クライアントエラーの情報を持つ構造体です。このクラスは、`Error`型の`error`というフィールドを持っています。また、このクラスは`getError`と`setError`というメソッドを持っており、それぞれエラーの取得と設定を行います。
 
-#### メンバの概要
+#### メンバ概要
 
-|メンバ名|型|概要|
+| メンバ名 | メンバタイプ | 概要 |
 |---|---|---|
-|error|Error|エラー情報を保持するフィールド。JsonPropertyアノテーションにより、JSONの"error"キーにバインドされます。|
+| error | `Error`型のフィールド | エラー情報を保持するフィールド |
+| ClientErrorBody() | コンストラクタ | errorフィールドを初期化しないコンストラクタ |
+| ClientErrorBody(Error error) | コンストラクタ | errorフィールドを引数で初期化するコンストラクタ |
+| getError() | メソッド | errorフィールドの値を取得するメソッド |
+| setError(Error error) | メソッド | errorフィールドの値を設定するメソッド |
+| toString() | メソッド | クラスの文字列表現を返すメソッド |
 
-#### メソッドの概要
-
-|メソッド名|引数|戻り値|概要|
-|---|---|---|---|
-|ClientErrorBody|(なし)|(なし)|デフォルトコンストラクタ。|
-|ClientErrorBody|Error error|(なし)|エラー情報を引数として受け取り、それをフィールドにセットするコンストラクタ。|
-|getError|(なし)|Error|エラー情報を返すメソッド。|
-|setError|Error error|(なし)|エラー情報を設定するメソッド。|
-|toString|(なし)|String|オブジェクトの文字列表現を返すメソッド。エラー情報を含む。|
 
 ---
 # pro.kensait.brain2doc.openai.**Error**
@@ -405,29 +429,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`Error`クラスは、エラーメッセージ、エラータイプ、パラメータ、コードをフィールドとして持つJavaクラスです。各フィールドは、プライベート変数として定義されており、それぞれに対応するgetterとsetterが用意されています。また、オーバーライドされた`toString`メソッドを通じて、フィールドの値を文字列として取得することができます。
+`Error`クラスは、エラーメッセージやエラータイプ、パラメータ、コードを保持するクラスです。それぞれのフィールドには、対応するgetterとsetterメソッドが提供されています。また、`toString`メソッドをオーバーライドして、エラー情報を文字列として出力します。
 
-#### メンバ概要
+#### メンバの概要
 
-|メンバ名|タイプ|説明|
-|---|---|---|
-|message|String|エラーメッセージを保持|
-|type|String|エラータイプを保持|
-|param|String|パラメータを保持|
-|code|String|エラーコードを保持|
-|Error()|コンストラクタ|デフォルトコンストラクタ|
-|Error(String, String, String, String)|コンストラクタ|メッセージ、タイプ、パラメータ、コードを引数に取るコンストラクタ|
-|getMessage()|メソッド|メッセージを取得|
-|setMessage(String)|メソッド|メッセージを設定|
-|getType()|メソッド|タイプを取得|
-|setType(String)|メソッド|タイプを設定|
-|getParam()|メソッド|パラメータを取得|
-|setParam(String)|メソッド|パラメータを設定|
-|getCode()|メソッド|コードを取得|
-|setCode(String)|メソッド|コードを設定|
-|toString()|メソッド|オブジェクトの文字列表現を取得|
-
-以上のメンバを通じて、`Error`クラスのインスタンスはエラー情報をカプセル化し、それを操作する機能を提供します。
+| メンバ名 | 役割 |
+|:-----------|:------|
+| message | エラーメッセージを保持するフィールド |
+| type | エラータイプを保持するフィールド |
+| param | パラメータを保持するフィールド |
+| code | コードを保持するフィールド |
+| getMessage | messageフィールドの値を取得するメソッド |
+| setMessage | messageフィールドの値を設定するメソッド |
+| getType | typeフィールドの値を取得するメソッド |
+| setType | typeフィールドの値を設定するメソッド |
+| getParam | paramフィールドの値を取得するメソッド |
+| setParam | paramフィールドの値を設定するメソッド |
+| getCode | codeフィールドの値を取得するメソッド |
+| setCode | codeフィールドの値を設定するメソッド |
+| toString | エラー情報を文字列として出力するメソッド |
 
 ---
 # pro.kensait.brain2doc.openai.**Message**
@@ -436,21 +456,22 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`Message`クラスは、文字列形式の`role`と`content`をフィールドとして保持します。これらのフィールドは、getterとsetterメソッドを通じてアクセス可能です。また、引数なしのデフォルトコンストラクタと、`role`と`content`を引数とするコンストラクタがあります。最後に、`toString`メソッドをオーバーライドして、`Message`オブジェクトの文字列表現を返します。
+このクラスはメッセージを表現するためのもので、roleとcontentの二つのフィールドを持っています。また、このクラスは以下のメソッドを提供します。
 
-#### メンバの概要
+#### メンバ概要
 
-| メンバ名 | 概要 |
+|メンバ名|概要|
 |---|---|
-| role | メッセージの役割を表す文字列 |
-| content | メッセージの内容を表す文字列 |
-| Message() | デフォルトコンストラクタ。フィールドは初期化されない |
-| Message(String role, String content) | `role`と`content`を引数にとるコンストラクタ |
-| getRole() | `role`フィールドのゲッター |
-| setRole(String role) | `role`フィールドのセッター |
-| getContent() | `content`フィールドのゲッター |
-| setContent(String content) | `content`フィールドのセッター |
-| toString() | `Message`オブジェクトの文字列表現を返す |
+|role|メッセージの役割を表すフィールドです。|
+|content|メッセージの内容を表すフィールドです。|
+|Message()|デフォルトコンストラクタです。|
+|Message(String role, String content)|roleとcontentを引数に取るコンストラクタです。|
+|getRole()|roleフィールドのゲッターメソッドです。|
+|setRole(String role)|roleフィールドのセッターメソッドです。|
+|getContent()|contentフィールドのゲッターメソッドです。|
+|setContent(String content)|contentフィールドのセッターメソッドです。|
+|toString()|メッセージのroleとcontentを文字列として返すメソッドです。|
+
 
 ---
 # pro.kensait.brain2doc.openai.**RequestBody**
@@ -459,31 +480,27 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-**パッケージ名**: pro.kensait.brain2doc.openai
+`RequestBody`クラスは、`model`、`messages`、`temperature`の三つのメンバ変数をもつJavaのクラスです。各メンバ変数は、以下のとおりです。
 
-**クラス名**: RequestBody
+#### メンバ変数
 
-このクラスは、OpenAIのAPIリクエストボディを表現するためのクラスです。JSON形式のメッセージを含み、Jacksonライブラリを用いてシリアライズとデシリアライズを行います。
+|メンバ|型|説明|
+|:--|:--|:--|
+|model|String|モデル名称|
+|messages|List<Message>|メッセージリスト|
+|temperature|Float|温度|
 
-#### メンバ概要
+#### メソッド
 
-|メンバ名|型|説明|
-|---|---|---|
-|model|String|OpenAIのモデル名を表す。|
-|messages|List<Message>|メッセージのリスト。各メッセージはMessageクラスのインスタンスである。|
-|temperature|Float|生成するテキストの「ランダム性」を制御するパラメータ。値が高いほど予測はランダムになり、低いほど予測は決定的になる。|
+各メンバ変数に対して、getterおよびsetterが定義されています。また、`toString`メソッドがオーバーライドされており、クラスの内容を文字列として返します。
 
-#### メソッド概要
-
-- **public RequestBody()**: デフォルトコンストラクタ。
-- **public RequestBody(String model, List<Message> messages, Float temperature)**: モデル名、メッセージのリスト、温度パラメータを引数に取るコンストラクタ。
-- **public String getModel()**: モデル名を取得するメソッド。
-- **public void setModel(String model)**: モデル名を設定するメソッド。
-- **public List<Message> getMessages()**: メッセージのリストを取得するメソッド。
-- **public void setMessages(List<Message> messages)**: メッセージのリストを設定するメソッド。
-- **public Float getTemperature()**: 温度パラメータを取得するメソッド。
-- **public void setTemperature(Float temperature)**: 温度パラメータを設定するメソッド。
-- **public String toString()**: クラスの内容を文字列化したものを返すメソッド。
+- `getModel()`: modelの値を取得します。
+- `setModel(String model)`: modelの値を設定します。
+- `getMessages()`: messagesの値を取得します。
+- `setMessages(List<Message> messages)`: messagesの値を設定します。
+- `getTemperature()`: temperatureの値を取得します。
+- `setTemperature(Float temperature)`: temperatureの値を設定します。
+- `toString()`: クラスの内容を文字列として返します。
 
 ---
 # pro.kensait.brain2doc.openai.**RequestFullBody**
@@ -492,23 +509,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`RequestFullBody`クラスは、OpenAIのエンドポイントに送信するリクエストの全体を表現します。以下は、このクラスのメンバー一覧とその概要です。
+`RequestFullBody`クラスは、OpenAIのリクエストボディを表現するクラスです。以下は、クラスのメンバ変数とその概要です。
 
-| メンバー名 | 型 | 説明 |
+#### メンバ変数
+
+| メンバ名 | データ型 | 概要 |
 | --- | --- | --- |
-| model | String | 使用するモデルの名前 |
-| messages | List<Message> | メッセージのリスト |
-| temperature | Float | ランダム性を制御するパラメータ |
-| topP | Float | トップPサンプリングを制御するパラメータ |
-| n | Integer | 生成するメッセージの数 |
-| stream | Boolean | ストリーミングモードかどうか |
-| stop | List<String> | 生成を停止するトークンのリスト |
-| maxTokens | Integer | 生成するトークンの最大数 |
-| presencePenalty | Float | 存在ペナルティ |
-| frequencyPenalty | Float | 頻度ペナルティ |
-| logitBias | Map<Object, Object> | ロジットバイアス |
+| model | String | モデルの名称をセットする。 |
+| messages | List<Message> | メッセージのリストをセットする。 |
+| temperature | Float | テンプレートの温度をセットする。 |
+| topP | Float | トップPの値をセットする。 |
+| n | Integer | nの値をセットする。 |
+| stream | Boolean | ストリームの値をセットする。 |
+| stop | List<String> | ストップのリストをセットする。 |
+| maxTokens | Integer | 最大トークン数をセットする。 |
+| presencePenalty | Float | プレゼンスペナルティの値をセットする。 |
+| frequencyPenalty | Float | フリーケンシーペナルティの値をセットする。 |
+| logitBias | Map<Object, Object> | ロジットバイアスのマップをセットする。 |
 
-各メンバーは、コンストラクタで初期化したり、ゲッターとセッターを通じて値を取得・設定したりできます。また、`toString`メソッドをオーバーライドしているため、クラスの状態を文字列で取得できます。
+各メンバには、ゲッターとセッターのメソッドが提供されています。
 
 ---
 # pro.kensait.brain2doc.openai.**StaticProxySelector**
@@ -517,16 +536,16 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、`ProxySelector`を継承した`StaticProxySelector`という名前のクラスです。このクラスは、特定のプロキシを使用するためのクラスです。
+`StaticProxySelector`クラスは、特定のプロキシ設定を強制するためのクラスです。Javaの`ProxySelector`を拡張し、選択したプロキシ設定を返すことができます。
 
 #### メンバの概要
 
-| メンバ名 | 概要 |
-| :--- | :--- |
-| proxyList | このリストはプロキシのリストを保持します。コンストラクタ`StaticProxySelector`で設定されます。 |
-| StaticProxySelector() | このクラスのコンストラクタです。引数としてプロキシのタイプとアドレスを受け取り、この情報を元にプロキシリストを作成します。 |
-| select() | このメソッドはプロキシリストを返します。 |
-| connectFailed() | このメソッドはプロキシへの接続エラーが発生した場合に呼び出されます。エラーが発生したら、ランタイムエクセプションをスローします。 |
+| メンバ | 概要 |
+| --- | --- |
+| `proxyList` | プロキシ設定のリスト。コンストラクタで受け取ったプロキシタイプとアドレスを元に作成されます。 |
+| `StaticProxySelector(Proxy.Type proxyType, InetSocketAddress proxyAddress)` | コンストラクタ。プロキシタイプとアドレスを受け取り、その情報を元にプロキシリストを作成します。 |
+| `select(URI uri)` | オーバーライドメソッド。URIに関係なく、常に同じプロキシ設定のリストを返します。 |
+| `connectFailed(URI uri, SocketAddress sa, IOException ioe)` | オーバーライドメソッド。プロキシへの接続が失敗した場合に呼び出され、実行時例外をスローします。 |
 
 ---
 # pro.kensait.brain2doc.openai.**SuccessResponseBody**
@@ -535,29 +554,21 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`SuccessResponseBody`クラスはレスポンスボディの成功時の内容を保持するためのクラスです。このクラスは、以下のメンバを持っています。
+`SuccessResponseBody`クラスは、レスポンスのボディ部分を表すクラスです。以下のメンバを持っています。
 
-#### メンバ概要
+#### メンバの概要
 
-| メンバ名 | 型 | 説明 |
-| --- | --- | --- |
-| id | String | レスポンスのID |
-| object | String | レスポンスのオブジェクト |
-| created | Long | 作成日時 |
-| model | String | モデル名 |
-| choices | List<Choice> | 選択肢のリスト |
-| usage | Usage | 使用状況 |
-| error | Error | エラー内容 |
+|メンバ名|型|説明|
+|---|---|---|
+|id|String|IDを表すフィールド|
+|object|String|オブジェクトを表すフィールド|
+|created|Long|作成日時を表すフィールド|
+|model|String|モデルを表すフィールド|
+|choices|List<Choice>|選択肢を表すフィールド|
+|usage|Usage|使用方法を表すフィールド|
+|error|Error|エラーを表すフィールド|
 
-このクラスは、メンバのゲッター、セッターなどのメソッドを持ちます。メンバの詳細な説明は以下の通りです。
-
-- `id`: レスポンスのIDを格納します。
-- `object`: レスポンスのオブジェクトを格納します。
-- `created`: 作成日時を格納します。
-- `model`: モデル名を格納します。
-- `choices`: 選択肢のリストを格納します。
-- `usage`: 使用状況を格納します。
-- `error`: エラー内容を格納します。
+各メンバへのアクセスは、getterおよびsetterメソッドを通じて行います。また、`toString`メソッドでオブジェクトの文字列表現を取得できます。
 
 ---
 # pro.kensait.brain2doc.openai.**Usage**
@@ -566,21 +577,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは「Usage」で、プロンプトトークン、コンプリーショントークン、合計トークンを管理します。それぞれの値はInteger型で表現され、getterおよびsetterを通じて操作が可能です。また、デフォルトコンストラクタと全フィールドの値を引数に取るコンストラクタがあります。さらに、オブジェクトの等価性をチェックするためのequalsメソッド、ハッシュコードを計算するためのhashCodeメソッド、オブジェクトの文字列表現を提供するためのtoStringメソッドが実装されています。
+`Usage`クラスは、トークンの使用状況を表すクラスです。以下の3つのフィールドを持っています。
 
-#### メンバの概要
+| メンバ名 | データ型 | 概要 |
+| --- | --- | --- |
+| promptTokens | Integer | プロンプトトークンの数 |
+| completionTokens | Integer | 完了トークンの数 |
+| totalTokens | Integer | トータルトークンの数 |
 
-| メソッド名 | 解説 |
-| --- | --- |
-| getPromptTokens | プロンプトトークンを返します |
-| setPromptTokens | プロンプトトークンを設定します |
-| getCompletionTokens | コンプリーショントークンを返します |
-| setCompletionTokens | コンプリーショントークンを設定します |
-| getTotalTokens | 合計トークンを返します |
-| setTotalTokens | 合計トークンを設定します |
-| equals | オブジェクトの等価性をチェックします |
-| hashCode | ハッシュコードを計算します |
-| toString | オブジェクトの文字列表現を提供します |
+### メソッド概要
+
+- `getPromptTokens` : プロンプトトークンの数を取得します。
+- `setPromptTokens` : プロンプトトークンの数を設定します。
+- `getCompletionTokens` : 完了トークンの数を取得します。
+- `setCompletionTokens` : 完了トークンの数を設定します。
+- `getTotalTokens` : トータルトークンの数を取得します。
+- `setTotalTokens` : トータルトークンの数を設定します。
+- `equals` : 他のオブジェクトと比較し、等価性を判断します。
+- `hashCode` : ハッシュコードを生成します。
+- `toString` : オブジェクトの文字列表現を生成します。
 
 ---
 # pro.kensait.brain2doc.params.**GenerateType**
@@ -589,20 +604,24 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`GenerateType`は、Javaの列挙型（enum）で、ドキュメント生成の種類を表します。4つの定数`SPEC`、`SUMMARY`、`REVIEW`、`OTHERS`を持ち、それぞれが生成するドキュメントの種類を表します。
+`GenerateType`は、生成するドキュメントの種類を表すEnumクラスです。以下の4つの種類が定義されています。
 
-#### 各メンバの概要
+- SPEC
+- SUMMARY
+- REVIEW
+- OTHERS
 
-| メンバ名 | 説明 |
-|---|---|
-| SPEC | 仕様書の生成を示す定数 |
-| SUMMARY | 要約の生成を示す定数 |
-| REVIEW | レビューの生成を示す定数 |
-| OTHERS | その他のドキュメントの生成を示す定数 |
-| name | ドキュメントの生成タイプを表す文字列 |
-| GenerateType(String name) | 列挙型のコンストラクタ。生成タイプの文字列をパラメータとして受け取ります |
-| getName() | 生成タイプの名前を返すメソッド |
-| getGenerateTypeByName(String name) | 生成タイプの名前から対応する列挙型を返す静的メソッド。存在しない名前が指定された場合はnullを返します。 |
+#### メンバの概要
+
+| メンバ名 | メンバ種別 | 概要 |
+| :------- | :--------- | :--- |
+| SPEC     | Enum定数   | 仕様書を生成するための定数です |
+| SUMMARY  | Enum定数   | 要約を生成するための定数です |
+| REVIEW   | Enum定数   | レビューを生成するための定数です |
+| OTHERS   | Enum定数   | その他のドキュメントを生成するための定数です |
+| name     | インスタンス変数 | 定数の名前を保持します |
+| getName  | メソッド   | 定数の名前を取得します |
+| getGenerateTypeByName | メソッド | 引数に指定された名前の定数を取得します。該当する定数がなければnullを返します |
 
 ---
 # pro.kensait.brain2doc.params.**OutputScaleType**
@@ -611,21 +630,27 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-このクラスは、出力スケールタイプを表す列挙型(Enums)で、出力の規模を「SMALL」、「MEDIUM」、「LARGE」、「NOLIMIT」の4種類で表現します。各タイプは、名前と文字サイズをフィールドとして持ち、それぞれのタイプに対応する名前と文字サイズを返すメソッドを提供します。
+`pro.kensait.brain2doc.params`パッケージに属する`OutputScaleType`という名前のenumクラスです。このクラスは、出力スケールのサイズを制御するためのもので、SMALL、MEDIUM、LARGE、NOLIMITの4つの値を持ちます。各値は名称と文字サイズを保持しています。
 
-#### メンバの概要
+#### メンバ一覧
 
-| メンバ名 | 型 | 説明 |
+| メンバ名 | データ型 | 概要 |
 | --- | --- | --- |
-| SMALL | OutputScaleType | 文字サイズが50の出力スケールタイプ |
-| MEDIUM | OutputScaleType | 文字サイズが200の出力スケールタイプ |
-| LARGE | OutputScaleType | 文字サイズが500の出力スケールタイプ |
-| NOLIMIT | OutputScaleType | 文字サイズが制限なしの出力スケールタイプ |
-| name | String | 出力スケールタイプの名前 |
+| SMALL | OutputScaleType | 名称が"small"、文字サイズが50の出力スケールタイプ |
+| MEDIUM | OutputScaleType | 名称が"medium"、文字サイズが200の出力スケールタイプ |
+| LARGE | OutputScaleType | 名称が"large"、文字サイズが500の出力スケールタイプ |
+| NOLIMIT | OutputScaleType | 名称が"nolimit"、文字サイズがnullの出力スケールタイプ |
+| name | String | 出力スケールタイプの名称 |
 | charSize | Integer | 出力スケールタイプの文字サイズ |
-| getName() | method | 出力スケールタイプの名前を取得する |
-| getCharSize() | method |出力スケールタイプの文字サイズを取得する |
-| getOutputScaleTypeByName(String name) | method | 名前に応じた出力スケールタイプを取得する |
+
+#### メソッド一覧
+
+| メソッド名 | 戻り値の型 | 概要 |
+| --- | --- | --- |
+| getName() | String | 出力スケールタイプの名称を取得 |
+| getCharSize() | Integer | 出力スケールタイプの文字サイズを取得 |
+| getOutputScaleTypeByName(String name) | OutputScaleType | 引数に指定した名称に対応する出力スケールタイプを取得 |
+
 
 ---
 # pro.kensait.brain2doc.params.**Parameter**
@@ -634,45 +659,42 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`Parameter`クラスは、APIのパラメータ情報を管理するためのクラスです。
+該当クラスは`Parameter`という名前で、各種設定やパラメータを管理するクラスです。
 
 #### メンバ一覧
 
-|メンバ名|概要|
-|---|---|
-|openaiURL|OpenAIのURL。デフォルト値はプロパティファイルから取得|
-|openaiModel|OpenAIのモデル。デフォルト値はプロパティファイルから取得|
-|openaiApikey|OpenAIのAPIキー。デフォルト値は環境変数から取得|
-|resourceType|リソースタイプ。デフォルト値はプロパティファイルから取得|
-|generateType|生成タイプ。デフォルト値はプロパティファイルから取得|
-|genTable|生成するテーブル名。任意指定|
-|fields|フィールド名。任意指定|
-|outputScaleType|出力スケールタイプ。デフォルト値はプロパティファイルから取得|
-|srcPath|ソースパス。指定必須|
-|srcRegex|ソースの正規表現。任意指定|
-|destFilePath|出力先のファイルパス。デフォルト値はソースパスと同じディレクトリの固定ファイル名|
-|locale|ロケール。デフォルト値はプロパティファイルから取得|
-|templateFile|テンプレートファイルのパス。任意指定|
-|maxSplitCount|最大分割数|
-|proxyURL|プロキシURL。任意指定|
-|connectTimeout|接続タイムアウト。デフォルト値はプロパティファイルから取得|
-|requestTimeout|リクエストタイムアウト。デフォルト値はプロパティファイルから取得|
-|retryCount|リトライ回数。デフォルト値はプロパティファイルから取得|
-|retryInterval|リトライ間隔。デフォルト値はプロパティファイルから取得|
-|isAutoSplitMode|自動分割モードかどうか。デフォルト値false|
-|printPrompt|プロンプトを表示するかどうか|
+| メンバ名            | 概要                                                                                     |
+|---------------------|------------------------------------------------------------------------------------------|
+| openaiURL           | OpenAIのURL（デフォルト値はプロパティファイルから取得）                                     |
+| openaiModel         | OpenAIのモデル（デフォルト値はプロパティファイルから取得）                                   |
+| openaiApikey        | OpenAIのAPIキー（デフォルト値は環境変数から取得）                                             |
+| resourceType        | リソースタイプ（デフォルト値はプロパティファイルから取得）                                    |
+| generateType        | 生成タイプ（デフォルト値はプロパティファイルから取得）                                        |
+| genTable            | 生成テーブル名（任意指定）                                                                   |
+| fields              | フィールド名（任意指定）                                                                     |
+| outputScaleType     | 出力スケールタイプ（デフォルト値はプロパティファイルから取得）                                 |
+| srcPath             | ソースパス（指定必須）                                                                       |
+| srcRegex            | ソースパスの正規表現（任意指定）                                                              |
+| destFilePath        | 出力ファイルパス（デフォルト値はソースパスと同じディレクトリの固定ファイル名）                   |
+| locale              | ロケール（デフォルト値はプロパティファイルから取得）                                           |
+| templateFile        | テンプレートファイル（任意指定）                                                              |
+| maxSplitCount       | 最大分割数                                                                                    |
+| proxyURL            | プロキシURL（任意指定）                                                                       |
+| connectTimeout      | 接続タイムアウト（デフォルト値はプロパティファイルから取得）                                    |
+| requestTimeout      | リクエストタイムアウト（デフォルト値はプロパティファイルから取得）                               |
+| retryCount          | 再試行回数（デフォルト値はプロパティファイルから取得）                                          |
+| retryInterval       | 再試行間隔（デフォルト値はプロパティファイルから取得）                                          |
+| isAutoSplitMode     | 自動分割モード（デフォルト値false）                                                            |
+| printPrompt         | プロンプト表示フラグ                                                                          |
 
-#### 主要メソッド
+#### メソッド一覧
 
-- `setUp(String[] args)`: パラメータの設定を行う静的メソッドです。コマンドライン引数を受け取り、各パラメータを設定します。
+- `setUp(String[] args)`：パラメータを設定するための静的メソッド。引数は文字列配列。
+- `getDefaultOutputFileName(ResourceType resourceType, GenerateType generateType)`：デフォルトの出力ファイル名を取得するための静的メソッド。
+- `getCurrentDateTimeStr()`：現在の日時を文字列で取得するための静的メソッド。
+- 各メンバのgetterメソッド
 
-- `getDefaultOutputFileName(ResourceType resourceType, GenerateType generateType)`: デフォルトの出力ファイル名を取得する静的メソッドです。
-
-- `getCurrentDateTimeStr()`: 現在の日時を文字列で取得する静的メソッドです。
-
-- 各メンバの`get`メソッド: 対応するメンバの値を取得するためのメソッドです。
-
-- `toString()`: クラスの文字列表現を返すメソッドです。
+クラスのインスタンスは、静的メソッド`setUp(String[] args)`を通じて生成され、その後はgetterメソッドを利用して各メンバの値を取得します。
 
 ---
 # pro.kensait.brain2doc.params.**PathType**
@@ -681,19 +703,15 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-クラス名：`PathType`
+`PathType`は、**pro.kensait.brain2doc.params**パッケージに属するenum型クラスです。以下の3つの定数を持っています。
 
-パッケージ名：`pro.kensait.brain2doc.params`
-
-種類：`enum` 
-
-#### メンバ一覧
+#### メンバ概要
 
 |メンバ名|概要|
-|---|---|
-|FILE|ファイルパスを表す要素|
-|DIRECTORY|ディレクトリパスを表す要素|
-|ZIP|ZIPファイルパスを表す要素|
+|:---:|:---:|
+|FILE| ファイルを表す定数|
+|DIRECTORY| ディレクトリを表す定数|
+|ZIP| ZIPファイルを表す定数|
 
 ---
 # pro.kensait.brain2doc.params.**ResourceType**
@@ -702,30 +720,29 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`ResourceType`は、リソースの種類を表すenumクラスです。各リソースの種類は、その名前(`name`)と、その種類に関連する拡張子(`exts`)を持っています。
+`ResourceType`は、複数のプログラミング言語やファイル形式を表現するための列挙型です。それぞれの`ResourceType`は名前と、それに関連付けられたファイル拡張子の配列を持っています。
 
-#### メンバ概要
+#### メソッド
 
-| メンバ名 | 概要 |
-|:--|:--|
-| `JAVA` | Javaのリソースを表します。 |
-| `JAVASCRIPT` | JavaScriptのリソースを表します。 |
-| `PYTHON` | Pythonのリソースを表します。 |
-| `SQL` | SQLのリソースを表します。 |
-| `PAGE` | HTML, XHTML, JSPなどのページリソースを表します。 |
-| `SHELLSCRIPT` | シェルスクリプトのリソースを表します。 |
-| `OTHERS` | 上記以外のリソースを表します。 |
+|メソッド名|概要|
+|---|---|
+|getName|列挙型の名前を返す|
+|getResourceTypeByName|指定した名前に一致する列挙型を返す|
+|getExts|関連付けられたファイル拡張子の配列を返す|
+|matchesExt|指定した拡張子が関連付けられているかどうかを返す|
+|getMatchExt|指定した拡張子が関連付けられている場合、その拡張子を返す|
 
-#### メソッド概要
+#### 列挙型の値と関連する拡張子
 
-| メソッド名 | 概要 |
-|:--|:--|
-| `getName()` | リソースの名前を返します。 |
-| `getResourceTypeByName(String name)` | 名前からリソースの種類を取得します。一致するものがない場合はnullを返します。 |
-| `getExts()` | リソースの拡張子を返します。 |
-| `matchesExt(String target)` | 指定された拡張子がリソースの拡張子と一致するかどうかを返します。 |
-| `getMatchExt(String target)` | 指定された拡張子がリソースの拡張子と一致する場合、その拡張子を返します。一致するものがない場合はnullを返します。 |
-
+|列挙型の値|関連する拡張子|
+|---|---|
+|JAVA| .java|
+|JAVASCRIPT| .js, .ts|
+|PYTHON| .py|
+|SQL| .sql|
+|PAGE| .html, .htm, .xhtml, .jsp|
+|SHELLSCRIPT| .sh, .bash, .ksh, .bash|
+|OTHERS| .*|
 
 ---
 # pro.kensait.brain2doc.process.**ConsoleProgressTask**
@@ -734,28 +751,29 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`ConsoleProgressTask`は、コンソールに進行状況を表示するためのクラスです。`Runnable`インターフェースを実装しており、マルチスレッドでの実行を可能にしています。開始信号の後に、進行状況が終了するまで等間隔でバー(`=`)を表示します。進行状況が終了した際には、終了バー(`=> `)と`done!`を表示します。
+`ConsoleProgressTask`クラスは、進捗バーをコンソールに表示するタスクを実行するクラスです。このクラスは`Runnable`インターフェースを実装しており、多重スレッドで実行することが可能です。
 
 #### メンバ概要
 
-|メンバ名|型|説明|
+|メンバ|型|概要|
 |---|---|---|
-| `DONE_BAR` | `String` | 進行状況が終了した際に表示する文字列 |
-| `BAR` | `String` | 進行状況を表示する際に使用するバーの文字列 |
-| `INTERVAL` | `int` | バーを表示する間隔（秒） |
-| `startSignal` | `CountDownLatch` | 開始信号を管理するオブジェクト |
-| `isDone` | `boolean` | 進行状況が終了しているかどうかを判定するフラグ |
+|DONE_BAR|String|処理が完了したときに表示する文字列|
+|BAR|String|進捗バーとして表示する文字列|
+|INTERVAL|int|進捗バーの更新間隔（秒）|
+|startSignal|CountDownLatch|開始信号を管理するCountDownLatchオブジェクト|
+|isDone|boolean|処理が完了したかどうかを示すフラグ|
 
 #### メソッド概要
 
-|メソッド名|説明|
-|---|---|
-| `ConsoleProgressTask(CountDownLatch startSignal, boolean isDone)` | コンストラクタ。開始信号と進行状況の終了フラグを初期化 |
-| `getStartSignal()` | 現在の開始信号を取得 |
-| `setStartSignal(CountDownLatch startSignal)` | 開始信号を設定 |
-| `isDone()` | 進行状況が終了しているかどうかを返す |
-| `setDone(boolean isDone)` | 進行状況の終了フラグを設定 |
-| `run()` | 開始信号の後に、進行状況が終了するまで等間隔でバーを表示。進行状況が終了した際には、終了バーと`done!`を表示 |
+|メソッド|戻り値|概要|
+|---|---|---|
+|ConsoleProgressTask(CountDownLatch, boolean)|-|コンストラクタ。開始信号と完了フラグを設定する|
+|getStartSignal()|CountDownLatch|開始信号を取得する|
+|setStartSignal(CountDownLatch)|void|開始信号を設定する|
+|isDone()|boolean|処理が完了したかどうかを確認する|
+|setDone(boolean)|void|処理が完了したかどうかを設定する|
+|run()|void|進捗バーを表示しながら処理を実行する|
+
 
 ---
 # pro.kensait.brain2doc.process.**Flow**
@@ -764,49 +782,48 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-### クラス名: Flow
-このクラスは、ファイルの読み取りからOpenAIへの問い合わせ、結果の処理といった一連の流れを制御します。
+`Flow`クラスはプログラムの処理フローを表しています。このクラスは、ファイルやディレクトリを読み込み、OpenAIのAPIに問い合わせを行い、結果を書き出します。
 
-#### メンバ概要
+### メンバの概要
 
-| メンバ名 | 説明 |
-| --- | --- |
-| `ZIP_FILE_EXT` | .zipファイルの拡張子 |
-| `SUCCESS_MESSAGE` | 成功メッセージ |
-| `TIMEOUT_MESSAGE` | タイムアウトメッセージ |
-| `CLIENT_ERROR_MESSAGE` | クライアントエラーメッセージ |
-| `INVALID_API_KEY_MESSAGE` | APIキー無効メッセージ |
-| `INSUFFICIENT_QUOTA_MESSAGE` | クオータ不足メッセージ |
-| `TOKEN_LIMIT_OVER_MESSAGE` | トークンリミット超過メッセージ |
-| `RATE_LIMIT_EXCEEDED_MESSAGE` | レート制限超過メッセージ |
-| `EXTRACT_TOKEN_COUNT_REGEX` | トークン数抽出の正規表現 |
-| `PROMPT_HEADING` | プロンプトの見出し |
-| `PROCESS_PROGRESS_HEADING` | プロセス進行の見出し |
-| `REPORT_TITLE` | レポートのタイトル |
-| `REPORT_TABLE_DIVIDER` | レポートテーブルの区切り |
-| `param` | パラメータオブジェクト |
-| `reportList` | レポートリスト |
+|メンバ|説明|
+|---|---|
+|ZIP_FILE_EXT|ZIPファイルの拡張子を表す定数|
+|SUCCESS_MESSAGE|成功時のメッセージを表す定数|
+|TIMEOUT_MESSAGE|タイムアウト時のメッセージを表す定数|
+|CLIENT_ERROR_MESSAGE|クライアントエラー時のメッセージを表す定数|
+|INVALID_API_KEY_MESSAGE|APIキー無効時のメッセージを表す定数|
+|INSUFFICIENT_QUOTA_MESSAGE|クオータ不足時のメッセージを表す定数|
+|TOKEN_LIMIT_OVER_MESSAGE|トークン制限超過時のメッセージを表す定数|
+|RATE_LIMIT_EXCEEDED_MESSAGE|レート制限超過時のメッセージを表す定数|
+|EXTRACT_TOKEN_COUNT_REGEX|トークン数を抽出するための正規表現|
+|PROMPT_HEADING|プロンプトの見出しを表す定数|
+|PROCESS_PROGRESS_HEADING|処理進捗の見出しを表す定数|
+|REPORT_TITLE|レポートのタイトルを表す定数|
+|REPORT_TABLE_DIVIDER|レポートの表の区切りを表す定数|
+|param|グローバルなParameterオブジェクト|
+|reportList|レポートの結果を格納するリスト|
 
-#### メソッド概要
+### メソッドの概要
 
-| メソッド名 | 説明 |
-| --- | --- |
-| `init(Parameter paramValues)` | パラメータの初期化とレポートリストのクリア |
-| `getReportList()` | レポートリストの取得 |
-| `startAndFork()` | ファイル処理の開始と分岐 |
-| `walkDirectory(Path srcPath)` | ディレクトリの走査 |
-| `readNormalFile(Path inputFilePath)` | 通常のファイルの読み取り |
-| `readZipFile(Path srcPath)` | .zipファイルの読み取り |
-| `mainProcess(Path inputFilePath, List<String> inputFileLines)` | メインプロセス |
-| `askToOpenAi(List<String> inputFileLines, String inputFileContent, int splitConut, int prevSplitCount, int tryCount, CountDownLatch startSignal, Runnable startProgressTask)` | OpenAIへの問い合わせ |
-| `extractToken(String content, String message)` | トークンの抽出 |
-| `extractNameWithoutExt(String fileName, String ext)` | 拡張子なしのファイル名の抽出 |
-| `toStringFromStrList(List<String> strList)` | 文字列リストから文字列への変換 |
-| `toChoicesFromResponce(SuccessResponseBody responseBody)` | レスポンスボディから選択肢への変換 |
-| `toLineListFromChoices(List<String> responseChoices)` | 選択肢から行リストへの変換 |
-| `write(String responseContent)` | 書き込み |
-| `printPrompt(Prompt prompt)` | プロンプトの表示 |
-| `addReport(Path inputFilePath, String message, int resuestTokenCount, int responseTokenCount, long interval)` | レポートの追加 |
+|メソッド|説明|
+|---|---|
+|init(Parameter paramValues)|パラメータを初期化する|
+|getReportList()|レポートのリストを返す|
+|startAndFork()|処理を開始し、ファイルまたはディレクトリに応じて処理を分岐する|
+|walkDirectory(Path srcPath)|ディレクトリを探索し、各ファイルを読み込む|
+|readNormalFile(Path inputFilePath)|通常のファイルを読み込む|
+|readZipFile(Path srcPath)|ZIPファイルを読み込み、各エントリを処理する|
+|mainProcess(Path inputFilePath, List<String> inputFileLines)|メインの処理を行う|
+|askToOpenAi(...)|OpenAIのAPIに問い合わせを行う|
+|extractToken(String content, String message)|レスポンスメッセージからトークン数を抽出する|
+|extractNameWithoutExt(String fileName, String ext)|ファイル名から拡張子を取り除く|
+|toStringFromStrList(List<String> strList)|文字列リストから文字列を生成する|
+|toChoicesFromResponce(SuccessResponseBody responseBody)|レスポンスから選択肢を抽出する|
+|toLineListFromChoices(List<String> responseChoices)|選択肢を行リストに変換する|
+|write(String responseContent)|結果を書き出す|
+|printPrompt(Prompt prompt)|プロンプトをコンソールに表示する|
+|addReport(Path inputFilePath, String message, int resuestTokenCount, int responseTokenCount, long interval)|レポートに処理結果を追加する|
 
 ---
 # pro.kensait.brain2doc.process.**SplitUtil**
@@ -815,18 +832,15 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`SplitUtil`クラスは、リストを分割するユーティリティクラスです。このクラスは以下のメソッドを持っています。
+`SplitUtil`クラスは、リストの分割や分割数の計算などを行うユーティリティクラスです。このクラスは`pro.kensait.brain2doc.process`パッケージに属しています。
 
-| メソッド名 | 概要 |
+#### メンバの概要
+
+|メンバ名|詳細|
 |---|---|
-| `split` | 引数として受け取ったリストを指定された数で分割し、分割後のリストをリストとして返します。 |
-| `calcSplitCount` | トークン数とトークン数の上限を引数にとり、トークン数と上限から分割数を計算し、分割数を返します。 |
-
-### splitメソッド
-このメソッドは、リストと分割数を引数にとり、リストを分割します。分割後の各リストの最大行数は、元のリストの行数を分割数で割った数に1を加えたものです。分割後のリストは元のリストの順番を保持します。
-
-### calcSplitCountメソッド
-このメソッドは、トークン数とトークン数の上限を引数にとり、これらから分割数を計算します。トークン数と上限から計算した数に0.5を加算し、さらに切り上げることで、分割数を計算します。
+|`MARKUP_FOR_SPLIT_COUNT`|分割数の計算に使用する定数（0.5）。|
+|`split`|指定した数にリストを分割します。分割数を超えないようにリストの最大行数を計算し、その数を使ってリストを分割します。|
+|`calcSplitCount`|トークン数の上限と現在のトークン数から分割数を計算します。トークン数比率と文字列比率が同じであるとは限らないこと、またテンプレートの追加なども考慮して、安全に倒すため`MARKUP_FOR_SPLIT_COUNT`を加算し、さらに切り上げています。|
 
 ---
 # pro.kensait.brain2doc.process.**TemplateAttacher**
@@ -835,24 +849,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`TemplateAttacher`は、特定のテンプレートをファイルにアタッチするためのクラスです。
+クラス名: TemplateAttacher
 
-このクラスには、次のメソッドと内部クラスが含まれます。
+所属パッケージ: pro.kensait.brain2doc.process
 
-#### メソッド
+このクラスはテンプレートの統合を行うためのクラスです。メインメソッドであるattachは、テンプレートを作成し、それをメッセージに変換し、Promptというユーザーメッセージラインを含むオブジェクトを返します。
 
-| メソッド名 | 概要 |
-| --- | --- |
-| `attach` | テンプレートをファイルにアタッチします。 |
-| `getScaleString` | 出力サイズタイプに対応する文字列を取得します。 |
-| `getTableTemplateStr` | テーブルテンプレート文字列を取得します。 |
+#### メソッド一覧
+
+| メソッド名 | 引数 | 戻り値 | 概要 |
+|---|---|---|---|
+| attach | List<String> inputFileLines,<br>ResourceType resourceType,<br>GenerateType generateType,<br>String genTable,<br>String fields,<br>OutputScaleType outputSizeType,<br>Locale locale,<br>Path templateFile,<br>int count | Prompt | テンプレートを作成し、それをメッセージに変換し、Promptを返します。 |
+| getScaleString | Map messageMap, <br>OutputScaleType outputSizeType | String | 出力内容の大きさを指定するための文字列を取得します。 |
+| getTableTemplateStr | Map messageMap, <br>String genTable, <br>String fields | String | 一覧形式のテンプレートを返します。 |
 
 #### 内部クラス
 
 | クラス名 | 概要 |
-| --- | --- |
-| `Prompt` | システムメッセージ、アシスタントメッセージ、ユーザーメッセージ、ユーザーメッセージラインを保持します。 |
-
+|---|---|
+| Prompt | テンプレートのメッセージを保持するクラスです。systemMessage、assistantMessage、userMessage、userMessageLinesの4つのメンバを持っています。 |
 
 ---
 # pro.kensait.brain2doc.transform.**GenericTransformStrategy**
@@ -861,14 +876,15 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-`GenericTransformStrategy`は`TransformStrategy`インターフェースを実装したクラスです。
+以下に、`GenericTransformStrategy`クラスのメソッド概要を示します。
 
-### メソッド
+| メソッド名 | 引数 | 戻り値 | 概要 |
+|:----------|:-----|:------|:-----|
+| transform | inputFilePath: Path, requestContent: String, responseLines: List<String>, seqNum: int | String | 入力ファイルのパス、リクエスト内容、レスポンス行のリスト、シーケンス番号を引数に取り、Markdown形式でファイル名、URL、レスポンス内容を整形して返す。 |
 
-|メソッド名|説明|
-|---------|----|
-|transform|入力ファイルパス、リクエスト内容、レスポンス行のリスト、シーケンス番号を引数に取り、Markdown形式の出力内容を返します。この出力内容は、ファイル名、ファイルパス、レスポンス内容を含んでいます。また、シーケンス番号が1以外の場合、ファイル名の後にシーケンス番号を追加します。|
+### クラスの詳細
 
+このクラスは、TransformStrategyインターフェースを実装しています。具体的な処理としては、引数で受け取った入力ファイルのパス、リクエスト内容、レスポンス行のリスト、シーケンス番号をもとに、Markdown形式の文字列を生成して返します。生成される文字列は、ファイル名、URL、レスポンス内容を含みます。ファイル名とシーケンス番号はヘッダとして表示され、URLとレスポンス内容は本文として表示されます。また、シーケンス番号が1でない場合は、ファイル名の後ろにシーケンス番号を追加します。各部分は改行で区切られ、全体は水平線で閉じられます。
 
 ---
 # pro.kensait.brain2doc.transform.**JavaGeneralTransformStrategy**
@@ -877,19 +893,25 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-クラス名: `JavaGeneralTransformStrategy`
+「JavaGeneralTransformStrategy」は、「TransformStrategy」インターフェースを実装したクラスです。このクラスは、与えられた入力情報をもとに、特定の形式（マークダウン形式）で整形します。
 
-パッケージ名: `pro.kensait.brain2doc.transform`
-
-このクラスは`TransformStrategy`インターフェースを実装しており、Javaソースコードをマークダウン形式に変換する役割を持っています。主な処理は`transform`メソッド内で行われ、入力されたファイルパスとリクエストコンテンツ、レスポンスラインのリスト、シーケンス番号を元にマークダウン形式の文字列を生成します。
-
-#### メンバの概要
+#### メソッド
 
 | メソッド名 | 概要 |
-|---|---|
-| `transform` | 入力されたファイルパス、リクエストコンテンツ、レスポンスラインのリスト、シーケンス番号を元にマークダウン形式の文字列を生成します。 |
-| `getPackageName` | リクエストコンテンツからパッケージ名を取得します。正規表現を使用してパッケージ宣言の行を探し、その行からパッケージ名を抽出します。 |
+|------------|------|
+| transform | 入力ファイルパス、リクエスト内容、レスポンス行のリスト、シーケンス番号を引数に取り、整形した内容を返します。 |
+| getPackageName | リクエスト内容からパッケージ名を抽出します。 |
 
+#### フィールド
+
+| フィールド名 | 概要 |
+|--------------|------|
+| PACKAGE_REGEX | パッケージ名を抽出するための正規表現のパターンです。 |
+
+#### 処理の詳細
+
+- transformメソッドでは、レスポンス行のリストを一つの文字列に結合し、クラス名とURLを抽出します。その後、マークダウン形式に整形します。
+- getPackageNameメソッドでは、与えられたリクエスト内容からパッケージ名を抽出します。具体的には、PACKAGE_REGEXにマッチする部分を取り出します。マッチする部分がない場合は空文字を返します。
 
 ---
 # pro.kensait.brain2doc.transform.**TransformStrategy**
@@ -898,13 +920,14 @@ JARファイルは、releasesディレクトリ下の最新VERをダウンロー
 
 ## クラス概要
 
-クラス名: TransformStrategyこのインターフェースは、リソースのタイプと生成タイプに基づいて、適切な変換戦略を提供します。
+### TransformStrategy
 
-### メソッドの概要
+TransformStrategyは、入力ファイルパス、リクエストコンテンツ、レスポンスコンテンツ、シーケンス番号を引数にとり、変換した結果を文字列で返すインターフェースです。また、リソースタイプと生成タイプを引数にとり、適切な出力ストラテジーを返す静的メソッドを持っています。
 
-|メソッド名|説明|
+#### メソッド概要
+
+| メソッド名 | 説明 |
 |---|---|
-|transform|指定された入力ファイルパス、リクエストコンテンツ、レスポンスコンテンツリスト、シーケンス番号を使用して変換を行います。|
-|getOutputStrategy|リソースタイプと生成タイプに基づいて適切なTransformStrategyを返します。リソースタイプがJAVAの場合はJavaGeneralTransformStrategyを、それ以外の場合はGenericTransformStrategyを返します。|
-
+| transform | 入力ファイルパス、リクエストコンテンツ、レスポンスコンテンツ、シーケンス番号を引数にとり、変換した結果を文字列で返します。 |
+| getOutputStrategy | リソースタイプと生成タイプを引数にとり、それに応じた出力ストラテジーを返します。 |
 ---
