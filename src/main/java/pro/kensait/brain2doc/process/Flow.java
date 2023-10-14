@@ -411,7 +411,7 @@ public class Flow {
     }
 
     /*
-     * ファイル系から拡張子を取り除いて返す
+     * ファイル名から拡張子を取り除いて返す
      */
     private static String extractNameWithoutExt(String fileName, String ext) {
         int lastExtIndex = fileName.lastIndexOf(ext);
@@ -442,7 +442,7 @@ public class Flow {
     }
     
     /*
-     * 複数のChoiceがリストで返されるので、それを文字列リストに変換する
+     * Choiceリストから文字列リストに変換する
      */
     private static List<String> toLineListFromChoices(
             List<String> responseChoices) {
@@ -456,7 +456,7 @@ public class Flow {
     }
 
     /*
-     * 結果を書き込む
+     * APIからの応答をファイルに書き込む
      */
     private static void write(String responseContent) {
         Path targetDir;
