@@ -56,7 +56,7 @@ java -jar <path-of-your-choice>/brain2doc.jar [source] [options]
 
 The available options are:
 
-```
+```bash
 --help
     Display how to specify parameters.
 
@@ -159,7 +159,7 @@ When you launch this tool, the following information will be displayed on the co
 
 Here's a console display example:
 
-```
+```bash
 ##############################
 #                            #
 #    Welcome to Brain2doc    #
