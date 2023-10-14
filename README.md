@@ -71,11 +71,20 @@ The available options are:
 
 --resource
     Specify the type of input resource (default is "others"). Available types include:
-    java, js, python, sql, page, shell, others.
+    java   : Java source code (targets files with ".java" extension)
+    js     : JavaScript or TypeScript source code (targets files with ".js", ".ts" extensions)
+    python : Python source code (targets files with ".py" extension)
+    sql    : SQL code (targets files with ".sql" extension)
+    page   : Page files (targets files with "page", ".html", ".htm", ".xhtml", ".jsp" extensions)
+    shell  : Shell script (targets files with ".sh", ".bash", ".ksh", ".bash" extensions)
+    others : General resources other than the above
 
 --gen
     Specify what you want to generate from the resource ("--gen" and "--gen-table" are mutually exclusive). Available types are:
-    spec, summary, review, others.
+    spec    : Specifications
+    summary : Summary
+    review  : Review results & improvement suggestions
+    others  : General outputs other than the above (default when neither "--gen" nor "--gen-table" is specified)
 
 --gen-table
     If you want to generate a list from the resource, specify its name ("--gen" and "--gen-table" are mutually exclusive).
@@ -85,7 +94,10 @@ The available options are:
 
 --output-scale
     Specify the desired size of the output (default is "nolimit"). Available sizes are:
-    small, medium, large, nolimit.
+    small   : Small size (approximately 50 characters)
+    medium  : Medium size (approximately 200 characters)
+    large   : Large size (approximately 500 characters)
+    nolimit : No limit
 
 --regex
     Specify a regular expression to filter the source to be read (optional).
