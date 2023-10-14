@@ -70,7 +70,8 @@ The available options are:
     Specify the API key (if not specified, it's fetched from the environment variable "OPENAI_API_KEY").
 
 --resource
-    Specify the type of input resource (default is "others"). Available types include:
+    Specify the type of input resource (default is "others").
+    Available types include:
     java   : Java source code (targets files with ".java" extension)
     js     : JavaScript or TypeScript source code (targets files with ".js", ".ts" extensions)
     python : Python source code (targets files with ".py" extension)
@@ -80,7 +81,8 @@ The available options are:
     others : General resources other than the above
 
 --gen
-    Specify what you want to generate from the resource ("--gen" and "--gen-table" are mutually exclusive). Available types are:
+    Specify what you want to generate from the resource ("--gen" and "--gen-table" are mutually exclusive).
+    Available types are:
     spec    : Specifications
     summary : Summary
     review  : Review results & improvement suggestions
@@ -93,7 +95,8 @@ The available options are:
     When generating a list from the resource, enumerate its column names (mandatory when using "--gen-table").
 
 --output-scale
-    Specify the desired size of the output (default is "nolimit"). Available sizes are:
+    Specify the desired size of the output (default is "nolimit").
+    Available sizes are:
     small   : Small size (approximately 50 characters)
     medium  : Medium size (approximately 200 characters)
     large   : Large size (approximately 500 characters)
@@ -103,7 +106,9 @@ The available options are:
     Specify a regular expression to filter the source to be read (optional).
 
 --dest
-    Specify the full path of the directory or file name where the Markdown file will be output. The default file name format is "brain2doc-{resource-type}-{output-type}-{yMMddHHmmss}.md", for example: "brain2doc-java-review-20230924104914.md". If not specified, output will be in the same directory as the source file.
+    Specify the full path of the directory or file name where the Markdown file will be output.
+    The default file name format is "brain2doc-{resource-type}-{output-type}-{yMMddHHmmss}.md", for example: "brain2doc-java-review-20230924104914.md".
+    If not specified, output will be in the same directory as the source file.
 
 --lang
     Specify the input/output language (default is Japanese). Options are:
