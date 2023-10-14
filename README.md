@@ -1,3 +1,5 @@
+Click [here](https://github.com/KenyaSaitoh/brain2doc/blob/main/README-ja.md) for the Japanese page.
+
 # brain2doc
 
 brain2doc is a tool that generates documentation from source code in bulk using the OpenAI API.
