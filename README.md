@@ -129,6 +129,10 @@ The available options are:
 
 --retry-interval
     Specify the retry interval in seconds (default is 5).
+
+--auto-split
+    When this option is specified, if a single API call reaches the token limit, it will automatically switch to a mode that splits the data into appropriate sizes and resends it.
+    If not specified, the relevant source will be skipped.
 ```
 
 Certainly! Here's the information translated to English in Markdown format:
