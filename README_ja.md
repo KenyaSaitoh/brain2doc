@@ -1,3 +1,5 @@
+日本語のREADME.mdは[こちら]()です
+
 # brain2doc
 
 brain2docは、OpenAIのAPIによって、ソースコードからドキュメントを一括生成するツールです。
@@ -180,9 +182,6 @@ java -jar <任意の場所>/brain2doc.jar [ソース] [オプション]
 制約条件と入力ソースをもとに最高のクラス仕様書を、マークダウン形式で出力してください。
 タイトルは「クラス仕様書」でお願いします。
 各メンバの仕様はマークダウンのテーブル形式で出力してください。        
-Based on the constraints and input source, please output the best class specification in Markdown format.
-Please title it "Class Specifications".
-Please output each member specification in Markdown table format.
 
 ### PROGRESS
 
@@ -205,16 +204,16 @@ Please output each member specification in Markdown table format.
 # Author
 
 - Kenya Saitoh
-- [Twitter Profile](https://twitter.com/KenyaSaitoh)
-- Email: sky_diamonds_2022@yahoo.co.jp
+- https://twitter.com/KenyaSaitoh
+- sky_diamonds_2022@yahoo.co.jp
 
 # License
 
-"brain2doc" is licensed under the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
+"brain2doc" is under [MIT license](https://en.wikipedia.org/wiki/MIT_License).
 
-# Specific Use Cases
+# 具体的な使用例
 
-- [01. Creating specifications from Java source code](https://github.com/KenyaSaitoh/brain2doc/wiki/01.-Java%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98%E6%9B%B8%E4%BD%9C%E6%88%90)
-- [02. Generating a summary from Python source code](https://github.com/KenyaSaitoh/brain2doc/wiki/02.-Python%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%82%B5%E3%83%9E%E3%83%AA%E3%83%BC%E4%BD%9C%E6%88%90)
-- [03. Creating review results & improvement suggestions from JavaScript source code](https://github.com/KenyaSaitoh/brain2doc/wiki/03.-JavaScript%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E3%83%BB%E6%94%B9%E5%96%84%E6%8F%90%E6%A1%88%E4%BD%9C%E6%88%90)
-- [04. Generating an error message list from Java source code](https://github.com/KenyaSaitoh/brain2doc/wiki/04.-Java%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8B%E3%82%89%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%B8%80%E8%A6%A7%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
+- [01. Javaソースコードから仕様書を作成する場合](https://github.com/KenyaSaitoh/brain2doc/wiki/01.-Java%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E4%BB%95%E6%A7%98%E6%9B%B8%E4%BD%9C%E6%88%90)
+- [02. Pythoソースコードからサマリーを作成する場合](https://github.com/KenyaSaitoh/brain2doc/wiki/02.-Python%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%82%B5%E3%83%9E%E3%83%AA%E3%83%BC%E4%BD%9C%E6%88%90)
+- [03. JavaScriptソースコードからレビュー結果・改善提案を作成する場合](https://github.com/KenyaSaitoh/brain2doc/wiki/03.-JavaScript%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E3%83%BB%E6%94%B9%E5%96%84%E6%8F%90%E6%A1%88%E4%BD%9C%E6%88%90)
+- [04. Javaソースコードからエラーメッセージ一覧を作成する場合](https://github.com/KenyaSaitoh/brain2doc/wiki/04.-Java%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8B%E3%82%89%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%B8%80%E8%A6%A7%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88)
