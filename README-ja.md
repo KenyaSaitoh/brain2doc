@@ -1,5 +1,3 @@
-日本語のREADME.mdは[こちら]()です
-
 # brain2doc
 
 brain2docは、OpenAIのAPIによって、ソースコードからドキュメントを一括生成するツールです。
