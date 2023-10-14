@@ -1,164 +1,145 @@
 # brain2doc
 
-brain2docは、OpenAIのAPIによって、ソースコードからドキュメントを一括生成するツールです。
+brain2doc is a tool that generates documentation from source code in bulk using the OpenAI API.
 
 # DEMO
 
-
+(No content provided for this section.)
 
 # Features
 
-- OpenAI APIによるソースコードからのドキュメント生成は、Chat GPTのようなインタラクションを必要としない、ワンショットでのAPI呼び出しで有効な回答を引き出せるため、このツールによって、ドキュメントを一括して効率的に生成可能です。
-- ソースには、単独のファイルはもちろん、ディレクトリを指定するも可能です。その場合、そこに格納されるファイルに対して再帰的に処理を行います。またZIPファイルを指定すると、ZIPファイル内を再帰的に処理します。
-- 生成結果はマークダウン形式で出力されます。ディレクトリやZIPファイルの場合は、各ソースコードの生成結果が1つのマークダウンファイルに連結されます。
-- 対応するソースコードには、以下の種類があります。
-  - **Java**のソースコード（拡張子".java"が対象）
-  - **JavaScript**または**TypeScript**のソースコード（拡張子".js", ".ts"が対象）
-  - **Python**のソースコード（拡張子".py"が対象）
-  - **SQL**コード（拡張子".sql"が対象）
-  - **ページファイル**（拡張子"page", ".html", ".htm", ".xhtml", ".jsp"が対象）
-  - **シェルスクリプト**（拡張子".sh", ".bash", ".ksh", ".bash"が対象）
-  - 上記以外の汎用的なリソース
-- 対応する生成処理には、以下の種類があります。生成結果はマークダウン形式で出力されます。
-  - **仕様書**
-  - **サマリー**
-  - **レビュー結果・改善提案**
-  - **何らかの一覧のテーブル（定数、メッセージ、REST APIなど）**
-  - 上記以外の汎用的な出力（デフォルト）
-- API Keyは環境変数"OPENAI_API_KEY"に設定しますが、コマンドにパラメータとして指定することもできます。
-- API呼び出し時にトークンリミットに達してエラーが発生すると、自動的にソースを適切なサイズに分割して再送することが可能です。
-- API呼び出し時にレートリミットに達してエラーが発生すると、一定間隔を置いてから自動的にリトライします。
-- API呼び出しでは、接続タイムアウト時間、読み込みタイムアウト時間、リトライ回数、リトライ間隔、プロキシサーバーなどをパラメータで指定可能です。
-- OpenAIのモデルは、デフォルトでは"gpt-4"ですが、"gpt-3.5-turbo"などにパラメータで切り替えることができます。
-- 出力結果の大きさを、小、中、大、制限なしの4種類から選択できます。
-- 対象のソースファイルの名前を、正規表現で絞り込むことが可能です。
-- 言語はデフォルトでは日本語ですが、英語にも対応しています。
+- Generating documentation from source code using the OpenAI API does not require an interaction like Chat GPT. A single API call can yield effective answers, making it possible to efficiently generate documentation in bulk with this tool.
+- You can specify a single file as the source, or even a directory. In the case of a directory, files stored there will be processed recursively. If you specify a ZIP file, the contents of the ZIP file will be processed recursively.
+- The generated results are output in Markdown format. For directories or ZIP files, the documentation generated from each source code will be concatenated into one Markdown file.
+- The supported source code types include:
+  - **Java** source code (with the ".java" extension)
+  - **JavaScript** or **TypeScript** source code (with ".js" or ".ts" extensions)
+  - **Python** source code (with the ".py" extension)
+  - **SQL** code (with the ".sql" extension)
+  - **Page files** (with extensions "page", ".html", ".htm", ".xhtml", ".jsp")
+  - **Shell scripts** (with ".sh", ".bash", ".ksh", ".bash" extensions)
+  - Other general-purpose resources
+- The supported generation processes include, with the results output in Markdown format:
+  - **Specifications**
+  - **Summary**
+  - **Review results & improvement suggestions**
+  - **Various tables (constants, messages, REST APIs, etc.)**
+  - Other general-purpose outputs (default)
+- The API Key is set in the environment variable "OPENAI_API_KEY", but it can also be specified as a command parameter.
+- If an error occurs due to token limit during API call, the source can be automatically split into appropriate sizes and resent.
+- If a rate limit error occurs during an API call, it will automatically retry after a set interval.
+- During API calls, parameters such as connection timeout duration, read timeout duration, retry count, retry interval, and proxy server can be specified.
+- By default, the OpenAI model is "gpt-4", but you can switch to models like "gpt-3.5-turbo" using a parameter.
+- The output size can be selected from four options: small, medium, large, or unlimited.
+- It's possible to filter target source files by name using regular expressions.
+- The default language is Japanese, but English is also supported.
 
 # Requirement
 
-本ツールを動作させるには、Java 11以上の環境が必要です。
+To operate this tool, you need an environment with Java 11 or higher.
 
 # Installation
 
-brain2docの実行に必要なファイルはJARファイルのみであり、依存ライブラリも含めて1つのJARファイルにパッケージングされています。
-JARファイルは、releasesディレクトリ下の最新VERをダウンロードして使用してください。
+The only file required to run brain2doc is a JAR file, which is packaged with all its dependencies. Please download the latest version from the releases directory and use it.
 
 # Usage
 
-```
-java -jar <任意の場所>/brain2doc.jar [ソース] [オプション]
+```bash
+java -jar <path-of-your-choice>/brain2doc.jar [source] [options]
 ```
 
-- [ソース]には、読み込み対象となるソースのファイルまたはディレクトリを指定する（指定必須）
-  - ディレクトリを指定すると、再帰的にファイルを一括処理する
-  - ZIPファイルを指定した場合も、ファイル内を再帰的に処理する
+- For [source], specify the file or directory of the source to be read (mandatory).
+  - If a directory is specified, all files are processed recursively.
+  - If a ZIP file is specified, the contents are also processed recursively.
 
-オプションの指定方法は、以下のとおりです。
+The available options are:
 
 ```
 --help
-    パラメータの指定方法を表示する
+    Display how to specify parameters.
 
 --url
-    APIのURLを指定する（デフォルトは"https://api.openai.com/v1/chat/completions"）
+    Specify the API URL (default is "https://api.openai.com/v1/chat/completions").
 
 --model           
-    gptのモデルを指定する（デフォルトは"gpt-4"）
+    Specify the gpt model (default is "gpt-4").
 
 --apikey
-    APIキーを指定する（指定がない場合は環境変数"OPENAI_API_KEY"より取得）
+    Specify the API key (if not specified, it's fetched from the environment variable "OPENAI_API_KEY").
 
 --resource
-    入力となるリソースの種別を指定する（デフォルトは"others"）
-    以下の種別あり
-    java   : Javaのソースコード（拡張子".java"が対象）
-    js     : JavaScriptまたはTypeScriptのソースコード（拡張子".js", ".ts"が対象）
-    python : Pythonのソースコード（拡張子".py"が対象）
-    sql    : SQLコード（拡張子".sql"が対象）
-    page   : ページファイル（拡張子"page", ".html", ".htm", ".xhtml", ".jsp"が対象）
-    shell  : シェルスクリプト（拡張子".sh", ".bash", ".ksh", ".bash"が対象）
-    others : 上記以外の汎用的なリソース
+    Specify the type of input resource (default is "others"). Available types include:
+    java, js, python, sql, page, shell, others.
 
 --gen
-    リソースから何を生成したいかを指定する（"--gen"と"--gen-table"の2つは指定不可）
-    以下の種別あり
-    spec    : 仕様書
-    summary : サマリー
-    review  : レビュー結果・改善提案
-    others  : 上記以外の汎用的な出力（"--gen"、"--gen-table"の指定がなかった場合のデフォルト）
+    Specify what you want to generate from the resource ("--gen" and "--gen-table" are mutually exclusive). Available types are:
+    spec, summary, review, others.
 
 --gen-table
-    リソースから何かの一覧を生成したい場合、その名前を指定する（"--gen"と"--gen-table"の2つは指定不可）
+    If you want to generate a list from the resource, specify its name ("--gen" and "--gen-table" are mutually exclusive).
 
 --fields
-    リソースから一覧を生成する場合、その列名を列挙する（"--gen-table"の場合は指定必須）
+    When generating a list from the resource, enumerate its column names (mandatory when using "--gen-table").
 
 --output-scale
-    出力結果の大きさ（目安）を指定する（デフォルトは"nolimit"）
-    small   : スモールサイズ（50文字程度）
-    medium  : ミディアムサイズ（200文字程度）
-    large   : ラージサイズ（500文字程度）
-    nolimit : 制限なし
+    Specify the desired size of the output (default is "nolimit"). Available sizes are:
+    small, medium, large, nolimit.
 
 --regex
-    読み込み対象となるソースを絞り込むための正規表現文字列を指定する（任意指定）
+    Specify a regular expression to filter the source to be read (optional).
 
 --dest
-    出力するマークダウンファイルのディレクトリ名またはファイル名をフルパスで指定する
-    ディレクトリ名を指定した場合は、デフォルトのファイル名は"brain2doc-{リソース名}-{出力種別名}-{yMMddHHmmss}.md"
-    （例："brain2doc-java-review-20230924104914.md"）
-    このオプションの指定がなかった場合は、ソースファイルと同じディレクトに、デフォルトのファイル名で出力される
+    Specify the full path of the directory or file name where the Markdown file will be output. The default file name format is "brain2doc-{resource-type}-{output-type}-{yMMddHHmmss}.md", for example: "brain2doc-java-review-20230924104914.md". If not specified, output will be in the same directory as the source file.
 
 --lang
-    入出力する言語を指定する（デフォルトは日本語）
-    ja : 日本語
-    en : 英語
+    Specify the input/output language (default is Japanese). Options are:
+    ja (Japanese), en (English).
 
 --template
-    任意のテンプレートファイルをフルパスで指定する（任意指定）
-    デフォルトのテンプレートファイルと、差分のみが上書きされる
+    Specify the full path of a custom template file (optional). Only differences from the default template will be overwritten.
 
 --max-split-count
-    最大ファイル分割数を指定する
-    トークンリミットオーバーやレートリミットオーバーが発生した場合、自動的にファイルを分割するが、
-    分割数がこのオプションに指定された数値を超えた場合は、当該ソースファイルの処理はスキップする（デフォルト10）
+    Specify the maximum number of file splits. If token or rate limit is exceeded, files are automatically split. If the number of splits exceeds this option, the source file processing is skipped (default is 10).
 
 --proxyURL
-    API呼び出しを行うときのプロキシサーバーのURLを指定する
+    Specify the URL of the proxy server to use when making API calls.
 
 --connect-timeout
-    API呼び出しにおける接続タイムアウト時間を秒で指定する（デフォルトは10秒）
+    Specify the connection timeout duration in milliseconds (default is 5000).
 
---timeout
-    API呼び出しにおける読み込みタイムアウト時間を秒で指定する（デフォルトは300秒）
+--read-timeout
+    Specify the read timeout duration in milliseconds (default is 10000).
 
 --retry-count
-    API呼び出しでレートリミットオーバーや読み込みタイムアウトが発生した場合の、最大リトライ回数を指定する（デフォルトは3回）
+    Specify the number of retries in the event of an error (default is 3).
 
 --retry-interval
-    API呼び出しでレートリミットオーバーや読み込みタイムアウトが発生した場合の、リトライ間隔を秒で指定する（デフォルトは60秒）
-
---auto-split
-    このオプションを指定すると、1回のAPI呼び出しがトークンリミットに達した場合に、自動的に適切なサイズに分割して再送するモードに切り替わる
-    指定がなかった場合は当該ソースをスキップする
+    Specify the retry interval in seconds (default is 5).
 ```
 
-# コンソール表示内容
+Certainly! Here's the information translated to English in Markdown format:
 
-本ツールを起動すると、以下の情報がコンソールに表示されます
+---
 
-1. PROMPT CONTENT (without source)
-  プロンプトに投入する内容。ただしソースファイルはここでは表示しません（実際にはソースを含むプロンプトが投入されます）。
+# Console Display Contents
 
-2. PROGRESS
-  各ソースファイルの進捗状況がリアルタイムに表示されます。
-  自動分割モードの場合、トークンリミットオーバーやレートリミットオーバーが発生すると、"[FILE_SPLIT]"と表示されて処理が先に進みます。
+When you launch this tool, the following information will be displayed on the console:
 
-3. REPORT
-  全ファイルの呼び出しが終了すると、レポートを出力します。
-  レポートの内容は、(1)ソースファイル名、(2)ステータス、(3)リクエストのトークン数、(4)レスポンスのトークン数、(5)処理時間
+1. **PROMPT CONTENT (without source)**
+   This shows the content that will be input into the prompt. The source files are not displayed here (although in actual use, the source will be included in the prompt).
 
-以下にコンシール表示の例を示します。
+2. **PROGRESS**
+   The progress of each source file is displayed in real-time. In auto-split mode, if a token limit or rate limit is exceeded, "[FILE_SPLIT]" will be displayed and the process will continue.
+
+3. **REPORT**
+   Once all file calls are completed, a report will be output. The report includes:
+   (1) Source file name
+   (2) Status
+   (3) Number of request tokens
+   (4) Number of response tokens
+   (5) Processing time
+
+Here's a console display example:
 
 ```
 ##############################
@@ -169,17 +150,14 @@ java -jar <任意の場所>/brain2doc.jar [ソース] [オプション]
 
 ### PROMPT CONTENT (without source)
 
-あなたは『プロのエンジニア』です。
+You are a "Professional Engineer".
 
-[制約条件]
-回答は日本語でお願いします。
-回答は50文字以内でお願いします。
-マークダウンの見出しは、タイトルにレベル2を使用し、それ以外はレベル4以上にしてください。
+[Constraints]
+Please answer in Japanese.
+Keep answers within 50 characters.
+For Markdown headings, use level 2 for titles and level 4 or higher for others.
 
-[命令書]
-制約条件と入力ソースをもとに最高のクラス仕様書を、マークダウン形式で出力してください。
-タイトルは「クラス仕様書」でお願いします。
-各メンバの仕様はマークダウンのテーブル形式で出力してください。        
+[Instructions]
 Based on the constraints and input source, please output the best class specification in Markdown format.
 Please title it "Class Specifications".
 Please output each member specification in Markdown table format.
