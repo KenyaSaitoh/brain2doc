@@ -4,10 +4,6 @@ Click [here](https://github.com/KenyaSaitoh/brain2doc/blob/main/README-ja.md) fo
 
 brain2doc is a tool that generates documentation from source code in bulk using the OpenAI API.
 
-# DEMO
-
-(No content provided for this section.)
-
 # Features
 
 - Generating documentation from source code using the OpenAI API does not require an interaction like Chat GPT. A single API call can yield effective answers, making it possible to efficiently generate documentation in bulk with this tool.
@@ -46,7 +42,7 @@ The only file required to run brain2doc is a JAR file, which is packaged with al
 
 # Usage
 
-```bash
+```
 java -jar <path-of-your-choice>/brain2doc.jar [source] [options]
 ```
 
@@ -56,7 +52,7 @@ java -jar <path-of-your-choice>/brain2doc.jar [source] [options]
 
 The available options are:
 
-```bash
+```
 --help
     Display how to specify parameters.
 
@@ -115,10 +111,13 @@ The available options are:
     ja (Japanese), en (English).
 
 --template
-    Specify the full path of a custom template file (optional). Only differences from the default template will be overwritten.
+    Specify the full path of a custom template file (optional).
+    Only differences from the default template will be overwritten.
 
 --max-split-count
-    Specify the maximum number of file splits. If token or rate limit is exceeded, files are automatically split. If the number of splits exceeds this option, the source file processing is skipped (default is 10).
+    Specify the maximum number of file splits.
+    If token or rate limit is exceeded, files are automatically split.
+    If the number of splits exceeds this option, the source file processing is skipped (default is 10).
 
 --proxyURL
     Specify the URL of the proxy server to use when making API calls.
@@ -140,10 +139,6 @@ The available options are:
     If not specified, the relevant source will be skipped.
 ```
 
-Certainly! Here's the information translated to English in Markdown format:
-
----
-
 # Console Display Contents
 
 When you launch this tool, the following information will be displayed on the console:
@@ -164,7 +159,7 @@ When you launch this tool, the following information will be displayed on the co
 
 Here's a console display example:
 
-```bash
+```
 ##############################
 #                            #
 #    Welcome to Brain2doc    #
@@ -176,7 +171,7 @@ Here's a console display example:
 You are a "Professional Engineer".
 
 [Constraints]
-Please answer in Japanese.
+Please answer in English.
 Keep answers within 50 characters.
 For Markdown headings, use level 2 for titles and level 4 or higher for others.
 
@@ -189,8 +184,8 @@ Please output each member specification in Markdown table format.
 
 - processing [GeneratorBase.java] ===========> done!
 - processing [package-info.java] ========> done!
-- processing [ParserBase.java] =[FILE_SPLIT]========================================================> done!
-- processing [ParserMinimalBase.java] ==================================================================> done!
+- processing [ParserBase.java] =[FILE_SPLIT]===========================================> done!
+- processing [ParserMinimalBase.java] ======================================> done!
 
 ### REPORT
 
