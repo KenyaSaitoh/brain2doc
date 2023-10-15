@@ -38,7 +38,8 @@ To operate this tool, you need an environment with Java 11 or higher.
 
 # Installation
 
-The only file required to run brain2doc is a JAR file, which is packaged with all its dependencies. Please download the latest version from the releases directory and use it.
+The only file required to run brain2doc is a JAR file, which is packaged with all its dependencies.
+Please download the latest version from the releases directory and use it.
 
 # Usage
 
@@ -107,7 +108,8 @@ The available options are:
     If not specified, output will be in the same directory as the source file.
 
 --lang
-    Specify the input/output language (default is Japanese). Options are:
+    Specify the input/output language (default is Japanese).
+    Options are:
     ja (Japanese), en (English).
 
 --template
