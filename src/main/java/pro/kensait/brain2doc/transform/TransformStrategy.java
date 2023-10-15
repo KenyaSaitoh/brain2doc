@@ -7,6 +7,9 @@ import pro.kensait.brain2doc.params.GenerateType;
 import pro.kensait.brain2doc.params.ResourceType;
 
 public interface TransformStrategy {
+    public static final String FILE_URL_TITLE = "FILE_URL: ";
+    public static final String BOLD = "**";
+
     String transform(Path inputFilePath, String requestContent,
             List<String> responseContents, int seqNum);
 

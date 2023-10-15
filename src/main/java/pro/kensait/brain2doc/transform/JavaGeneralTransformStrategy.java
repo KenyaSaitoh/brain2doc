@@ -22,11 +22,11 @@ public class JavaGeneralTransformStrategy implements TransformStrategy {
                 .replaceAll("(.*)\\.java", "$1");
         String url = inputFilePath.toUri().toString();
         String outputContent = MARKDOWN_HEADING + 
-                packageName + "." + "**" + className + "**" +
+                packageName + "." + BOLD + className + BOLD +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
                 LINE_SEP +
                 LINE_SEP +
-                "ファイルパス: " + url +
+                FILE_URL_TITLE + url +
                 LINE_SEP +
                 LINE_SEP +
                 responseContent +

@@ -15,12 +15,13 @@ public class GenericTransformStrategy implements TransformStrategy {
         }
         String fileName = inputFilePath.getFileName().toString();
         String url = inputFilePath.toUri().toString();
+
         String outputContent = MARKDOWN_HEADING + 
-                "**" + fileName + "**" +
+                BOLD + fileName + BOLD +
                 (seqNum != 1 ? " [" + seqNum + "]" : "") +
                 LINE_SEP +
                 LINE_SEP +
-                "ファイルパス: " + url +
+                FILE_URL_TITLE + url +
                 LINE_SEP +
                 LINE_SEP +
                 responseContent +
