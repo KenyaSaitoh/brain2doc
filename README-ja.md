@@ -2,9 +2,9 @@
 
 brain2docは、OpenAIのAPIによって、ソースコードからドキュメントを一括生成するツールです。
 
-# DEMO (英語版)
+# DEMO英語版 (20秒)
 
-![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/b8bc1508-800a-4538-9784-6d8533abd34c)
+![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/c058930f-0d9c-4687-b76d-40e13a5c6438)
 
 # Features
 
