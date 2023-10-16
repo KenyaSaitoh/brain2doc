@@ -4,7 +4,9 @@ Click [here](https://github.com/KenyaSaitoh/brain2doc/blob/main/README-ja.md) fo
 
 brain2doc is a tool that generates documentation from source code in bulk using the OpenAI API.
 
-# DEMO (20 seconds)
+# DEMO (in 20 seconds)
+
+When you input the command as described below, it recursively reads the Java source placed in the specified directory and calls the OpenAI API, allowing you to create specification documents in bulk (in markdown format).
 
 ![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/946f5ddb-63be-481e-aea9-41f6c2ab20e8)
 
