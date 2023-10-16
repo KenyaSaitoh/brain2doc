@@ -4,9 +4,9 @@ Click [here](https://github.com/KenyaSaitoh/brain2doc/blob/main/README-ja.md) fo
 
 brain2doc is a tool that generates documentation from source code in bulk using the OpenAI API.
 
-# DEMO
+# DEMO (20 seconds)
 
-![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/397591cc-e461-4f7f-8f38-28a0205cc297)
+![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/946f5ddb-63be-481e-aea9-41f6c2ab20e8)
 
 # Features
 
