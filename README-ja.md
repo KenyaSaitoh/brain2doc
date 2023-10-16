@@ -4,6 +4,8 @@ brain2docは、OpenAIのAPIによって、ソースコードからドキュメ�
 
 # DEMO英語版 (20秒)
 
+以下のようにコマンドを投入すると、指定されたディレクトリに配置されたJavaソースを再帰的に読み込み、Open AIのAPIを呼び出して仕様書を一括で作成できます（マークダウン形式）。
+
 ![brain2doc](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/c058930f-0d9c-4687-b76d-40e13a5c6438)
 
 # Features
