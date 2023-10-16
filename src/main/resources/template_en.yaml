@@ -7,7 +7,7 @@ message:
   char-limit-prefix: The answer should be
   char-limit-suffix: characters or less.
   markdown-level: For markdown headings, use level 2 for the title and level 4 or higher for the rest.
-  lang: Answers should be in Japanese.
+  lang: Answers should be in English.
   # user
   title: "[instructions]"
   table-prefix: From the input source,

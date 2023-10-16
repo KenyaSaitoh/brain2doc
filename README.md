@@ -141,6 +141,17 @@ The available options are:
     If not specified, the relevant source will be skipped.
 ```
 
+# Example input command
+
+```
+java -jar brain2doc-0.1.1.jar \
+c://src-target/jackson/src/main/java/com/fasterxml/jackson/core/base \
+--resource java \
+--gen spec \
+--dest C:/tmp/output \
+--auto-split
+```
+
 # Console Display Contents
 
 When you launch this tool, the following information will be displayed on the console:

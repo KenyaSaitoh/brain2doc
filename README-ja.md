@@ -139,6 +139,17 @@ java -jar <任意の場所>/brain2doc.jar [ソース] [オプション]
     指定がなかった場合は当該ソースをスキップする
 ```
 
+# 投入コマンド例
+
+```
+java -jar brain2doc-0.1.1.jar \
+c://src-target/jackson/src/main/java/com/fasterxml/jackson/core/base \
+--resource java \
+--gen spec \
+--dest C:/tmp/output \
+--auto-split
+```
+
 # コンソール表示内容
 
 本ツールを起動すると、以下の情報がコンソールに表示されます。
