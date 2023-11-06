@@ -72,6 +72,9 @@ The available options are:
 --apikey
     Specify the API key (if not specified, it's fetched from the environment variable "OPENAI_API_KEY").
 
+--temperature
+    Adjusting the spread of a probability distribution (default is 0.7F).
+
 --resource
     Specify the type of input resource (default is "others").
     Available types include:
@@ -141,9 +144,6 @@ The available options are:
 
 --retry-interval
     Specify the retry interval in seconds (default is 5).
-
---temperature
-    Adjusting the spread of a probability distribution (default is 0.7F).
 
 --auto-split
     When this option is specified, if a single API call reaches the token limit, it will automatically switch to a mode that splits the data into appropriate sizes and resends it.
