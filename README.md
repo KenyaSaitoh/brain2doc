@@ -72,6 +72,9 @@ The available options are:
 --apikey
     Specify the API key (if not specified, it's fetched from the environment variable "OPENAI_API_KEY").
 
+--temperature
+    Adjusting the spread of a probability distribution (default is 0.7F).
+
 --resource
     Specify the type of input resource (default is "others").
     Available types include:
