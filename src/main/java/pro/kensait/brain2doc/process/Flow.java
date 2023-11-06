@@ -323,6 +323,7 @@ public class Flow {
                         prompt.getSystemMessage(),
                         prompt.getAssistantMessage(),
                         userMessageContent,
+                        param.getTemparature(),
                         param.getOpenaiURL(),
                         param.getOpenaiModel(),
                         param.getOpenaiApikey(),

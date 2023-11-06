@@ -7,7 +7,7 @@ public class TestBrain2docSummary {
     @Test
     public void test() {
         String parameter = "" +
-                "D:\\GitHubRepos\\brain2doc\\src\\main\\java " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--dest " +
                 "C:/tmp/output " +
                 "--resource " +

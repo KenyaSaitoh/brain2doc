@@ -7,7 +7,7 @@ public class TestLargeEn {
     @Test
     public void testLargeRequest() {
         String parameter = "" +
-                "C:\\tmp\\large " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--resource " +
                 "java " +
                 "--gen " +

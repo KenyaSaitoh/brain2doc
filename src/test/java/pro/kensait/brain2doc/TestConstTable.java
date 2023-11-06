@@ -7,7 +7,7 @@ public class TestConstTable {
     @Test
     public void testTable() {
         String parameter = "" +
-                "D:\\GitHubRepos\\brain2doc\\src\\main\\java " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--resource " +
                 "java " +
                 "--gen-table " +

@@ -31,7 +31,6 @@ import pro.kensait.brain2doc.exception.TimeoutException;
 
 ;public class ApiClient {
     // 定数
-    private static final float TEMPERATURE = 0.7F;
     private static final String INVALID_API_KEY_CODE = "invalid_api_key";
     private static final String INSUFFICIENT_QUOTA_CODE = "insufficient_quota";
     private static final String CONTEXT_LENGTH_EXCEEDED_CODE = "context_length_exceeded";
@@ -44,6 +43,7 @@ import pro.kensait.brain2doc.exception.TimeoutException;
             String systemMessageStr,
             String assistantMessageStr,
             String userMessageContent,
+            float temparature,
             String openaiURL,
             String openAiModel,
             String openAiApiKey,
@@ -60,10 +60,12 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         Message assistantMessage = new Message("assistant", assistantMessageStr);
         Message userMessage = new Message("user", userMessageContent);
 
+        System.out.println("##########" + temparature);
+        
         RequestBody requestBody = new RequestBody(
                 openAiModel,
                 List.of(systemMessage, assistantMessage, userMessage),
-                TEMPERATURE);
+                temparature);
 
         String requestStr = getRequestJson(requestBody);
 

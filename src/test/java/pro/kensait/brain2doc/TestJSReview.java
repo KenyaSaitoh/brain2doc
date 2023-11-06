@@ -7,7 +7,7 @@ public class TestJSReview {
     @Test
     public void testJSReview() {
         String parameter = "" +
-                "D:\\Java\\brain2doc-src\\realworld-main\\apps\\api\\src\\app\\controllers " +
+                "D:\\src-target\\realworld-main\\apps\\api\\src\\app\\controllers " +
                 "--resource " +
                 "js " +
                 "--gen " +
@@ -16,6 +16,8 @@ public class TestJSReview {
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
+                "--temparature " +
+                "0.0F " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

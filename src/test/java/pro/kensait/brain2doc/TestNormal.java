@@ -6,7 +6,7 @@ public class TestNormal {
     @Test
     public void testSimple1() {
         String parameter = "" +
-                "C:\\tmp\\params " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--resource " +
                 "java " +
                 "--gen " +
@@ -14,7 +14,7 @@ public class TestNormal {
                 "--output-scale " +
                 "medium " + 
                 "--dest " +
-                "C:/tmp/aaa/sdsaaa/tmp2.md " + 
+                "C:/tmp/tmp2.md " + 
                 "--print-prompt" +
                 "";
         String[] params = parameter.split(" ");

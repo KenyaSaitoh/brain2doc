@@ -38,6 +38,7 @@ public class Parameter {
     private int retryCount; // デフォルト値はプロパティファイルから
     private int retryInterval; // デフォルト値はプロパティファイルから
     private boolean isAutoSplitMode; // デフォルト値false
+    private float temparature;
     private boolean printPrompt;
 
     synchronized public static void setUp(String[] args) {
@@ -70,6 +71,8 @@ public class Parameter {
         int retryInterval = Integer.parseInt(
                 DefaultValueHolder.getProperty("retry_interval"));
         boolean isAutoSplitMode = false;
+        float temparature = Float.parseFloat(
+                DefaultValueHolder.getProperty("temparature"));
 
         // ソースパスの設定
         String srcParam = args[0];
@@ -162,6 +165,10 @@ public class Parameter {
                         retryInterval = Integer.parseInt(args[++i]);
                     } else if (args[i].equalsIgnoreCase("--auto-split")) {
                         isAutoSplitMode = true;
+                    } else if (args[i].equalsIgnoreCase("--temparature")) {
+                        if (args[i + 1].startsWith("-"))
+                            continue;
+                        temparature = Float.parseFloat(args[++i]);
                     } else {
                         throw new IllegalArgumentException(
                                 "パラメータが不正です => \"" + args[i] + "\"");
@@ -236,7 +243,7 @@ public class Parameter {
                 locale, templateFile,
                 maxSplitCount,
                 proxyURL, connectTimeout, requestTimeout, retryCount, retryInterval,
-                isAutoSplitMode, true);
+                isAutoSplitMode, temparature, true);
     }
 
     private static String getDefaultOutputFileName(ResourceType resourceType,
@@ -264,6 +271,7 @@ public class Parameter {
             String proxyURL, int connectTimeout, int requestTimeout,
             int retryCount, int retryInterval,
             boolean isAutoSplitMode,
+            float temparature,
             boolean printPrompt) {
         this.openaiURL = openaiURL;
         this.openaiModel = openaiModel;
@@ -285,6 +293,7 @@ public class Parameter {
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
         this.isAutoSplitMode = isAutoSplitMode;
+        this.temparature = temparature;
         this.printPrompt = printPrompt;
     }
 
@@ -368,6 +377,10 @@ public class Parameter {
         return isAutoSplitMode;
     }
 
+    public float getTemparature() {
+        return temparature;
+    }
+
     public boolean isPrintPrompt() {
         return printPrompt;
     }
@@ -388,6 +401,6 @@ public class Parameter {
                 + ", connectTimeout=" + connectTimeout + ", requestTimeout="
                 + requestTimeout + ", retryCount=" + retryCount + ", retryInterval="
                 + retryInterval + ", isAutoSplitMode=" + isAutoSplitMode
-                + ", printPrompt=" + printPrompt + "]";
+                + ", printPrompt=" + printPrompt + ", temparature=" + temparature + "]";
     }
 }

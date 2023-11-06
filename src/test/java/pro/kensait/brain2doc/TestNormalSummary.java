@@ -6,7 +6,7 @@ public class TestNormalSummary {
     @Test
     public void testSimple1() {
         String parameter = "" +
-                "C:\\tmp\\params " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--resource " +
                 "java " +
                 "--gen " +

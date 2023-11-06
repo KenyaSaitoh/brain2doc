@@ -7,7 +7,7 @@ public class TestJavaSpec {
     @Test
     public void testJavaSpec() {
         String parameter = "" +
-                "D:\\Java\\brain2doc-src\\jackson-core-2.16\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
+                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
                 "--resource " +
                 "java " +
                 "--gen " +
