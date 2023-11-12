@@ -60,8 +60,6 @@ import pro.kensait.brain2doc.exception.TimeoutException;
         Message assistantMessage = new Message("assistant", assistantMessageStr);
         Message userMessage = new Message("user", userMessageContent);
 
-        System.out.println("##########" + temparature);
-        
         RequestBody requestBody = new RequestBody(
                 openAiModel,
                 List.of(systemMessage, assistantMessage, userMessage),
