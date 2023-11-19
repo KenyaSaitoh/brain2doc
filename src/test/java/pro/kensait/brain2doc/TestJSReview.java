@@ -18,6 +18,8 @@ public class TestJSReview {
                 "C:/tmp/output " +
                 "--temparature " +
                 "0.0F " +
+                "--model " +
+                "gpt-4-1106-preview " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);

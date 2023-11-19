@@ -22,6 +22,9 @@ ZIP files will also be processed recursively.
 --apikey
     Specify the API key (if not specified, it will be retrieved from the environment variable "OPENAI_API_KEY").
 
+--temperature
+    Adjusting the spread of a probability distribution (default is 0.7F).
+
 --resource
     Specify the type of input resource (default is "others").
     Available types are:
@@ -32,6 +35,9 @@ ZIP files will also be processed recursively.
     page : Page file (extensions ".page", ".html", ".htm", ".xhtml", ".jsp" are targeted).
     shell : Shell script (extensions ".sh", ".bash", ".ksh", ".bash" are targeted).
     others : General resources other than the above.
+
+--charset
+    Specifies the character encoding of the input resource (default is "UTF-8")
 
 --gen
     Specify what you want to generate from the resource (you can't specify both "--gen" and "--gen-table").

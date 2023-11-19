@@ -26,10 +26,13 @@ public class SuccessResponseBody {
     @JsonProperty(value = "error")
     private Error error;
 
+    @JsonProperty(value = "system_fingerprint")
+    private String systemFingerprint;
+
     public SuccessResponseBody() {}
 
     public SuccessResponseBody(String id, String object, Long created, String model,
-            List<Choice> choices, Usage usage, Error error) {
+            List<Choice> choices, Usage usage, Error error, String systemFingerprint) {
         this.id = id;
         this.object = object;
         this.created = created;
@@ -37,6 +40,7 @@ public class SuccessResponseBody {
         this.choices = choices;
         this.usage = usage;
         this.error = error;
+        this.systemFingerprint = systemFingerprint;
     }
 
     public String getId() {
@@ -95,10 +99,19 @@ public class SuccessResponseBody {
         this.error = error;
     }
 
+    public String getSystemFingerprint() {
+        return systemFingerprint;
+    }
+
+    public void setSystemFingerprint(String systemFingerprint) {
+        this.systemFingerprint = systemFingerprint;
+    }
+
     @Override
     public String toString() {
-        return "ResponseBody [id=" + id + ", object=" + object + ", created=" + created
-                + ", model=" + model + ", choices=" + choices + ", usage=" + usage
-                + ", error=" + error + "]";
+        return "SuccessResponseBody [id=" + id + ", object=" + object + ", created="
+                + created + ", model=" + model + ", choices=" + choices + ", usage="
+                + usage + ", error=" + error + ", systemFingerprint=" + systemFingerprint
+                + "]";
     }
 }

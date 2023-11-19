@@ -5,9 +5,12 @@ import static pro.kensait.brain2doc.common.Util.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +33,7 @@ import java.util.zip.ZipInputStream;
 
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.ConstMapHolder;
+import pro.kensait.brain2doc.config.DefaultValueHolder;
 import pro.kensait.brain2doc.exception.OpenAIClientException;
 import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
 import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
@@ -127,7 +131,10 @@ public class Flow {
                         .matches(param.getSrcRegex())) {
                     return;
                 }
-                List<String> inputFileLines = Files.readAllLines(inputFilePath);
+
+                List<String> inputFileLines = Files.readAllLines(
+                        inputFilePath,
+                        Charset.forName(param.getCharset()));
                 mainProcess(inputFilePath, inputFileLines);
             }
         } catch(IOException ioe) {
@@ -471,8 +478,9 @@ public class Flow {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        try (FileWriter writer = new FileWriter(param.getDestFilePath().toString(),
-                true)) {
+        try (Writer writer = new OutputStreamWriter(
+                new FileOutputStream(param.getDestFilePath().toString(), true),
+                Charset.forName(DefaultValueHolder.getProperty("charset")))) {
             writer.append(responseContent);
             writer.flush();
         } catch (IOException ioe) {

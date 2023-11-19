@@ -18,6 +18,10 @@ public class TestAPITable {
                 "small " +
                 "--dest " +
                 "C:/tmp/output " +
+                "--temparature " +
+                "0.0F " +
+                "--model " +
+                "gpt-4-1106-preview " +
                 "--auto-split " +
                 "";
         String[] params = parameter.split(" ");

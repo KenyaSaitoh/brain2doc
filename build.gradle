@@ -2,7 +2,7 @@
 buildscript {
     ext {
         brain2docBaseName = "brain2doc"
-        brain2docVersion = "0.1.1"
+        brain2docVersion = "0.1.2"
     }
 }
 
