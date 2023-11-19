@@ -86,6 +86,9 @@ The available options are:
     shell  : Shell script (targets files with ".sh", ".bash", ".ksh", ".bash" extensions)
     others : General resources other than the above
 
+--charset
+    Specifies the character encoding of the input resource (default is "UTF-8")
+
 --gen
     Specify what you want to generate from the resource ("--gen" and "--gen-table" are mutually exclusive).
     Available types are:
