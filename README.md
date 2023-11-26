@@ -156,7 +156,7 @@ The available options are:
 # Example input command
 
 ```
-java -jar brain2doc-0.1.1.jar \
+java -jar brain2doc-0.1.3.jar \
 c://src-target/jackson/src/main/java/com/fasterxml/jackson/core/base \
 --resource java \
 --gen spec \
