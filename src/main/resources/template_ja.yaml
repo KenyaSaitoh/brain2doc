@@ -4,18 +4,15 @@ message:
   # assistant
   constraints: "[制約条件]"
   continuing: "先ほどのソースの続きです。"
-  char-limit-prefix: 回答は
-  char-limit-suffix: 文字以内でお願いします。
+  char-limit: 回答は、%d文字以内でお願いします。
   markdown-level: マークダウンの見出しは、タイトルにレベル2を使用し、それ以外はレベル4以上にしてください。
   lang: 回答は日本語でお願いします。
   # user
   title: "[命令書]"
-  table-prefix: 入力ソースの中から、
-  table-suffix: 
-    の一覧を、マークダウンのテーブル形式で出力してください。
+  table: |
+    入力ソースの中から、%sの一覧を、マークダウンのテーブル形式で出力してください。
     存在しない場合、回答は不要です。
-  fields-prefix: テーブルの列名は、
-  fields-suffix: でお願いします。
+  fields: テーブルの列名は、[%s]でお願いします。
   default-gen: |
     制約条件に基づいて、入力ソースの解析をお願いします。
     結果は、マークダウン形式で出力してください。

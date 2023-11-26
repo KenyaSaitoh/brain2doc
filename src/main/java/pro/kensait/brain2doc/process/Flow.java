@@ -34,19 +34,19 @@ import java.util.zip.ZipInputStream;
 import pro.kensait.brain2doc.common.Const;
 import pro.kensait.brain2doc.config.ConstMapHolder;
 import pro.kensait.brain2doc.config.DefaultValueHolder;
-import pro.kensait.brain2doc.exception.OpenAIClientException;
-import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
-import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
-import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
-import pro.kensait.brain2doc.exception.OpenAITokenLimitOverException;
-import pro.kensait.brain2doc.exception.RetryCountOverException;
-import pro.kensait.brain2doc.openai.ApiClient;
-import pro.kensait.brain2doc.openai.ApiResult;
-import pro.kensait.brain2doc.openai.SuccessResponseBody;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.params.ResourceType;
 import pro.kensait.brain2doc.process.TemplateAttacher.Prompt;
 import pro.kensait.brain2doc.transform.TransformStrategy;
+import pro.kensait.openai.api.client.ApiClient;
+import pro.kensait.openai.api.client.ApiResult;
+import pro.kensait.openai.api.entity.SuccessResponseBody;
+import pro.kensait.openai.api.exception.OpenAIClientException;
+import pro.kensait.openai.api.exception.OpenAIInsufficientQuotaException;
+import pro.kensait.openai.api.exception.OpenAIInvalidAPIKeyException;
+import pro.kensait.openai.api.exception.OpenAIRateLimitExceededException;
+import pro.kensait.openai.api.exception.OpenAITokenLimitOverException;
+import pro.kensait.openai.api.exception.RetryCountOverException;
 
 /*
  * 処理フローを表すクラス

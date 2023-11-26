@@ -1,25 +1,22 @@
 message:
   # system
-  system: You are a "professional engineer".
+  system: You are a "Professional Engineer".
   # assistant
-  constraints: "[constraints]"
-  continuing: "This is a continuation of the previous source."
-  char-limit-prefix: The answer should be
-  char-limit-suffix: characters or less.
-  markdown-level: For markdown headings, use level 2 for the title and level 4 or higher for the rest.
-  lang: Answers should be in English.
+  constraints: "[Constraints]"
+  continuing: "Continuing from the previous source."
+  char-limit: Please keep the response within %d characters.
+  markdown-level: Use level 2 for headings in titles, and level 4 or higher for others in Markdown.
+  lang: Please respond in English.
   # user
-  title: "[instructions]"
-  table-prefix: From the input source,
-  table-suffix: 
-    list them in a markdown table format.
-    If not present, no answer is required.
-  fields-prefix: The column names for the table should be
-  fields-suffix: Please use
+  title: "[Directive]"
+  table: |
+    From the input source, output a list of %s in Markdown table format.
+    If it does not exist, no response is needed.
+  fields: Please use [%s] as the column names of the table.
   default-gen: |
-    Please analyze the input source based on the constraints.
-    Please output the results in markdown format.
-  input: "[Input source]"
+    Based on the constraints, please analyze the input source.
+    Output the results in Markdown format.
+  input: "[Input Source]"
 java: 
   spec: |
     Based on the constraints and input source, please produce the best class specification in markdown format.

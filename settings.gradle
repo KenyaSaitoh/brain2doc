@@ -1,0 +1,2 @@
+include ':openai_common'
+project(':openai_common').projectDir = new File(settingsDir, '../openai_common')

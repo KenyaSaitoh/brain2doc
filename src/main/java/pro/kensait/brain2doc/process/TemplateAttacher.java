@@ -69,22 +69,14 @@ public class TemplateAttacher {
      */
     @SuppressWarnings("rawtypes")
     private static String getScaleString(Map messageMap, OutputScaleType outputSizeType) {
+        String template = (String) (messageMap.get("char-limit"));
         switch (outputSizeType) {
         case SMALL:
-            return (String) (messageMap.get("char-limit-prefix")) +
-                    OutputScaleType.SMALL.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix")) +
-                    LINE_SEP;
+            return String.format(template, OutputScaleType.SMALL.getCharSize()) + LINE_SEP;
         case MEDIUM:
-            return (String) (messageMap.get("char-limit-prefix")) +
-                    OutputScaleType.MEDIUM.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix")) +
-                    LINE_SEP;
+            return String.format(template, OutputScaleType.MEDIUM.getCharSize()) + LINE_SEP;
         case LARGE:
-            return (String) (messageMap.get("char-limit-prefix")) +
-                    OutputScaleType.LARGE.getCharSize() +
-                    (String) (messageMap.get("char-limit-suffix")) +
-                    LINE_SEP;
+            return String.format(template, OutputScaleType.LARGE.getCharSize()) + LINE_SEP;
         default:
             return "";
         }
@@ -96,13 +88,9 @@ public class TemplateAttacher {
     @SuppressWarnings("rawtypes")
     private static String getTableTemplateStr(Map messageMap, String genTable,
             String fields) {
-        String str1 = (String) (messageMap.get("table-prefix")) +
-                genTable +
-                (String) (messageMap.get("table-suffix")) + LINE_SEP;
-        String str2 = (String) (messageMap.get("fields-prefix")) + "[" +
-                fields + "]" +
-                (String) (messageMap.get("fields-suffix"));
-        return str1 + str2;
+        String template1 = (String) (messageMap.get("table"));
+        String template2 = (String) (messageMap.get("fields"));
+        return String.format(template1, genTable) + LINE_SEP + String.format(template2, fields);
     }
 
     /*

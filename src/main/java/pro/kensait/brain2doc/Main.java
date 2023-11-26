@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Locale;
 
 import pro.kensait.brain2doc.config.HelpMessageHolder;
-import pro.kensait.brain2doc.exception.OpenAIClientException;
-import pro.kensait.brain2doc.exception.OpenAIInsufficientQuotaException;
-import pro.kensait.brain2doc.exception.OpenAIInvalidAPIKeyException;
-import pro.kensait.brain2doc.exception.OpenAIRateLimitExceededException;
-import pro.kensait.brain2doc.exception.RetryCountOverException;
 import pro.kensait.brain2doc.params.Parameter;
 import pro.kensait.brain2doc.process.Flow;
+import pro.kensait.openai.api.exception.OpenAIClientException;
+import pro.kensait.openai.api.exception.OpenAIInsufficientQuotaException;
+import pro.kensait.openai.api.exception.OpenAIInvalidAPIKeyException;
+import pro.kensait.openai.api.exception.OpenAIRateLimitExceededException;
+import pro.kensait.openai.api.exception.RetryCountOverException;
 
 /*
  * brain2docを起動するメインクラス

@@ -7,7 +7,7 @@ public class TestAPITable {
     @Test
     public void testTable() {
         String parameter = "" +
-                "D:\\GitHubRepos\\spring_boot2_repo\\spring_rs_person\\src\\main\\java " +
+                "D:\\GitHubRepos\\springboot_projects\\spring_boot2_repo\\spring_rs_person\\src\\main\\java " +
                 "--resource " +
                 "java " +
                 "--gen-table " +
