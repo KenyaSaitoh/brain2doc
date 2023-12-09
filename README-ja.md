@@ -38,7 +38,7 @@ brain2docは、OpenAIのAPIによって、ソースコードからドキュメ�
 
 # Requirement
 
-本ツールを動作させるには、Java 11以上の環境が必要です。
+本ツールを動作させるには、Java 17以上の環境が必要です。
 
 # Installation
 
