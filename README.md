@@ -40,7 +40,7 @@ When you input the command as described below, it recursively reads the Java sou
 
 # Requirement
 
-To operate this tool, you need an environment with Java 11 or higher.
+To operate this tool, you need an environment with Java 17 or higher.
 
 # Installation
 
