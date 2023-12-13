@@ -2,6 +2,8 @@
 
 brain2docは、OpenAIのAPIによって、ソースコードからドキュメントを一括生成するツールです。
 
+![image](https://github.com/KenyaSaitoh/brain2doc/assets/5621884/e7092efb-3fa5-4ca2-994a-b41035f7b2c1)
+
 # DEMO英語版 (20秒)
 
 以下のようにコマンドを投入すると、指定されたディレクトリに配置されたJavaソースを再帰的に読み込み、Open AIのAPIを呼び出して仕様書を一括で作成できます（マークダウン形式）。
