@@ -7,18 +7,15 @@ public class TestLarge {
     @Test
     public void testLargeRequest() {
         String parameter = "" +
-                "D:\\src-target\\jackson\\src\\main\\java\\com\\fasterxml\\jackson\\core\\base " +
+                "D:\\GitHubRepos\\udemy_projects\\learn_java_testing\\junit5\\src\\main\\java " +
                 "--resource " +
                 "java " +
                 "--gen " +
-                "review " +
-                "--output-scale " +
-                "small " +
+                "writing " +
                 "--dest " +
-                "C:/tmp/output " +
-                "--auto-split " +
-                "--model " +
-                "gpt-3.5-turbo" +
+                "D:\\LetsLearn\\OpenAITest\\output\\junit-src-explanation.md " +
+                "--template " +
+                "D:\\LetsLearn\\OpenAITest\\template_writing.yaml " +
                 "";
         String[] params = parameter.split(" ");
         Main.main(params);
